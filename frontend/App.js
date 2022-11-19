@@ -1,10 +1,19 @@
-import { StatusBar } from 'expo-status-bar';
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
+import {Worker} from "Worker"
 
 export default function App() {
+  let [user, sUser] = useState(undefined);
+
+  useEffect(() => {
+    // Run! Like go get some data from an API.
+    let checkLoggedInResponse = Worker.checkIfUserLoggedin();
+    sUser(checkLoggedInResponse['user']);
+  }, []);
   return (
     <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
+      {user !== undefined && <Text>loggedin</Text>}
+      {user === undefined && <Text>Not loggedin</Text>}
       <StatusBar style="auto" />
     </View>
   );
