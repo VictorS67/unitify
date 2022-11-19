@@ -58,7 +58,7 @@ const rankSchema = new mongoose.Schema(
             required:true
         },
         timeStamp:{
-            type:String,
+            type:Date,
             required:true
         }
     }
@@ -76,7 +76,7 @@ const mileSchema = new mongoose.Schema(
             required:true
         },
         timeStamp:{
-            type:String,
+            type:Date,
             required:true
         }
     }
@@ -97,10 +97,14 @@ const transportationSchema = new mongoose.Schema(
             type:String,
             required:true
         },
+        speed:{
+            type: number,
+            required: true
+        },
         timeStamp:{
-            type:String,
-            required:true
-        } 
+                    type:Date,
+                    required:true
+         }
     }
 )
 
@@ -120,7 +124,7 @@ const questionnaireSchema = new mongoose.Schema(
             required:true
         },
         timeStamp:{
-            type:String,
+            type:Date,
             required:true
         }
     }
