@@ -1,13 +1,11 @@
 import React from "react";
-
-import LoginUser from "./components/Users/LoginUser";
+import { View } from 'react-native';
+import LoginUser from "./Users/LoginUser";
 
 
 function App() {
     return (
-        <div>
-            <LoginUser />
-        </div>
+        <LoginUser />
     );
 }
 
