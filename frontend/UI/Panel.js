@@ -2,7 +2,7 @@ import React from "react";
 import { View, StyleSheet } from 'react-native';
 
 
-const Card = props => {
+const Panel = props => {
     return (
         <View style={styles.card}>
             <View style={styles.cardContent}>
@@ -14,15 +14,8 @@ const Card = props => {
 
 const styles = StyleSheet.create({
     card: {
-        borderRadius: 6,
         elevation: 3,
-        backgroundColor: '#fff',
-        shadowOffset: { width: 1, height: 1 },
-        shadowColor: '#333',
-        shadowOpacity: 0.3,
-        shadowRadius: 2,
-        marginHorizontal: 5,
-        marginVertical: 5
+        backgroundColor: '#fff'
     },
     cardContent: {
         marginHorizontal: 5,
@@ -30,4 +23,4 @@ const styles = StyleSheet.create({
     }
 })
 
-export default Card;
+export default Panel;

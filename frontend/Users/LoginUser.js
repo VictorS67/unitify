@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Text, Alert, Button, TextInput, View, StyleSheet, Linking } from 'react-native';
 
-// import styles from "./LoginUser.css"
+
 import Card from "../UI/Card";
 
 const LoginUser = props => {
@@ -49,7 +49,7 @@ const LoginUser = props => {
                 </Card>
 
                 <Text style={[styles.linkText, styles.normalText]} onPress={() => Linking.openURL(url)}>
-                    forgot your password?
+                    Forgot your password?
                 </Text>
             </View>
 
@@ -62,10 +62,10 @@ const LoginUser = props => {
 
             <Text style={styles.signupText}>
                 <Text>
-                    don't have account?&nbsp;
+                    Don't have account?&nbsp;
                 </Text>
                 <Text style={styles.linkText} onPress={() => Linking.openURL(url)}>
-                    register one
+                    Register one
                 </Text>
             </Text>
         </View>
@@ -96,7 +96,8 @@ const styles = StyleSheet.create({
     },
     signupText: {
         width: 300,
-        textAlign: "center"
+        textAlign: "center",
+        marginTop: 20
     },
     titleText: {
         fontSize: 32,
