@@ -6,8 +6,8 @@ import { normalize } from "../Tool/FontSize";
 
 const MileCard = props => {
     return (
-        <View style={{ flex: 0.8, backgroundColor: "orange", padding: normalize(10) }}>
-            <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: normalize(5) }}>
+        <View style={styles.mileCard}>
+            <View style={styles.mileCardTitle}>
                 <Text style={styles.titleText}>
                     Miles
                 </Text>
@@ -18,7 +18,7 @@ const MileCard = props => {
                     </Text>
                 </Pressable>
             </View>
-            <View style={{ flexDirection: "row", justifyContent: "space-around" }}>
+            <View style={styles.mileCardContent}>
                 <View style={styles.statCard}>
                     <Text style={styles.mileText}>
                         3
@@ -51,6 +51,23 @@ const MileCard = props => {
 };
 
 const styles = StyleSheet.create({
+    mileCard: { 
+        flex: 0.8, 
+        backgroundColor: "orange", 
+        padding: normalize(10),
+        height: "100%"
+    },
+    mileCardTitle: { 
+        flexDirection: "row", 
+        justifyContent: "space-between", 
+        paddingBottom: normalize(5) 
+    },
+    mileCardContent: { 
+        flexDirection: "row", 
+        justifyContent: "space-around",
+        alignItems: "center",
+        flexGrow: 1
+    },
     titleText: {
         fontSize: normalize(18),
         textAlign: "left",

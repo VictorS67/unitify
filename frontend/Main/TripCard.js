@@ -1,5 +1,5 @@
 import React from "react";
-import { Text, View, StyleSheet, Pressable } from 'react-native';
+import { Text, View, StyleSheet, Pressable, useWindowDimensions } from 'react-native';
 import { FontAwesome5, MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
 
 import Card from "../UI/Card";
@@ -18,10 +18,11 @@ function secondsToHms(d) {
 const TripCard = props => {
 
     const [hour, minute] = secondsToHms(props.duration);
+    const { height, width, scale, fontScale } = useWindowDimensions();
 
     return (
-        <View style={{ flex: 1, justifyContent: "space-between", backgroundColor: "green", padding: normalize(10) }}>
-            <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: normalize(5) }}>
+        <View style={styles.tripCard}>
+            <View style={styles.tripCardTitle}>
                 <Text style={styles.titleText}>
                     Current Trip
                 </Text>
@@ -32,12 +33,12 @@ const TripCard = props => {
                     </Text>
                 </Pressable>
             </View>
-            <View style={{ flex: 1, flexDirection: "row", justifyContent: "space-around" }}>
+            <View style={styles.tripCardContent}>
                 <View style={styles.flexColumn}>
                     <Text style={styles.cardText}>
                         Distance
                     </Text>
-                    <Card style={styles.statCard} childrenStyle={styles.userCardContent}>
+                    <Card style={{ width: normalize(0.1 * width), height: normalize(0.1 * width) }} childrenStyle={styles.userCardContent}>
                         <MaterialCommunityIcons name="map-marker-distance" size={normalize(24)} color="black" />
                     </Card>
                     <Text style={styles.cardText}>
@@ -49,11 +50,12 @@ const TripCard = props => {
                         </Text>
                     </Text>
                 </View>
+
                 <View style={styles.flexColumn}>
                     <Text style={styles.cardText}>
                         Duration
                     </Text>
-                    <Card style={styles.statCard} childrenStyle={styles.userCardContent}>
+                    <Card style={{ width: normalize(0.1 * width), height: normalize(0.1 * width) }} childrenStyle={styles.userCardContent}>
                         <FontAwesome5 name="clock" size={normalize(24)} color="black" />
                     </Card>
                     <Text style={styles.cardText}>
@@ -76,7 +78,7 @@ const TripCard = props => {
                     <Text style={styles.cardText}>
                         Speed
                     </Text>
-                    <Card style={styles.statCard} childrenStyle={styles.userCardContent}>
+                    <Card style={{ width: normalize(0.1 * width), height: normalize(0.1 * width) }} childrenStyle={styles.userCardContent}>
                         <Ionicons name="speedometer" size={normalize(24)} color="black" />
                     </Card>
                     <Text style={styles.cardText}>
@@ -93,7 +95,7 @@ const TripCard = props => {
                     <Text style={styles.cardText}>
                         Pause
                     </Text>
-                    <Card style={styles.statCard} childrenStyle={styles.userCardContent}>
+                    <Card style={{ width: normalize(0.1 * width), height: normalize(0.1 * width) }} childrenStyle={styles.userCardContent}>
                         <FontAwesome5 name="hand-paper" size={normalize(24)} color="black" />
                     </Card>
                     <Text style={styles.cardText}>
@@ -109,6 +111,23 @@ const TripCard = props => {
 
 
 const styles = StyleSheet.create({
+    tripCard: { 
+        flex: 1, 
+        justifyContent: "space-between", 
+        backgroundColor: "green", 
+        padding: normalize(10) 
+    },
+    tripCardTitle: { 
+        flexDirection: "row", 
+        justifyContent: "space-between", 
+        paddingBottom: normalize(5) 
+    },
+    tripCardContent: {
+        flexDirection: "row", 
+        justifyContent: "space-around",
+        alignItems: "center",
+        flexGrow: 1
+    },
     userCardContent: {
         flex: 1,
         alignItems: 'center', 
@@ -128,7 +147,9 @@ const styles = StyleSheet.create({
     },
     flexColumn: {
         flex: 1,
-        alignItems: "center"
+        alignItems: "center",
+        justifyContent: "center",
+        height: "50%"
     },
     button: {
         flexDirection: "row",
@@ -144,8 +165,8 @@ const styles = StyleSheet.create({
         fontWeight: "bold"
     },
     statCard: { 
-        width: normalize(40), 
-        height: normalize(40) 
+        width: "60%", 
+        height: "100%"
     }
 });
 

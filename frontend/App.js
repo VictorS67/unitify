@@ -6,7 +6,7 @@ import MainPage from "./Main/Main";
 
 function App() {
     return (
-        <LoginUser/>
+        <MainPage/>
     );
 }
 
