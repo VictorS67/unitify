@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { Text, Alert, Button, TextInput, View, StyleSheet, Linking } from 'react-native';
 
-
 import Card from "../UI/Card";
+import { normalize } from "../Tool/FontSize";
 
 const LoginUser = props => {
 
@@ -80,42 +80,42 @@ const styles = StyleSheet.create({
         backgroundColor: '#ecf0f1'
     },
     input: {
-        width: 300,
-        height: 44,
-        padding: 5
+        width: normalize(250),
+        height: normalize(40),
+        padding: normalize(5)
     },
     loginButton: {
-        width: 300,
-        height: 44,
-        marginHorizontal: 5,
-        marginVertical: 5
+        width: normalize(250),
+        height: normalize(40),
+        marginHorizontal: normalize(5),
+        marginVertical: normalize(5)
     },
     linkText: {
         color: 'black',
         textDecorationLine: "underline"
     },
     signupText: {
-        width: 300,
+        width: normalize(250),
         textAlign: "center",
-        marginTop: 20
+        marginTop: normalize(20)
     },
     titleText: {
-        fontSize: 32,
+        fontSize: normalize(30),
         textAlign: "center",
-        marginBottom: 15
+        marginBottom: normalize(14)
     },
     subtitleText: {
-        fontSize: 20,
+        fontSize: normalize(18),
         textAlign: "center",
-        marginVertical: 8
+        marginVertical: normalize(8)
     },
     normalText: {
-        fontSize: 12,
+        fontSize: normalize(12),
         textAlign: "right",
-        marginEnd: 5
+        marginEnd: normalize(10)
     },
     loginBox: {
-        marginVertical: 20
+        marginVertical: normalize(20)
     }
 });
 

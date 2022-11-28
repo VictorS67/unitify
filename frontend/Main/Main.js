@@ -36,7 +36,7 @@ const styles = StyleSheet.create({
     },
     userCard: {
         marginLeft: normalize(20),
-        marginTop: normalize(35),
+        marginTop: normalize(30),
         width: normalize(50),
         height: normalize(50),
         borderRadius: normalize(50/2)
