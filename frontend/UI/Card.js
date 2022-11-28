@@ -4,8 +4,8 @@ import { View, StyleSheet } from 'react-native';
 
 const Card = props => {
     return (
-        <View style={styles.card}>
-            <View style={styles.cardContent}>
+        <View style={[styles.card, props.style]}>
+            <View style={[styles.cardContent, props.childrenStyle]}>
                 {props.children}
             </View>
         </View>
