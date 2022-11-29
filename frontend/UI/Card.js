@@ -1,6 +1,7 @@
 import React from "react";
 import { View, StyleSheet } from 'react-native';
 
+import { normalize } from "../Tool/FontSize";
 
 const Card = props => {
     return (
@@ -14,19 +15,19 @@ const Card = props => {
 
 const styles = StyleSheet.create({
     card: {
-        borderRadius: 6,
+        borderRadius: normalize(6),
         elevation: 3,
         backgroundColor: '#fff',
         shadowOffset: { width: 1, height: 1 },
         shadowColor: '#333',
         shadowOpacity: 0.3,
-        shadowRadius: 2,
-        marginHorizontal: 5,
-        marginVertical: 5
+        shadowRadius: normalize(2),
+        marginHorizontal: normalize(5),
+        marginVertical: normalize(5)
     },
     cardContent: {
-        marginHorizontal: 5,
-        marginVertical: 5
+        marginHorizontal: normalize(5),
+        marginVertical: normalize(5)
     }
 })
 

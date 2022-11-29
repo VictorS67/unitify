@@ -3,6 +3,7 @@ import { Text, View, StyleSheet, useWindowDimensions, Pressable } from 'react-na
 import { FontAwesome5, MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
 
 import Card from "../UI/Card";
+import StatusBar from "../UI/StatusBar";
 import TripCard from "./TripCard";
 import UsageCard from "./UsageCard";
 import MileCard from "./MileCard";
@@ -36,7 +37,7 @@ const styles = StyleSheet.create({
     },
     userCard: {
         marginLeft: normalize(20),
-        marginTop: normalize(30),
+        marginTop: normalize(35),
         width: normalize(50),
         height: normalize(50),
         borderRadius: normalize(50/2)
