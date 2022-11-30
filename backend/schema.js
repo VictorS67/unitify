@@ -1,5 +1,5 @@
 const mongoose = require('mongoose')
-
+const ObjectId = require('mongodb').ObjectID;
 // const userSchema = new mongoose.Schema(
 //     {
 //         username: {
@@ -11,10 +11,6 @@ const mongoose = require('mongoose')
 
 const userSchema = new mongoose.Schema( 
     {
-        userid:{
-        type:ObjectId,
-        required: true
-        },
         userName:{
             type:String,
             equired: true
@@ -23,21 +19,25 @@ const userSchema = new mongoose.Schema(
             type: String,
             required: true
         },
+        pass: {
+            type: String, 
+            required: true
+        },
         avatarImage:{
             // dont know
         },
-        championSig:{
-            type:String,
-            required: true
-        },
-        backgroundImage:{
-            //type unknown
-            required:false
-        },
-        fontSize:{
-            type:Number,
-            required:false
-        },
+        // championSig:{
+        //     type:String,
+        //     required: true
+        // },
+        // backgroundImage:{
+        //     //type unknown
+        //     required:false
+        // },
+        // fontSize:{
+        //     type:Number,
+        //     required:false
+        // },
         //Palette etcs unkown
     }
 )
@@ -98,7 +98,7 @@ const transportationSchema = new mongoose.Schema(
             required:true
         },
         speed:{
-            type: number,
+            type: Number,
             required: true
         },
         timeStamp:{
