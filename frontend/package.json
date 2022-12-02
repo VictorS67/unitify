@@ -10,7 +10,10 @@
   },
   "dependencies": {
     "@expo/webpack-config": "^0.17.2",
+    "@turf/destination": "^6.5.0",
+    "@turf/helpers": "^6.5.0",
     "expo": "^47.0.8",
+    "expo-location": "^15.0.1",
     "expo-status-bar": "~1.4.2",
     "react": "18.1.0",
     "react-dom": "18.1.0",
