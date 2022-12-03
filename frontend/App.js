@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { Text, MaskedViewComponent, View, StyleSheet } from 'react-native';
+import React, { useState, useEffect, useRef } from "react";
+import { Text, MaskedViewComponent, View, StyleSheet, Button } from 'react-native';
 import { point } from '@turf/helpers';
 import destination from '@turf/destination';
 import * as Location from "expo-location";
@@ -11,7 +11,9 @@ import MapView from "react-native-maps";
 
 function App() {
 
+    const mapRef = useRef(null);
     const [location, sLocation] = useState(null);
+    const [position, sPosition] = useState(null);
     const [errorMsg, sErrorMsg] = useState(null);
 
     const [south, sSouth] = useState(null);
@@ -28,9 +30,15 @@ function App() {
                 return;
             }
         
-            let location = await Location.getCurrentPositionAsync({});
-            console.log(location)
-            sLocation(location);
+            let curr_location = await Location.getCurrentPositionAsync({});
+            console.log(curr_location)
+            sLocation(curr_location);
+            sPosition({
+                latitude: curr_location.coords.latitude,
+                longitude: curr_location.coords.longitude,
+                latitudeDelta: 0.02, 
+                longitudeDelta: 0.02
+            })
         })();
     }, []);
 
@@ -48,7 +56,13 @@ function App() {
         sWest(west.geometry.coordinates[0]);
         sNorth(north.geometry.coordinates[1]);
         sEast(east.geometry.coordinates[0]);
+        sPosition(region);
     }
+
+    const goToCurrentPosition = () => {
+        //Animate the user to new region. Complete this animation in 3 seconds
+        mapRef.current.animateToRegion(position);
+    };
 
     let text = 'Waiting..';
     if (errorMsg) {
@@ -61,18 +75,28 @@ function App() {
         <View style={styles.container}>
             {
                 location && 
-                <MapView 
-                    onRegionChangeComplete={onRegionChangeComplete}
-                    style={styles.map} 
-                    showsUserLocation
-                    initialRegion={{
-                        latitude: location.coords.latitude,
-                        longitude: location.coords.latitude,
-                        latitudeDelta: 0.02, 
-                        longitudeDelta: 0.02,
-                    }}
-                    provider={MapView.PROVIDER_GOOGLE}
-                />
+                position &&
+                <View style={styles.mapContainer}>
+                    <MapView 
+                        // onRegionChangeComplete={onRegionChangeComplete}
+                        style={styles.map} 
+                        showsUserLocation={true}
+                        initialRegion={position}
+                        provider={MapView.PROVIDER_GOOGLE}
+                        showsMyLocationButton={false}
+                        showsCompass={true}
+                        showsIndoors={true}
+                        showsIndoorLevelPicker={true}
+                        loadingEnabled={true}
+                        showsBuildings={false}
+                        showsTraffic={false}
+                        ref={mapRef} //assign our ref to this MapView
+                    >
+
+                    </MapView>
+
+                    <Button onPress={() => goToCurrentPosition()} title="Locate Myself" />
+                </View>
             }
 
             {/* <Text style={styles.map}>{text}</Text> */}
@@ -82,13 +106,20 @@ function App() {
 
 const styles = StyleSheet.create({
     container: {
-      flex: 1,
+        flex: 1,
+    },
+    mapContainer: {
+        ...StyleSheet.absoluteFillObject,
+        flex: 1,
+        alignItems: "center",
+        justifyContent: "flex-end"
     },
     map: {
-      width: '100%',
-      height: '100%',
-      textAlign: 'center'
+        ...StyleSheet.absoluteFillObject,
     },
+    button: {
+
+    }
 
 });
 
