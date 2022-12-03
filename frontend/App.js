@@ -19,15 +19,31 @@ const GOOGLE_MAP_API = "AIzaSyAtc6gbQfdI-YdE7SoIeBXJMPmSV_LuOCk";
 function App() {
 
     const mapRef = useRef(null);
-    const [location, sLocation] = useState(null);
+
+    // Current position of the user
     const [position, sPosition] = useState(null);
+    
+    // Origin information
+    const [origin, sOrigin] = useState(null);
+
+    // Destination information
+    const [destination, sDestination] = useState(null);
+
+    // Polylines from origin destination
+    const [polylines, sPolylines] = useState([]);
+
+    // Markers with customized text on map
+    const [markers, sMarkers] = useState([]);
+
+    // Error message for getting locations from user
     const [errorMsg, sErrorMsg] = useState(null);
 
-    const [south, sSouth] = useState(null);
-    const [west, sWest] = useState(null); 
-    const [north, sNorth] = useState(null);
-    const [east, sEast] = useState(null);
-    const [coords, sCoords] = useState([]);
+    const polyline_colors = {
+        "DRIVING": "#f07167",
+        "TRANSIT": "#00afb9",
+        "WALKING":  "#ef8354",
+        "BICYCLING": "#60d394"
+    }
 
     useEffect(() => {
         (async () => {
@@ -40,7 +56,6 @@ function App() {
         
             let curr_location = await Location.getCurrentPositionAsync({});
             console.log(curr_location)
-            sLocation(curr_location);
             sPosition({
                 latitude: curr_location.coords.latitude,
                 longitude: curr_location.coords.longitude,
@@ -49,22 +64,6 @@ function App() {
             })
         })();
     }, []);
-
-    const onRegionChangeComplete = (region) => {
-        const center = point([region.longitude, region.latitude]);
-        const verticalMeter = (111 * region.latitudeDelta) / 2;
-        const horizontalMeter = (111 * region.longitudeDelta) / 2;
-        const options = { units: 'kilometers' };
-        const south = destination(center, verticalMeter, 180, options);
-        const west = destination(center, horizontalMeter, -90, options);
-        const north = destination(center, verticalMeter, 0, options);
-        const east = destination(center, horizontalMeter, 90, options);
-
-        sSouth(south.geometry.coordinates[1]);
-        sWest(west.geometry.coordinates[0]);
-        sNorth(north.geometry.coordinates[1]);
-        sEast(east.geometry.coordinates[0]);
-    }
 
     const goToCurrentPosition = () => {
         //Animate the user to new region. Complete this animation in 3 seconds
@@ -89,9 +88,16 @@ function App() {
             `${coordinate.latitude},${coordinate.longitude}`
         )
         .then(
-            coords => {
-                sCoords(coords);
-                console.log(coords);
+            direction => {
+                // sCoords(coords);
+                // console.log(coords);
+
+                sOrigin(direction.origin);
+                sDestination(direction.destination);
+
+                console.log(direction.steps);
+                sPolylines(direction.steps);
+                sMarkers(direction.markers);
             }
         )
         .catch(
@@ -104,33 +110,65 @@ function App() {
     const getDirections = async (startLoc, destinationLoc) => {
         try {
             const KEY = GOOGLE_MAP_API; //put your API key here.
+
             //otherwise, you'll have an 'unauthorized' error.
             let resp = await fetch(
-                `https://maps.googleapis.com/maps/api/directions/json?origin=${startLoc}&destination=${destinationLoc}&key=${KEY}`
+                `https://maps.googleapis.com/maps/api/directions/json?origin=${startLoc}&destination=${destinationLoc}&key=${KEY}&departure_time=now&mode=transit&transit_mode=subway`
             );
             let respJson = await resp.json();
-            let points = decode(respJson.routes[0].overview_polyline.points);
-            console.log(points);
-            let coords = points.map((point, index) => {
-                return {
-                    latitude: point[0],
-                    longitude: point[1]
-                };
+            let leg = respJson.routes[0].legs[0];
+            let origin_info = {
+                "latitude": leg.start_location.lat,
+                "longitude": leg.start_location.lng,
+                "address": leg.start_address
+            }
+            let destination_info = {
+                "latitude": leg.end_location.lat,
+                "longitude": leg.end_location.lng,
+                "distance": leg.distance.text,
+                "duration": leg.duration.text,
+                "address": leg.end_address
+            }
+            let steps = leg.steps;
+            console.log(respJson.routes[0]);
+
+            let markers = steps.map((step) => {
+                console.log("STEP");
+                console.log(step);
+                console.log(step.steps);
+
+                let coords = decode(step.polyline.points).map((coord) => {
+                    return {
+                        "latitude": coord[0],
+                        "longitude": coord[1]
+                    }
+                });
+
+                let mid_coord = coords[Math.floor(coords.length / 2) + 1];
+
+                return mid_coord;
             });
-            return coords;
+
+            console.log("MARKER");
+            console.log(markers);
+
+            return {
+                "origin": origin_info,
+                "destination": destination_info,
+                "steps": steps,
+                "markers": markers
+            };
         } catch (error) {
             return error;
         }
-      };
+    };
 
     return (
         <View style={styles.container}>
             {
-                location && 
                 position &&
                 <View style={styles.mapContainer}>
                     <MapView 
-                        onRegionChangeComplete={onRegionChangeComplete}
                         onPress={onMapPress}
                         style={styles.map} 
                         showsUserLocation={true}
@@ -146,28 +184,67 @@ function App() {
                         ref={mapRef} //assign our ref to this MapView
                     >
                         {
+                            origin &&
                             <Marker
                                 coordinate={{
-                                    "latitude": position.latitude, 
-                                    "longitude": position.longitude
+                                    "latitude": origin.latitude, 
+                                    "longitude": origin.longitude
                                 }}
-                                title={"You are here"}
-                                key={"my_location"}
+                                title={origin.address}
+                                key={"origin_loc"}
                             />
                         }
                         {
-                            (coords.length >= 2) &&
+                            destination &&
                             <Marker
-                                coordinate={coords[coords.length - 1]}
-                                key={`selected_coord`}
+                                coordinate={{
+                                    "latitude": destination.latitude, 
+                                    "longitude": destination.longitude
+                                }}
+                                title={destination.address}
+                                description={`distance: ${destination.distance} duration: ${destination.duration}`}
+                                key={`destination_loc`}
                             />
                         }
                         {
-                            (coords.length >= 2) &&
-                            <Polyline 
-                                coordinates={coords}
-                                strokeWidth={6}
-                            />
+                            origin &&
+                            destination &&
+                            (polylines.length >= 1) &&
+                            (
+                                polylines.map((element, index)  => {
+
+                                    let coords = decode(element.polyline.points).map((coord) => {
+                                        return {
+                                            "latitude": coord[0],
+                                            "longitude": coord[1]
+                                        }
+                                    });
+
+                                    return (
+                                        <Polyline 
+                                            coordinates={coords}
+                                            strokeWidth={6}
+                                            strokeColor={polyline_colors[element.travel_mode]}
+                                            fillColor={polyline_colors[element.travel_mode]}
+                                            key={`polyline_${index}`}
+                                        />
+                                    )
+                                })
+                            )
+                        }
+                        {
+                            (markers.length >= 1) &&
+                            (
+                                markers.map((element, index)  => {
+
+                                    return (
+                                        <Marker 
+                                            coordinate={element}
+                                            key={`marker_${index}`}
+                                        />
+                                    )
+                                })
+                            )
                         }
                     </MapView>
 
