@@ -158,6 +158,7 @@ const locationSchema = new mongoose.Schema({
     {
         timestamps: {
             createdAt: 'created_at',
+            updatedAt: 'updatedAt'
         }
     }
 
