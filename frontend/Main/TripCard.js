@@ -1,5 +1,5 @@
 import React from "react";
-import { Text, View, StyleSheet, Pressable, useWindowDimensions } from 'react-native';
+import { Text, View, StyleSheet, Pressable, useWindowDimensions, KeyboardAvoidingView, Platform } from 'react-native';
 import { FontAwesome5, MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
 
 import Card from "../UI/Card";
@@ -158,7 +158,7 @@ const styles = StyleSheet.create({
         paddingVertical: normalize(5),
         paddingHorizontal: normalize(10),
         borderRadius: normalize(4),
-        elevation: 3,
+        // elevation: 3,
         backgroundColor: 'orange'
     },
     statText: {
