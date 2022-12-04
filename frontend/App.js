@@ -1,10 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Text, TextInput, View, StyleSheet, Button, TouchableOpacity } from 'react-native';
-import { point } from '@turf/helpers';
-import destination from '@turf/destination';
 import * as Location from "expo-location";
 import MapView, { Marker, Polyline } from "react-native-maps";
-import MapViewDirections from 'react-native-maps-directions';
 import { decode } from "@mapbox/polyline";
 import { Ionicons, FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons';
 
@@ -20,6 +17,7 @@ const GOOGLE_MAP_API = "AIzaSyAtc6gbQfdI-YdE7SoIeBXJMPmSV_LuOCk";
 function App() {
 
     const mapRef = useRef(null);
+    const destinationAddRef = useRef(null);
 
     // Current position of the user
     const [position, sPosition] = useState(null);
@@ -321,12 +319,24 @@ function App() {
                     </MapView>
 
                     <View style={styles.inputContainer}>
-                        <TextInput
-                            value={destinationAdd ? destinationAdd : null}
-                            placeholder={'Where you want to go?'}
-                            onChangeText = {(searchString) => { sDestinationAdd(searchString) }}
-                            style={styles.input}
-                        />
+                        <View style={styles.inputBox}>
+                            <TextInput
+                                value={destinationAdd ? destinationAdd : null}
+                                placeholder={'Where you want to go?'}
+                                onChangeText = {(searchString) => { sDestinationAdd(searchString) }}
+                                style={styles.input}
+                                ref={destinationAddRef}
+                            />
+                            <TouchableOpacity 
+                                style={styles.buttonInputClear} 
+                                onPress={
+                                    () => { destinationAddRef.current.clear() }
+                                }
+                            > 
+                                <Ionicons name="close" size={normalize(18)} color="black" />
+                            </TouchableOpacity>
+                        </View>
+
                         <TouchableOpacity 
                             style={styles.buttonSquare} 
                             onPress={() => {
@@ -452,14 +462,19 @@ const styles = StyleSheet.create({
         flexWrap: 'wrap',
         width: "75%"
     },
-    input: {
+    inputBox: {
+        flexDirection: "row",
         width: "80%",
         height: "100%",
-        paddingVertical: normalize(5),
-        paddingHorizontal: normalize(10),
         backgroundColor: "white",
         marginHorizontal: normalize(3),
         borderRadius: normalize(20)
+    },
+    input: {
+        width: "85%",
+        height: "100%",
+        paddingVertical: normalize(5),
+        paddingHorizontal: normalize(10),
     },
     buttonContainer: {
         flexDirection: "row",
@@ -488,6 +503,11 @@ const styles = StyleSheet.create({
         height: "100%",
         borderRadius: normalize(5),
         marginHorizontal: normalize(3)
+    },
+    buttonInputClear: {
+        flex: 1,
+        alignItems: "center",
+        justifyContent: "center"
     },
     buttonActive: {
         backgroundColor: "#ff8d1e"
