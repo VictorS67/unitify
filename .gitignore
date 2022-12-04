@@ -115,6 +115,7 @@ frontend/*.key
 frontend/*.mobileprovision
 frontend/*.orig.*
 frontend/web-build/
+frontend/.env.local
 
 # macOS
 frontend/.DS_Store
