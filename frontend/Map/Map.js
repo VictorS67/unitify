@@ -167,7 +167,7 @@ function Map() {
                         initialRegion={position}
                         provider={MapView.PROVIDER_GOOGLE}
                         showsMyLocationButton={false}
-                        showsCompass={true}
+                        showsCompass={false}
                         showsIndoors={true}
                         showsIndoorLevelPicker={true}
                         loadingEnabled={true}

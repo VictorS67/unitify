@@ -8,7 +8,7 @@ import Map from "./Map/Map";
 function App() {
 
     return (
-        <MainPage />
+        <Map />
     );
 }
 
