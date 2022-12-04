@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Text, TextInput, View, StyleSheet, Button, TouchableOpacity } from 'react-native';
+import { Text, TextInput, View, SafeAreaView, StyleSheet, Button, TouchableOpacity } from 'react-native';
 import * as Location from "expo-location";
 import MapView, { Marker, Polyline } from "react-native-maps";
+import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import { decode } from "@mapbox/polyline";
 import { Ionicons, FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons';
 
@@ -30,9 +31,6 @@ function App() {
 
     // Destination information
     const [destination, sDestination] = useState(null);
-
-    // Destination address
-    const [destinationAdd, sDestinationAdd] = useState(null);
 
     // Polylines from origin destination
     const [polylines, sPolylines] = useState([]);
@@ -105,7 +103,7 @@ function App() {
                 sDestination(direction.destination);
                 
                 if (direction.destination !== null) {
-                    sDestinationAdd(direction.destination.address);
+                    destinationAddRef.current?.setAddressText(direction.destination.address);
                 }
 
                 sPolylines(direction.steps);
@@ -117,6 +115,36 @@ function App() {
                 console.log("Something went wrong");
             }
         );
+    }
+
+    const getLocation = async (addressString) => {
+        try {
+            const KEY = GOOGLE_MAP_API; //put your API key here.
+            //otherwise, you'll have an 'unauthorized' error.
+
+            const stringURL = addressString.replace(/\s/g, '+');
+
+            // console.log("stringURL")
+            // console.log(stringURL)
+
+            let resp = await fetch(
+                `https://maps.googleapis.com/maps/api/geocode/json?address=${stringURL}&key=${KEY}`
+            );
+            let respJson = await resp.json();
+            let respLocation = respJson.results[0].geometry.location;
+            let respAddress = respJson.results[0].formatted_address;
+            // console.log(respJson.results[0])
+
+            return {
+                "latitude": respLocation.lat, 
+                "longitude": respLocation.lng,
+                "address": respAddress
+            }
+
+        } catch (error) {
+            return error;
+        }
+        
     }
 
     const getDirections = async (startLoc, destinationLoc, travalModeString) => {
@@ -135,6 +163,9 @@ function App() {
             } else if (travalModeString === "WALKING") {
                 travalModeFilter = "&mode=walking";
             }
+
+            // console.log("DESTINATION")
+            // console.log(destinationLoc)
 
             let resp = await fetch(
                 `https://maps.googleapis.com/maps/api/directions/json?origin=${startLoc}&destination=${destinationLoc}&key=${KEY}&departure_time=now${travalModeFilter}`
@@ -224,7 +255,7 @@ function App() {
     };
 
     return (
-        <View style={styles.container}>
+        <SafeAreaView style={styles.container}>
             {
                 position &&
                 <View style={styles.mapContainer}>
@@ -319,60 +350,126 @@ function App() {
                     </MapView>
 
                     <View style={styles.inputContainer}>
-                        <View style={styles.inputBox}>
-                            <TextInput
-                                value={destinationAdd ? destinationAdd : null}
-                                placeholder={'Where you want to go?'}
-                                onChangeText = {(searchString) => { sDestinationAdd(searchString) }}
-                                style={styles.input}
-                                ref={destinationAddRef}
-                            />
-                            <TouchableOpacity 
-                                style={styles.buttonInputClear} 
-                                onPress={
-                                    () => { destinationAddRef.current.clear() }
-                                }
-                            > 
-                                <Ionicons name="close" size={normalize(18)} color="black" />
-                            </TouchableOpacity>
-                        </View>
-
-                        <TouchableOpacity 
-                            style={styles.buttonSquare} 
-                            onPress={() => {
-                                if (destination !== null) {
-                                    getDirections(
-                                        `${position.latitude},${position.longitude}`, 
-                                        `${destination.latitude},${destination.longitude}`,
-                                        travalMode
-                                    )
-                                    .then(
-                                        direction => {
-                                            // sCoords(coords);
-                                            // console.log(coords);
-                                            // console.log("DIRECTION");
-                                            // console.log(direction);
-                                            sOrigin(direction.origin);
-                                            sDestination(direction.destination);
-                                            
-                                            if (direction.destination !== null) {
-                                                sDestinationAdd(direction.destination.address);
+                        <GooglePlacesAutocomplete
+                            ref={destinationAddRef}
+                            placeholder="Type a place"
+                            query={{key: GOOGLE_MAP_API}}
+                            fetchDetails={true}
+                            onFail={error => console.log(error)}
+                            onNotFound={() => console.log('no results')}
+                            renderRightButton={() => {
+                                return (
+                                    <View style={{ flexDirection: "row", flex: 1}}>
+                                        <TouchableOpacity 
+                                            style={styles.buttonInputClear} 
+                                            onPress={
+                                                () => { 
+                                                    destinationAddRef.current.clear();
+                                                    destinationAddRef.current.blur();
+                                                }
                                             }
-                            
-                                            sPolylines(direction.steps);
-                                            sMarkers(direction.markers);
-                                        }
-                                    )
-                                    .catch(
-                                        err => {
-                                            console.log("Something went wrong");
-                                        }
-                                    );
-                                }
+                                        > 
+                                            <Ionicons name="close" size={normalize(24)} color="black" />
+                                        </TouchableOpacity>
+                                        <TouchableOpacity 
+                                            style={styles.buttonInputClear} 
+                                            onPress={async () => {
+                                                if (destinationAddRef.current && destinationAddRef.current.getAddressText() !== "") {
+
+                                                    getLocation(
+                                                        destinationAddRef.current.getAddressText()
+                                                    )
+                                                    .then(
+                                                        locationInfo => {
+                                                            // console.log("LOCATION INFO");
+                                                            // console.log(locationInfo);
+                                                            getDirections(
+                                                                `${position.latitude},${position.longitude}`, 
+                                                                `${locationInfo.latitude},${locationInfo.longitude}`,
+                                                                travalMode
+                                                            )
+                                                            .then(
+                                                                direction => {
+                                                                    // console.log("DIRECTION");
+                                                                    // console.log(direction);
+                                                                    sOrigin(direction.origin);
+                                                                    sDestination(direction.destination);
+                                                                    
+                                                                    if (direction.destination !== null) {
+                                                                        destinationAddRef.current?.setAddressText(direction.destination.address);
+                                                                    }
+                                                    
+                                                                    sPolylines(direction.steps);
+                                                                    sMarkers(direction.markers);
+                                                                }
+                                                            )
+                                                            .catch(
+                                                                err => {
+                                                                    console.log("Something went wrong");
+                                                                }
+                                                            );
+                                                        }
+                                                    )
+                                                    .catch(
+                                                        err => {
+                                                            console.log("Something went wrong");
+                                                        }
+                                                    )
+                                                }
+                                            }}
+                                        > 
+                                            <FontAwesome5 name="search" size={normalize(15)} color="black" />
+                                        </TouchableOpacity>
+                                    </View>
+                                );
                             }}
-                        > 
-                            <FontAwesome5 name="search" size={normalize(15)} color="black" />
-                        </TouchableOpacity>
+                            styles={{
+                                container: {
+                                    flex: 1,
+                                    marginHorizontal: normalize(3),
+                                },
+                                textInputContainer: {
+                                    flexDirection: 'row',
+                                    marginBottom: normalize(2)
+                                },
+                                textInput: {
+                                    backgroundColor: '#FFFFFF',
+                                    height: "100%",
+                                    borderRadius: normalize(5),
+                                    paddingVertical: normalize(5),
+                                    paddingHorizontal: normalize(10),
+                                    fontSize: normalize(15),
+                                    flex: 2,
+                                },
+                                poweredContainer: {
+                                    justifyContent: 'flex-end',
+                                    alignItems: 'center',
+                                    borderBottomRightRadius: 5,
+                                    borderBottomLeftRadius: 5,
+                                    borderColor: '#c8c7cc',
+                                    borderTopWidth: 0.5,
+                                },
+                                powered: {},
+                                listView: {},
+                                row: {
+                                    backgroundColor: '#FFFFFF',
+                                    padding: 13,
+                                    height: normalize(35),
+                                    flexDirection: 'row',
+                                },
+                                separator: {
+                                    height: 0.5,
+                                    backgroundColor: '#c8c7cc',
+                                },
+                                description: {},
+                                loader: {
+                                    flexDirection: 'row',
+                                    justifyContent: 'flex-end',
+                                    height: 20,
+                                },
+                            }
+                            }
+                        />
                     </View>
 
                     <View style={styles.buttonContainer}>
@@ -436,7 +533,7 @@ function App() {
             }
 
             {/* <Text style={styles.map}>{text}</Text> */}
-        </View>
+        </SafeAreaView>
     );
 }
 
@@ -457,7 +554,6 @@ const styles = StyleSheet.create({
     },
     inputContainer: {
         flexDirection: "row",
-        marginVertical: normalize(5),
         backgroundColor: "transparent",
         flexWrap: 'wrap',
         width: "75%"
@@ -506,8 +602,11 @@ const styles = StyleSheet.create({
     },
     buttonInputClear: {
         flex: 1,
+        backgroundColor: "dodgerblue",
+        borderRadius: normalize(5),
         alignItems: "center",
-        justifyContent: "center"
+        justifyContent: "center",
+        marginHorizontal: normalize(3)
     },
     buttonActive: {
         backgroundColor: "#ff8d1e"
