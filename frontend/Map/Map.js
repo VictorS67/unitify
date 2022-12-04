@@ -64,6 +64,37 @@ function Map() {
         })();
     }, []);
 
+    useEffect(() => {
+        // console.log(travalMode, '- Has changed')
+        if (position && origin && destination) {
+            getDirections(
+                `${position.latitude},${position.longitude}`, 
+                `${destination.latitude},${destination.longitude}`,
+                travalMode
+            )
+            .then(
+                direction => {
+                    // console.log("DIRECTION");
+                    // console.log(direction);
+                    sOrigin(direction.origin);
+                    sDestination(direction.destination);
+                    
+                    if (direction.destination !== null) {
+                        destinationAddRef.current?.setAddressText(direction.destination.address);
+                    }
+    
+                    sPolylines(direction.steps);
+                    sMarkers(direction.markers);
+                }
+            )
+            .catch(
+                err => {
+                    console.log("Something went wrong");
+                }
+            );
+        }
+    }, [travalMode]) // <-- here put the parameter to listen
+
     const goToCurrentPosition = () => {
         //Animate the user to new region. Complete this animation in 3 seconds
         mapRef.current.animateToRegion(position);
