@@ -1,17 +1,18 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Text, MaskedViewComponent, View, StyleSheet, Button, TouchableOpacity } from 'react-native';
+import { Text, TextInput, View, StyleSheet, Button, TouchableOpacity } from 'react-native';
 import { point } from '@turf/helpers';
 import destination from '@turf/destination';
 import * as Location from "expo-location";
 import MapView, { Marker, Polyline } from "react-native-maps";
 import MapViewDirections from 'react-native-maps-directions';
 import { decode } from "@mapbox/polyline";
-
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons, FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons';
 
 import LoginUser from "./Users/LoginUser";
 import MainPage from "./Main/Main";
 import UserPage from "./Users/UserPage";
+import TalkBubble from "./UI/TalkBubble";
+import PolylineInfo from "./UI/PolylineInfo";
 import { normalize } from "./Tool/FontSize";
 
 const GOOGLE_MAP_API = "AIzaSyAtc6gbQfdI-YdE7SoIeBXJMPmSV_LuOCk";
@@ -22,12 +23,18 @@ function App() {
 
     // Current position of the user
     const [position, sPosition] = useState(null);
+
+    // Travel Mode
+    const [travalMode, sTravalMode] = useState("DRIVING");
     
     // Origin information
     const [origin, sOrigin] = useState(null);
 
     // Destination information
     const [destination, sDestination] = useState(null);
+
+    // Destination address
+    const [destinationAdd, sDestinationAdd] = useState(null);
 
     // Polylines from origin destination
     const [polylines, sPolylines] = useState([]);
@@ -55,7 +62,7 @@ function App() {
             }
         
             let curr_location = await Location.getCurrentPositionAsync({});
-            console.log(curr_location)
+            // console.log(curr_location)
             sPosition({
                 latitude: curr_location.coords.latitude,
                 longitude: curr_location.coords.longitude,
@@ -71,8 +78,10 @@ function App() {
     };
 
     const onMapPress = (e) => {
-
         const coordinate = e.nativeEvent.coordinate;
+
+        // console.log("COORDINATE");
+        // console.log(coordinate);
 
         // setCoords(coordinate);
         mapRef.current.animateToRegion({
@@ -85,17 +94,22 @@ function App() {
         //fetch the coordinates and then store its value into the coords Hook.
         getDirections(
             `${position.latitude},${position.longitude}`, 
-            `${coordinate.latitude},${coordinate.longitude}`
+            `${coordinate.latitude},${coordinate.longitude}`,
+            travalMode
         )
         .then(
             direction => {
                 // sCoords(coords);
                 // console.log(coords);
-
+                // console.log("DIRECTION");
+                // console.log(direction);
                 sOrigin(direction.origin);
                 sDestination(direction.destination);
+                
+                if (direction.destination !== null) {
+                    sDestinationAdd(direction.destination.address);
+                }
 
-                console.log(direction.steps);
                 sPolylines(direction.steps);
                 sMarkers(direction.markers);
             }
@@ -107,15 +121,39 @@ function App() {
         );
     }
 
-    const getDirections = async (startLoc, destinationLoc) => {
+    const getDirections = async (startLoc, destinationLoc, travalModeString) => {
         try {
             const KEY = GOOGLE_MAP_API; //put your API key here.
-
             //otherwise, you'll have an 'unauthorized' error.
+
+            //Search for different traval mode
+            let travalModeFilter = "&mode=driving";
+            if (travalModeString === "SUBWAY") {
+                travalModeFilter = "&mode=transit&transit_mode=subway";
+            } else if (travalModeString === "BUS") {
+                travalModeFilter = "&mode=transit&transit_mode=bus";
+            } else if (travalModeString === "BICYCLING") {
+                travalModeFilter = "&mode=bicycling";
+            } else if (travalModeString === "WALKING") {
+                travalModeFilter = "&mode=walking";
+            }
+
             let resp = await fetch(
-                `https://maps.googleapis.com/maps/api/directions/json?origin=${startLoc}&destination=${destinationLoc}&key=${KEY}&departure_time=now&mode=transit&transit_mode=subway`
+                `https://maps.googleapis.com/maps/api/directions/json?origin=${startLoc}&destination=${destinationLoc}&key=${KEY}&departure_time=now${travalModeFilter}`
             );
             let respJson = await resp.json();
+            // console.log("ROUTE");
+            // console.log(respJson.routes);
+
+            if ((respJson.routes.length === 0) || (respJson.routes[0].legs.length === 0)) {
+                return {
+                    "origin": null,
+                    "destination": null,
+                    "steps": [],
+                    "markers": []
+                }
+            }
+
             let leg = respJson.routes[0].legs[0];
             let origin_info = {
                 "latitude": leg.start_location.lat,
@@ -130,27 +168,51 @@ function App() {
                 "address": leg.end_address
             }
             let steps = leg.steps;
-            console.log(respJson.routes[0]);
+            // console.log(respJson.routes[0]);
 
-            let markers = steps.map((step) => {
-                console.log("STEP");
-                console.log(step);
-                console.log(step.steps);
-
-                let coords = decode(step.polyline.points).map((coord) => {
-                    return {
-                        "latitude": coord[0],
-                        "longitude": coord[1]
+            let markers = [];
+            if ((travalModeString === "SUBWAY") || (travalModeString === "BUS")) {
+                markers = steps.map((step) => {
+                    let traval_mode = step.travel_mode;
+                    if (step.travel_mode === "TRANSIT") {
+                        traval_mode = step.transit_details.line.vehicle.type;
+    
+                        if ((traval_mode === "BUS") || (traval_mode === "TRAM")) {
+                            traval_mode = "BUS";
+                        } else {
+                            traval_mode = "SUBWAY";
+                        }
                     }
+    
+                    let coords = decode(step.polyline.points);
+                    let mid_coord = coords[Math.floor(coords.length / 2)];
+    
+                    // console.log("MID COORD");
+                    // console.log(mid_coord);
+    
+                    return {
+                        "latitude": mid_coord[0],
+                        "longitude": mid_coord[1],
+                        "distance": step.distance.text,
+                        "duration": step.duration.text,
+                        "mode": traval_mode
+                    };
                 });
+            } else {
+                let points = decode(respJson.routes[0].overview_polyline.points);
+                let mid_coord = points[Math.floor(points.length / 2)];
 
-                let mid_coord = coords[Math.floor(coords.length / 2) + 1];
+                // console.log("MID COORD");
+                // console.log(mid_coord);
 
-                return mid_coord;
-            });
-
-            console.log("MARKER");
-            console.log(markers);
+                markers = [{
+                    "latitude": mid_coord[0],
+                    "longitude": mid_coord[1],
+                    "distance": leg.distance.text,
+                    "duration": leg.duration.text,
+                    "mode": travalModeString
+                }]
+            }
 
             return {
                 "origin": origin_info,
@@ -241,14 +303,113 @@ function App() {
                                         <Marker 
                                             coordinate={element}
                                             key={`marker_${index}`}
-                                        />
+                                        >
+
+                                            <TalkBubble>
+                                                <PolylineInfo 
+                                                    mode={element.mode} 
+                                                    distance={element.distance} 
+                                                    duration={element.duration}
+                                                />
+                                            </TalkBubble>
+                                        </Marker>
                                     )
                                 })
                             )
                         }
+
                     </MapView>
 
+                    <View style={styles.inputContainer}>
+                        <TextInput
+                            value={destinationAdd ? destinationAdd : null}
+                            placeholder={'Where you want to go?'}
+                            onChangeText = {(searchString) => { sDestinationAdd(searchString) }}
+                            style={styles.input}
+                        />
+                        <TouchableOpacity 
+                            style={styles.buttonSquare} 
+                            onPress={() => {
+                                if (destination !== null) {
+                                    getDirections(
+                                        `${position.latitude},${position.longitude}`, 
+                                        `${destination.latitude},${destination.longitude}`,
+                                        travalMode
+                                    )
+                                    .then(
+                                        direction => {
+                                            // sCoords(coords);
+                                            // console.log(coords);
+                                            // console.log("DIRECTION");
+                                            // console.log(direction);
+                                            sOrigin(direction.origin);
+                                            sDestination(direction.destination);
+                                            
+                                            if (direction.destination !== null) {
+                                                sDestinationAdd(direction.destination.address);
+                                            }
+                            
+                                            sPolylines(direction.steps);
+                                            sMarkers(direction.markers);
+                                        }
+                                    )
+                                    .catch(
+                                        err => {
+                                            console.log("Something went wrong");
+                                        }
+                                    );
+                                }
+                            }}
+                        > 
+                            <FontAwesome5 name="search" size={normalize(15)} color="black" />
+                        </TouchableOpacity>
+                    </View>
+
                     <View style={styles.buttonContainer}>
+                        <TouchableOpacity 
+                            style={[styles.buttonSquare, (travalMode === "DRIVING") && styles.buttonActive]} 
+                            onPress={
+                                () => sTravalMode("DRIVING")
+                            }
+                        > 
+                            <FontAwesome5 name="car" size={normalize(14)} color="black" />
+                        </TouchableOpacity>
+
+                        <TouchableOpacity 
+                            style={[styles.buttonSquare, (travalMode === "WALKING") && styles.buttonActive]} 
+                            onPress={
+                                () => sTravalMode("WALKING")
+                            }
+                        > 
+                            <FontAwesome5 name="walking" size={normalize(14)} color="black" />
+                        </TouchableOpacity>
+
+                        <TouchableOpacity 
+                            style={[styles.buttonSquare, (travalMode === "SUBWAY") && styles.buttonActive]} 
+                            onPress={
+                                () => sTravalMode("SUBWAY")
+                            }
+                        > 
+                            <FontAwesome5 name="subway" size={normalize(14)} color="black" />
+                        </TouchableOpacity>
+                        <TouchableOpacity 
+                            style={[styles.buttonSquare, (travalMode === "BUS") && styles.buttonActive]} 
+                            onPress={
+                                () => sTravalMode("BUS")
+                            }
+                        > 
+                            <FontAwesome5 name="bus" size={normalize(14)} color="black" />
+                        </TouchableOpacity>
+                        <TouchableOpacity 
+                            style={[styles.buttonSquare, (travalMode === "BICYCLING") && styles.buttonActive]} 
+                            onPress={
+                                () => sTravalMode("BICYCLING")
+                            }
+                        > 
+                            <FontAwesome5 name="bicycle" size={normalize(12)} color="black" />
+                        </TouchableOpacity>
+
+
                         <TouchableOpacity 
                             style={styles.button} 
                             onPress={
@@ -272,30 +433,64 @@ function App() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        alignItems: "center",
+        justifyContent: "center"
     },
     mapContainer: {
         ...StyleSheet.absoluteFillObject,
         flex: 1,
-        alignItems: "center",
+        alignItems: "flex-start",
         justifyContent: "flex-end"
     },
     map: {
         ...StyleSheet.absoluteFillObject
     },
+    inputContainer: {
+        flexDirection: "row",
+        marginVertical: normalize(5),
+        backgroundColor: "transparent",
+        flexWrap: 'wrap',
+        width: "75%"
+    },
+    input: {
+        width: "80%",
+        height: "100%",
+        paddingVertical: normalize(5),
+        paddingHorizontal: normalize(10),
+        backgroundColor: "white",
+        marginHorizontal: normalize(3),
+        borderRadius: normalize(20)
+    },
     buttonContainer: {
         flexDirection: "row",
-        marginVertical: normalize(10),
+        marginVertical: normalize(5),
         backgroundColor: "transparent",
-        alignItems: "center"
+        flexWrap: 'nowrap',
+        width: "75%"
     },
     button: {
+        flex: 4,
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "center",
         backgroundColor: "dodgerblue",
         paddingVertical: normalize(5),
         paddingHorizontal: normalize(10),
-        borderRadius: normalize(20)
+        borderRadius: normalize(20),
+        marginHorizontal: normalize(3)
+    },
+    buttonSquare: {
+        flex: 1,
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "center",
+        backgroundColor: "dodgerblue",
+        height: "100%",
+        borderRadius: normalize(5),
+        marginHorizontal: normalize(3)
+    },
+    buttonActive: {
+        backgroundColor: "#ff8d1e"
     },
     buttonText: {
         fontSize: normalize(13)
