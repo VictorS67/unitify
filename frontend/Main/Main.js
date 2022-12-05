@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, StyleSheet,  Keyboard } from 'react-native';
+import { ScrollView , View, StyleSheet, Keyboard, useWindowDimensions } from 'react-native';
 import { FontAwesome5 } from '@expo/vector-icons';
 
 import Card from "../UI/Card";
@@ -14,14 +14,22 @@ import { normalize } from "../Tool/FontSize";
 const MainPage = props => {
 
     const [keyboardStatus, setKeyboardStatus] = useState(false);
+    const [scrollHeight, setScrollHeight] = useState(50);
+    const [locationY, setLocationY] = useState(null);
+    const [pageY, setPageY] = useState(null);
+    const [locationYOffest, setLocationYOffest] = useState(0);
+    const [pageYOffest, setPageYOffest] = useState(0);
+
+
+    const { height, width, scale, fontScale } = useWindowDimensions();
 
     useEffect(() => {
         const showSubscription = Keyboard.addListener("keyboardDidShow", () => {
-          setKeyboardStatus(true);
+            setKeyboardStatus(true);
         });
 
         const hideSubscription = Keyboard.addListener("keyboardDidHide", () => {
-          setKeyboardStatus(false);
+            setKeyboardStatus(false);
         });
 
         return () => {
@@ -30,15 +38,48 @@ const MainPage = props => {
         };
     }, []);
 
+    const onTouchMove = (e) => {
+
+        // console.log("SCROLL");
+        // console.log('touch info:', e.nativeEvent);
+
+        if (locationY !== null) {
+            setLocationYOffest(locationY - e.nativeEvent.locationY);
+        }
+
+        if (pageY !== null) {
+            setPageYOffest(pageY - e.nativeEvent.pageY);
+        }
+
+        setLocationY(e.nativeEvent.locationY);
+        setPageY(e.nativeEvent.pageY);
+
+        // setScrollOffset(currentOffset);
+        setScrollHeight(Math.max(Math.min(scrollHeight + pageYOffest / height * 100, 50), 17));
+    }
+
+    const onTouchEnd = (e) => {
+        setLocationYOffest(0);
+        setPageYOffest(0);
+        setLocationY(null);
+        setPageY(null);
+    }
+
     return (
         <View style={styles.container}>
-            <View style={[styles.container, {flex: 1}]}>
+            <View style={[{flexGrow: 1}]}>
                 <Map />
                 <Card style={styles.userCard} childrenStyle={styles.userCardContent}>
                     <FontAwesome5 name="user" size={normalize(26)} color="black" />
                 </Card>
             </View>
-            <View style={[styles.container, (keyboardStatus === false) ? {flex: 1.3} : {flex: 0.4}]}>
+            <ScrollView 
+                style={[(keyboardStatus === false) ? {maxHeight: `${scrollHeight}%`} : {maxHeight: "30%"}]}
+                onTouchMove={onTouchMove}
+                onTouchEnd={onTouchEnd}
+                scrollEnabled={false}
+                contentContainerStyle={{ flexGrow: 1 }}
+            >
                 <View style={[styles.container, {flex: 1}]}>
                     <TripCard distance={0.2} duration={320} speed={0.3} pause={3} />
                 </View>
@@ -49,7 +90,7 @@ const MainPage = props => {
                         <UsageCard />
                     </View>
                 }
-            </View>
+            </ScrollView>
         </View>
     )
 
