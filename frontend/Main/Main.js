@@ -83,13 +83,13 @@ const MainPage = props => {
                 <View style={[styles.container, {flex: 1}]}>
                     <TripCard distance={0.2} duration={320} speed={0.3} pause={3} />
                 </View>
-                {
+                {/* {
                     keyboardStatus === false &&
                     <View style={[styles.container, {flex: 2}]}>
                         <MileCard />
                         <UsageCard />
                     </View>
-                }
+                } */}
             </ScrollView>
         </View>
     )
