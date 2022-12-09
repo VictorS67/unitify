@@ -4,6 +4,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const session = require('express-session')
 const bodyParser = require('body-parser')
+const cors = require('cors');
 
 const connectionString = process.env.MONGODB_URI;
 let mongoDB = connectionString;
@@ -16,6 +17,7 @@ const schemas = require('./schema.js');
 const e = require('express');
 
 const User = mongoose.model('users', schemas.userSchema, 'users');
+const Location = mongoose.model('locations', schemas.locationSchema, 'locations');
 
 const backend = express();
 
@@ -33,84 +35,139 @@ backend.use(session({
     saveUninitialized: true
 }))
 
+backend.use(cors());
 
+// Authedication APIs
+{
 
-/**
- * Get /user
- * Return the user object if the user logins in. Otherwise return undefined.
- */
-backend.get("/user", (req, res) => {
-    console.log("Received a request to check if logged in.")
-    if (req.session.loggedin) {
-        return res.status(200).json({ "status": 200, "user": req.session.user })
-    }
-    else {
-        return res.status(200).json({ "status": 200, "user": undefined })
-    }
-})
-
-
-
-/**
- * POST /auth
- * Login Authedication. 
- * Will set up user object in the session if the user exists and the credentials match.
- * The Request Body includes username & password.
- */
-backend.post('/auth', async (req, res) => {
-    try {
-
-
-        const username = req.body.username;
-        const password = req.body.password;
-        let user = await User.findOne({ userName: username });
-        if (user === null) {
-            return res.status(404).json({ 'status': 404, 'message': `The user doesn't exist.` });
-        }
-        else {
-            if (password !== user.pass) {
-                return res.status(400).json({ 'status': 400, 'message': `The credentials don't match.` });
+    /**
+     * Get /user
+     * Return the user object if the user logins in. Otherwise return undefined.
+     */
+    backend.get("/user", (req, res) => {
+        console.log("Received a request to check if logged in.")
+        try {
+            if (req.session.loggedin) {
+                console.log("Logged in.")
+                return res.status(200).json({ "status": 200, "user": req.session.user })
             }
             else {
-                // The credentials match.
-                req.session.loggedin = true
-                req.session.user = {
-                    username: username,
-                    _id: user._id
-                }
-                return res.status(200).json({ 'status': 200, 'message': `Logged in.` })
+                console.log("Not logged in.")
+                return res.status(404).json({ "status": 404, "user": undefined })
             }
-
         }
-    }
-    catch (error) {
-        console.log(error)
-        return res.status(500).json({ 'status': 500, 'message': 'The server is down.' })
-    }
-})
+        catch {
+            return res.status(500).json({ "status": 500, "message": "Try again later." })
+        }
+    })
+
+
+
+    /**
+     * POST /auth
+     * Login Authedication. 
+     * Will set up user object in the session if the user exists and the credentials match.
+     * The Request Body includes username & password.
+     */
+    backend.post('/auth', async (req, res) => {
+        try {
+
+
+            const username = req.body.username;
+            const password = req.body.password;
+            let user = await User.findOne({ userName: username });
+            if (user === null) {
+                return res.status(404).json({ 'status': 404, 'message': `The user doesn't exist.` });
+            }
+            else {
+                if (password !== user.pass) {
+                    return res.status(400).json({ 'status': 400, 'message': `The credentials don't match.` });
+                }
+                else {
+                    // The credentials match.
+                    req.session.loggedin = true
+                    req.session.user = {
+                        username: username,
+                        _id: user._id
+                    }
+
+                    console.log("password correct")
+                    return res.status(200).json({ 'status': 200, 'message': `Logged in.`, 'user': req.session.user });
+                }
+
+            }
+        }
+        catch (error) {
+            console.log(error)
+            return res.status(500).json({ 'status': 500, 'message': 'The server is down.' })
+        }
+    })
+
+
+    /**
+     * DELETE /logout
+     * Logout
+     * Will delete the session
+     */
+    backend.delete('/logout', async (req, res) => {
+        try {
+            if (req.session.user) {
+                req.session.destroy();
+                return res.status(200).json({ 'status': 200, 'message': 'Signed out.' })
+            }
+            else {
+                return res.status(400).json({ 'status': 400, 'message': 'Not logged in.' })
+            }
+        }
+        catch (error) {
+            console.log(error)
+            return res.status(500).json({ 'status': 500, 'message': 'The server is down.' })
+        }
+    })
+}
+
+
+// Map related APIs.
+{
+    /**
+     * POST /location
+     * Login Add a location record.
+     */
+    backend.post('/location', async (req, res) => {
+        try {
+
+            // TODO: check if the userId in the session is the same as what's given in the body.
+            // TODO: check if the userId exists.
+            let userId = req.body.userId;
+            let coordinates = req.body.coordinates;
+
+            let point = { type: 'Point', coordinates: coordinates };
+            let newLocation = await Location.create({
+                userId: userId,
+                location: point
+            });
+            if(newLocation) {
+                return res.status(200).json({ 'status': 200, 'message': 'The location is recorded successfully.' })
+            }
+        }
+        catch (error) {
+            console.log(error)
+            return res.status(500).json({ 'status': 500, 'message': 'The server is down.' })
+        }
+    })
+}
+
+
+
 
 
 /**
- * DELETE /logout
- * Logout
- * Will delete the session
+ * Test if the server is on or not.
  */
- backend.delete('/logout', async (req, res) => {
-    try {
-        if(req.session.user) {
-            req.session.destroy();
-            return res.status(200).json({ 'status': 200, 'message': 'Signed out.' })
-        }
-        else {
-            return res.status(400).json({ 'status': 400, 'message': 'Not logged in.' })
-        }
-    }
-    catch (error) {
-        console.log(error)
-        return res.status(500).json({ 'status': 500, 'message': 'The server is down.' })
-    }
-})
 
+backend.get('/hello', async (req, res) => {
+    return res.status(200).json({ 'status': 200, 'message': 'The server has started.' })
+})
 
 
 
