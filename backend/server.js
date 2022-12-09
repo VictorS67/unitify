@@ -51,16 +51,17 @@ const socketIO = require('socket.io')(http, {
 
 socketIO.on('connection', (socket) => {
 
-    console.log(`${socket.id}`);
+    console.log(`${socket.id}: ${socket.handshake.query.user_id}`);
 
     setInterval(function () {
         // The Trip Stopped
         console.log(Date.now())
-    }, 1000);
+        socket.emit("tripEnded", "Trip Ended");
+        // Stopped!
+    }, 30000);
 
     socket.on("updateLocation", (location) => {
-        console.log(`${location}`)
-        //socket.emit("roomsList", chatRooms);
+        console.log(`${socket.handshake.query.user_id} is in ${location}.`)
     });
     socket.on('disconnect', () => {
         socket.disconnect()
@@ -159,7 +160,7 @@ backend.delete('/logout', async (req, res) => {
 
 
 const port = process.env.PORT || 43030
-backend.listen(port, () => {
+http.listen(port, () => {
     log(`Listening on port ${port}...`)
 })
 
