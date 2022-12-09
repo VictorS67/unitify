@@ -35,8 +35,37 @@ backend.use(session({
 }))
 
 //backend.use(cors());
-backend.use(cors({ credentials: true, origin: "http://localhost:19006" }));
+backend.use(cors({ credentials: true, origin: "*" }));
 
+
+/**
+ * SOCKET PART
+ */
+
+const http = require("http").Server(backend);
+const socketIO = require('socket.io')(http, {
+    cors: {
+        origin: "*"
+    }
+});
+
+socketIO.on('connection', (socket) => {
+
+    console.log(`${socket.id}`);
+
+    setInterval(function () {
+        // The Trip Stopped
+        console.log(Date.now())
+    }, 1000);
+
+    socket.on("updateLocation", (location) => {
+        console.log(`${location}`)
+        //socket.emit("roomsList", chatRooms);
+    });
+    socket.on('disconnect', () => {
+        socket.disconnect()
+    });
+});
 
 
 /**
@@ -56,7 +85,7 @@ backend.get("/user", (req, res) => {
         }
     }
     catch {
-        return res.status(500).json({ "status": 500, "message": "Try again later."  })
+        return res.status(500).json({ "status": 500, "message": "Try again later." })
     }
 })
 
@@ -91,7 +120,7 @@ backend.post('/auth', async (req, res) => {
                 }
 
                 console.log("password correct")
-                return res.status(200).json({ 'status': 200, 'message': `Logged in.`, 'user': req.session.user});
+                return res.status(200).json({ 'status': 200, 'message': `Logged in.`, 'user': req.session.user });
             }
 
         }
