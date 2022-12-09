@@ -52,7 +52,7 @@ const MileCard = props => {
 
 const styles = StyleSheet.create({
     mileCard: { 
-        flex: 0.8, 
+        flex: 1, 
         backgroundColor: "orange", 
         padding: normalize(10),
         height: "100%"

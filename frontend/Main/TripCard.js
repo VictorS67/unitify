@@ -1,8 +1,10 @@
 import React from "react";
-import { Text, View, StyleSheet, Pressable, useWindowDimensions } from 'react-native';
-import { FontAwesome5, MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
+import { Text, View, StyleSheet, Pressable, useWindowDimensions, KeyboardAvoidingView, Platform } from 'react-native';
+import { Divider, ProgressBar } from 'react-native-paper';
+import { FontAwesome5, MaterialCommunityIcons, Ionicons, Octicons } from '@expo/vector-icons';
 
 import Card from "../UI/Card";
+import TripPlanningCard from "./TripPlanningCard";
 import { normalize } from "../Tool/FontSize";
 
 function secondsToHms(d) {
@@ -20,91 +22,97 @@ const TripCard = props => {
     const [hour, minute] = secondsToHms(props.duration);
     const { height, width, scale, fontScale } = useWindowDimensions();
 
+    const trending = "up";
+
     return (
         <View style={styles.tripCard}>
             <View style={styles.tripCardTitle}>
                 <Text style={styles.titleText}>
-                    Current Trip
+                    Your Trip
                 </Text>
+            </View>
+            <TripPlanningCard trending={trending} />
+
+            {/* <React.Fragment>
+                <View style={styles.tripCardContent}>
+                    <View style={styles.flexColumn}>
+                        <Text style={styles.cardText}>
+                            Distance
+                        </Text>
+                        <Card style={{ width: normalize(0.1 * width), height: normalize(0.1 * width) }} childrenStyle={styles.userCardContent}>
+                            <MaterialCommunityIcons name="map-marker-distance" size={normalize(24)} color="black" />
+                        </Card>
+                        <Text style={styles.cardText}>
+                            <Text style={styles.statText}>
+                                {props.distance}
+                            </Text>
+                            <Text>
+                                &nbsp;km
+                            </Text>
+                        </Text>
+                    </View>
+
+                    <View style={styles.flexColumn}>
+                        <Text style={styles.cardText}>
+                            Duration
+                        </Text>
+                        <Card style={{ width: normalize(0.1 * width), height: normalize(0.1 * width) }} childrenStyle={styles.userCardContent}>
+                            <FontAwesome5 name="clock" size={normalize(24)} color="black" />
+                        </Card>
+                        <Text style={styles.cardText}>
+                            <Text style={styles.statText}>
+                                {hour}
+                            </Text>
+                            <Text>
+                                &nbsp;h&nbsp;
+                            </Text>
+                            <Text style={styles.statText}>
+                                {minute}
+                            </Text>
+                            <Text>
+                                &nbsp;min
+                            </Text>
+                        </Text>
+                    </View>
+
+                    <View style={styles.flexColumn}>
+                        <Text style={styles.cardText}>
+                            Speed
+                        </Text>
+                        <Card style={{ width: normalize(0.1 * width), height: normalize(0.1 * width) }} childrenStyle={styles.userCardContent}>
+                            <Ionicons name="speedometer" size={normalize(24)} color="black" />
+                        </Card>
+                        <Text style={styles.cardText}>
+                            <Text style={styles.statText}>
+                                {props.speed}
+                            </Text>
+                            <Text>
+                                &nbsp;km/h
+                            </Text>
+                        </Text>
+                    </View>
+
+                    <View style={styles.flexColumn}>
+                        <Text style={styles.cardText}>
+                            Pause
+                        </Text>
+                        <Card style={{ width: normalize(0.1 * width), height: normalize(0.1 * width) }} childrenStyle={styles.userCardContent}>
+                            <FontAwesome5 name="hand-paper" size={normalize(24)} color="black" />
+                        </Card>
+                        <Text style={styles.cardText}>
+                            <Text style={styles.statText}>
+                                {props.pause}
+                            </Text>
+                        </Text>
+                    </View>
+                </View>
                 <Pressable style={styles.button}>
-                    <FontAwesome5 name="question-circle" size={normalize(14)} color="black" />
-                    <Text style={{ fontSize: normalize(12), textAlign: "center", textTransform: 'uppercase' }}>
+                    <FontAwesome5 name="question-circle" size={normalize(20)} color="black" />
+                    <Text style={{ fontSize: normalize(22), textAlign: "center", textTransform: 'uppercase' }}>
                         &nbsp;Not My Trip
                     </Text>
                 </Pressable>
-            </View>
-            <View style={styles.tripCardContent}>
-                <View style={styles.flexColumn}>
-                    <Text style={styles.cardText}>
-                        Distance
-                    </Text>
-                    <Card style={{ width: normalize(0.1 * width), height: normalize(0.1 * width) }} childrenStyle={styles.userCardContent}>
-                        <MaterialCommunityIcons name="map-marker-distance" size={normalize(24)} color="black" />
-                    </Card>
-                    <Text style={styles.cardText}>
-                        <Text style={styles.statText}>
-                            {props.distance}
-                        </Text>
-                        <Text>
-                            &nbsp;km
-                        </Text>
-                    </Text>
-                </View>
-
-                <View style={styles.flexColumn}>
-                    <Text style={styles.cardText}>
-                        Duration
-                    </Text>
-                    <Card style={{ width: normalize(0.1 * width), height: normalize(0.1 * width) }} childrenStyle={styles.userCardContent}>
-                        <FontAwesome5 name="clock" size={normalize(24)} color="black" />
-                    </Card>
-                    <Text style={styles.cardText}>
-                        <Text style={styles.statText}>
-                            {hour}
-                        </Text>
-                        <Text>
-                            &nbsp;h&nbsp;
-                        </Text>
-                        <Text style={styles.statText}>
-                            {minute}
-                        </Text>
-                        <Text>
-                            &nbsp;min
-                        </Text>
-                    </Text>
-                </View>
-
-                <View style={styles.flexColumn}>
-                    <Text style={styles.cardText}>
-                        Speed
-                    </Text>
-                    <Card style={{ width: normalize(0.1 * width), height: normalize(0.1 * width) }} childrenStyle={styles.userCardContent}>
-                        <Ionicons name="speedometer" size={normalize(24)} color="black" />
-                    </Card>
-                    <Text style={styles.cardText}>
-                        <Text style={styles.statText}>
-                            {props.speed}
-                        </Text>
-                        <Text>
-                            &nbsp;km/h
-                        </Text>
-                    </Text>
-                </View>
-
-                <View style={styles.flexColumn}>
-                    <Text style={styles.cardText}>
-                        Pause
-                    </Text>
-                    <Card style={{ width: normalize(0.1 * width), height: normalize(0.1 * width) }} childrenStyle={styles.userCardContent}>
-                        <FontAwesome5 name="hand-paper" size={normalize(24)} color="black" />
-                    </Card>
-                    <Text style={styles.cardText}>
-                        <Text style={styles.statText}>
-                            {props.pause}
-                        </Text>
-                    </Text>
-                </View>
-            </View>
+            </React.Fragment> */}
         </View>
     );
 };
@@ -113,7 +121,7 @@ const TripCard = props => {
 const styles = StyleSheet.create({
     tripCard: { 
         flex: 1, 
-        justifyContent: "space-between", 
+        justifyContent: "flex-start",
         backgroundColor: "green", 
         padding: normalize(10) 
     },
@@ -126,7 +134,7 @@ const styles = StyleSheet.create({
         flexDirection: "row", 
         justifyContent: "space-around",
         alignItems: "center",
-        flexGrow: 1
+        paddingVertical: normalize(5)
     },
     userCardContent: {
         flex: 1,
@@ -158,7 +166,7 @@ const styles = StyleSheet.create({
         paddingVertical: normalize(5),
         paddingHorizontal: normalize(10),
         borderRadius: normalize(4),
-        elevation: 3,
+        // elevation: 3,
         backgroundColor: 'orange'
     },
     statText: {
