@@ -166,5 +166,9 @@ const locationSchema = new mongoose.Schema({
 
 module.exports = {
     userSchema: userSchema,
-    locationSchema: locationSchema
+    locationSchema: locationSchema, 
+    rankSchema: rankSchema,
+    mileSchema: mileSchema, 
+    transportationSchema: transportationSchema, 
+    questionnaireSchema: questionnaireSchema
 }

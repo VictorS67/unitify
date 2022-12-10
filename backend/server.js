@@ -17,6 +17,20 @@ const schemas = require('./schema.js');
 const e = require('express');
 
 const User = mongoose.model('users', schemas.userSchema, 'users');
+const Location = mongoose.model('locations', schemas.locationSchema, 'locations');
+const Rank = mongoose.model('ranks', schemas.rankSchema, 'ranks');
+const Mile = mongoose.model('miles', schemas.mileSchema, 'miles');
+const Transportation = mongoose.model('transportations', schemas.transportationSchema, 'transportations');
+const Questionnnaire = mongoose.model('questionnaires', schemas.questionnaireSchema, 'questionnaires');
+
+const tables = {
+    users: User,
+    locations: Location,
+    ranks: Rank, 
+    miles: Mile,
+    transportations: Transportation, 
+    questionnaires: Questionnnaire
+}
 
 const backend = express();
 
@@ -155,6 +169,40 @@ backend.delete('/logout', async (req, res) => {
 })
 
 
+/**
+ * Get /collection
+ * Get Collection
+ * Will return the whole document based on the filter
+ */
+
+// TODO: all need proper error handling, permission check, e.t.c.
+backend.get('/collection', async (req, res) => {
+    try {
+        let tableName = req.body.tableName;
+        let Table = tables[tableName];
+        let response = await Table.findOne(req.body.filter);
+        return res.status(200).json({ 'status': 200, 'data': response })
+    }
+    catch (error) {
+        console.log(error)
+        return res.status(500).json({ 'status': 500, 'message': 'The server is down.' })
+    }
+})
+
+
+
+backend.post('/collection', async (req, res) => {
+    try {
+        let tableName = req.body.tableName;
+        let Table = tables[tableName];
+        let response = await Table.create(req.body.newDoc);
+        return res.status(200).json({ 'status': 200, 'data': response })
+    }
+    catch (error) {
+        console.log(error)
+        return res.status(500).json({ 'status': 500, 'message': 'The server is down.' })
+    }
+})
 
 
 
