@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Text, View, SafeAreaView, StyleSheet, Button, TouchableOpacity } from 'react-native';
+import { useSelector, useDispatch } from "react-redux";
 import { Ionicons, FontAwesome5 } from '@expo/vector-icons';
 import * as Location from "expo-location";
 import MapView, { Marker, Polyline } from "react-native-maps";
@@ -10,32 +11,16 @@ import TalkBubble from "../UI/TalkBubble";
 import PolylineInfo from "../UI/PolylineInfo";
 import { normalize } from "../Tool/FontSize";
 import { getDirections, getLocation, GOOGLE_MAP_API } from "../Utils/GoogleMap";
+import { mapActions } from "../store/map-slice";
+
 
 function Map() {
 
     const mapRef = useRef(null);
     const destinationAddRef = useRef(null);
 
-    // Current position of the user
-    const [position, sPosition] = useState(null);
-
-    // Travel Mode
-    const [travalMode, sTravalMode] = useState("DRIVING");
-    
-    // Origin information
-    const [origin, sOrigin] = useState(null);
-
-    // Destination information
-    const [destination, sDestination] = useState(null);
-
-    // Polylines from origin destination
-    const [polylines, sPolylines] = useState([]);
-
-    // Markers with customized text on map
-    const [markers, sMarkers] = useState([]);
-
-    // Error message for getting locations from user
-    const [errorMsg, sErrorMsg] = useState(null);
+    const dispatch = useDispatch();
+    const map = useSelector((state) => state.map);
 
     const polyline_colors = {
         "DRIVING": "#f07167",
@@ -49,42 +34,47 @@ function Map() {
         
             let { status } = await Location.requestForegroundPermissionsAsync();
             if (status !== 'granted') {
-                sErrorMsg('Permission to access location was denied');
+                dispatch(mapActions.sErrorMsg(
+                    {
+                        message: 'Permission to access location was denied'
+                    }
+                ));
                 return;
             }
         
             let curr_location = await Location.getCurrentPositionAsync({});
             // console.log(curr_location)
-            sPosition({
-                latitude: curr_location.coords.latitude,
-                longitude: curr_location.coords.longitude,
-                latitudeDelta: 0.02, 
-                longitudeDelta: 0.02
-            })
+            dispatch(mapActions.sPosition(
+                {
+                    latitude: curr_location.coords.latitude,
+                    longitude: curr_location.coords.longitude,
+                    latitudeDelta: 0.02, 
+                    longitudeDelta: 0.02
+                }
+            ));
         })();
-    }, []);
+    }, [dispatch]);
 
     useEffect(() => {
         // console.log(travalMode, '- Has changed')
-        if (position && origin && destination) {
+        if (map.position && map.origin && map.destination) {
             getDirections(
-                `${position.latitude},${position.longitude}`, 
-                `${destination.latitude},${destination.longitude}`,
-                travalMode
+                `${map.position.latitude},${map.position.longitude}`, 
+                `${map.destination.latitude},${map.destination.longitude}`,
+                map.travalMode
             )
             .then(
                 direction => {
                     // console.log("DIRECTION");
                     // console.log(direction);
-                    sOrigin(direction.origin);
-                    sDestination(direction.destination);
-                    
+                    dispatch(mapActions.sOrigin(direction.origin));
+                    dispatch(mapActions.sDestination(direction.destination));
+                    dispatch(mapActions.sPolylines(direction.steps));
+                    dispatch(mapActions.sMarkers(direction.markers));
+
                     if (direction.destination !== null) {
                         destinationAddRef.current?.setAddressText(direction.destination.address);
                     }
-    
-                    sPolylines(direction.steps);
-                    sMarkers(direction.markers);
                 }
             )
             .catch(
@@ -93,11 +83,11 @@ function Map() {
                 }
             );
         }
-    }, [travalMode]) // <-- here put the parameter to listen
+    }, [map.travalMode, dispatch]) // <-- here put the parameter to listen
 
     const goToCurrentPosition = () => {
         //Animate the user to new region. Complete this animation in 3 seconds
-        mapRef.current.animateToRegion(position);
+        mapRef.current.animateToRegion(map.position);
     };
 
     const onMapPress = (e) => {
@@ -109,29 +99,28 @@ function Map() {
         mapRef.current.animateToRegion({
             "latitude": coordinate.latitude, 
             "longitude": coordinate.longitude, 
-            "latitudeDelta": position.latitudeDelta, 
-            "longitudeDelta": position.longitudeDelta
+            "latitudeDelta": map.position.latitudeDelta, 
+            "longitudeDelta": map.position.longitudeDelta
         });
 
         //fetch the coordinates and then store its value into the coords Hook.
         getDirections(
-            `${position.latitude},${position.longitude}`, 
+            `${map.position.latitude},${map.position.longitude}`, 
             `${coordinate.latitude},${coordinate.longitude}`,
-            travalMode
+            map.travalMode
         )
         .then(
             direction => {
                 // console.log("DIRECTION");
                 // console.log(direction);
-                sOrigin(direction.origin);
-                sDestination(direction.destination);
+                dispatch(mapActions.sOrigin(direction.origin));
+                dispatch(mapActions.sDestination(direction.destination));
+                dispatch(mapActions.sPolylines(direction.steps));
+                dispatch(mapActions.sMarkers(direction.markers));
                 
                 if (direction.destination !== null) {
                     destinationAddRef.current?.setAddressText(direction.destination.address);
                 }
-
-                sPolylines(direction.steps);
-                sMarkers(direction.markers);
             }
         )
         .catch(
@@ -152,23 +141,22 @@ function Map() {
                     // console.log("LOCATION INFO");
                     // console.log(locationInfo);
                     getDirections(
-                        `${position.latitude},${position.longitude}`, 
+                        `${map.position.latitude},${map.position.longitude}`, 
                         `${locationInfo.latitude},${locationInfo.longitude}`,
-                        travalMode
+                        map.travalMode
                     )
                     .then(
                         direction => {
                             // console.log("DIRECTION");
                             // console.log(direction);
-                            sOrigin(direction.origin);
-                            sDestination(direction.destination);
+                            dispatch(mapActions.sOrigin(direction.origin));
+                            dispatch(mapActions.sDestination(direction.destination));
+                            dispatch(mapActions.sPolylines(direction.steps));
+                            dispatch(mapActions.sMarkers(direction.markers));
                             
                             if (direction.destination !== null) {
                                 destinationAddRef.current?.setAddressText(direction.destination.address);
                             }
-            
-                            sPolylines(direction.steps);
-                            sMarkers(direction.markers);
                         }
                     )
                     .catch(
@@ -189,13 +177,13 @@ function Map() {
     return (
         <SafeAreaView style={styles.container}>
             {
-                position &&
+                map.position &&
                 <View style={styles.mapContainer}>
                     <MapView 
                         onPress={onMapPress}
                         style={styles.map} 
                         showsUserLocation={true}
-                        initialRegion={position}
+                        initialRegion={map.position}
                         provider={MapView.PROVIDER_GOOGLE}
                         showsMyLocationButton={false}
                         showsCompass={false}
@@ -207,34 +195,34 @@ function Map() {
                         ref={mapRef} //assign our ref to this MapView
                     >
                         {
-                            origin &&
+                            map.origin &&
                             <Marker
                                 coordinate={{
-                                    "latitude": origin.latitude, 
-                                    "longitude": origin.longitude
+                                    "latitude": map.origin.latitude, 
+                                    "longitude": map.origin.longitude
                                 }}
-                                title={origin.address}
+                                title={map.origin.address}
                                 key={"origin_loc"}
                             />
                         }
                         {
-                            destination &&
+                            map.destination &&
                             <Marker
                                 coordinate={{
-                                    "latitude": destination.latitude, 
-                                    "longitude": destination.longitude
+                                    "latitude": map.destination.latitude, 
+                                    "longitude": map.destination.longitude
                                 }}
-                                title={destination.address}
-                                description={`distance: ${destination.distance} duration: ${destination.duration}`}
+                                title={map.destination.address}
+                                description={`distance: ${map.destination.distance} duration: ${map.destination.duration}`}
                                 key={`destination_loc`}
                             />
                         }
                         {
-                            origin &&
-                            destination &&
-                            (polylines.length >= 1) &&
+                            map.origin &&
+                            map.destination &&
+                            (map.polylines.length >= 1) &&
                             (
-                                polylines.map((element, index)  => {
+                                map.polylines.map((element, index)  => {
 
                                     let coords = decode(element.polyline.points).map((coord) => {
                                         return {
@@ -256,9 +244,9 @@ function Map() {
                             )
                         }
                         {
-                            (markers.length >= 1) &&
+                            (map.markers.length >= 1) &&
                             (
-                                markers.map((element, index)  => {
+                                map.markers.map((element, index)  => {
 
                                     return (
                                         <Marker 
@@ -318,43 +306,43 @@ function Map() {
 
                     <View style={styles.buttonContainer}>
                         <TouchableOpacity 
-                            style={[styles.buttonSquare, (travalMode === "DRIVING") && styles.buttonActive]} 
+                            style={[styles.buttonSquare, (map.travalMode === "DRIVING") && styles.buttonActive]} 
                             onPress={
-                                () => sTravalMode("DRIVING")
+                                () => dispatch(mapActions.sTravalMode("DRIVING"))
                             }
                         > 
                             <FontAwesome5 name="car" size={normalize(14)} color="black" />
                         </TouchableOpacity>
 
                         <TouchableOpacity 
-                            style={[styles.buttonSquare, (travalMode === "WALKING") && styles.buttonActive]} 
+                            style={[styles.buttonSquare, (map.travalMode === "WALKING") && styles.buttonActive]} 
                             onPress={
-                                () => sTravalMode("WALKING")
+                                () => dispatch(mapActions.sTravalMode("WALKING"))
                             }
                         > 
                             <FontAwesome5 name="walking" size={normalize(14)} color="black" />
                         </TouchableOpacity>
 
                         <TouchableOpacity 
-                            style={[styles.buttonSquare, (travalMode === "SUBWAY") && styles.buttonActive]} 
+                            style={[styles.buttonSquare, (map.travalMode === "SUBWAY") && styles.buttonActive]} 
                             onPress={
-                                () => sTravalMode("SUBWAY")
+                                () => dispatch(mapActions.sTravalMode("SUBWAY"))
                             }
                         > 
                             <FontAwesome5 name="subway" size={normalize(14)} color="black" />
                         </TouchableOpacity>
                         <TouchableOpacity 
-                            style={[styles.buttonSquare, (travalMode === "BUS") && styles.buttonActive]} 
+                            style={[styles.buttonSquare, (map.travalMode === "BUS") && styles.buttonActive]} 
                             onPress={
-                                () => sTravalMode("BUS")
+                                () => dispatch(mapActions.sTravalMode("BUS"))
                             }
                         > 
                             <FontAwesome5 name="bus" size={normalize(14)} color="black" />
                         </TouchableOpacity>
                         <TouchableOpacity 
-                            style={[styles.buttonSquare, (travalMode === "BICYCLING") && styles.buttonActive]} 
+                            style={[styles.buttonSquare, (map.travalMode === "BICYCLING") && styles.buttonActive]} 
                             onPress={
-                                () => sTravalMode("BICYCLING")
+                                () => dispatch(mapActions.sTravalMode("BICYCLING"))
                             }
                         > 
                             <FontAwesome5 name="bicycle" size={normalize(12)} color="black" />
