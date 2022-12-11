@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Provider, useSelector, useDispatch } from "react-redux";
 import * as Location from "expo-location";
 
@@ -6,7 +6,7 @@ import LoginUser from "./Users/LoginUser";
 import MainPage from "./Main/Main";
 import UserPage from "./Users/UserPage";
 import Map from "./Map/Map";
-import { mapActions } from "../store/map-slice";
+import { mapActions } from "./store/map-slice";
 
 function Foreground() {
 
