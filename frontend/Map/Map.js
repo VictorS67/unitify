@@ -30,64 +30,42 @@ function Map() {
     }
 
     useEffect(() => {
-        (async () => {
-        
-            let { status } = await Location.requestForegroundPermissionsAsync();
-            if (status !== 'granted') {
-                dispatch(mapActions.sErrorMsg(
-                    {
-                        message: 'Permission to access location was denied'
-                    }
-                ));
-                return;
-            }
-        
-            let curr_location = await Location.getCurrentPositionAsync({});
-            // console.log(curr_location)
-            dispatch(mapActions.sPosition(
-                {
-                    latitude: curr_location.coords.latitude,
-                    longitude: curr_location.coords.longitude,
-                    latitudeDelta: 0.02, 
-                    longitudeDelta: 0.02
-                }
-            ));
-        })();
-    }, [dispatch]);
-
-    useEffect(() => {
         // console.log(travalMode, '- Has changed')
         if (map.position && map.origin && map.destination) {
-            getDirections(
-                `${map.position.latitude},${map.position.longitude}`, 
-                `${map.destination.latitude},${map.destination.longitude}`,
-                map.travalMode
-            )
-            .then(
-                direction => {
-                    // console.log("DIRECTION");
-                    // console.log(direction);
-                    dispatch(mapActions.sOrigin(direction.origin));
-                    dispatch(mapActions.sDestination(direction.destination));
-                    dispatch(mapActions.sPolylines(direction.steps));
-                    dispatch(mapActions.sMarkers(direction.markers));
-
-                    if (direction.destination !== null) {
-                        destinationAddRef.current?.setAddressText(direction.destination.address);
-                    }
-                }
-            )
-            .catch(
-                err => {
-                    console.log("Something went wrong");
-                }
-            );
+            updateDirection(map.position, map.destination, map.travalMode);
         }
     }, [map.travalMode, dispatch]) // <-- here put the parameter to listen
 
     const goToCurrentPosition = () => {
         //Animate the user to new region. Complete this animation in 3 seconds
         mapRef.current.animateToRegion(map.position);
+    };
+
+    const updateDirection = (position, destination, travalMode) => {
+        getDirections(
+            `${position.latitude},${position.longitude}`, 
+            `${destination.latitude},${destination.longitude}`,
+            travalMode
+        )
+        .then(
+            direction => {
+                // console.log("DIRECTION");
+                // console.log(direction);
+                dispatch(mapActions.sOrigin(direction.origin));
+                dispatch(mapActions.sDestination(direction.destination));
+                dispatch(mapActions.sPolylines(direction.steps));
+                dispatch(mapActions.sMarkers(direction.markers));
+
+                if (direction.destination !== null) {
+                    destinationAddRef.current?.setAddressText(direction.destination.address);
+                }
+            }
+        )
+        .catch(
+            err => {
+                console.log("Something went wrong");
+            }
+        );
     };
 
     const onMapPress = (e) => {
@@ -104,30 +82,7 @@ function Map() {
         });
 
         //fetch the coordinates and then store its value into the coords Hook.
-        getDirections(
-            `${map.position.latitude},${map.position.longitude}`, 
-            `${coordinate.latitude},${coordinate.longitude}`,
-            map.travalMode
-        )
-        .then(
-            direction => {
-                // console.log("DIRECTION");
-                // console.log(direction);
-                dispatch(mapActions.sOrigin(direction.origin));
-                dispatch(mapActions.sDestination(direction.destination));
-                dispatch(mapActions.sPolylines(direction.steps));
-                dispatch(mapActions.sMarkers(direction.markers));
-                
-                if (direction.destination !== null) {
-                    destinationAddRef.current?.setAddressText(direction.destination.address);
-                }
-            }
-        )
-        .catch(
-            err => {
-                console.log("Something went wrong");
-            }
-        );
+        updateDirection(map.position, coordinate, map.travalMode);
     }
 
     const onSearchPress = () => {
@@ -140,30 +95,7 @@ function Map() {
                 locationInfo => {
                     // console.log("LOCATION INFO");
                     // console.log(locationInfo);
-                    getDirections(
-                        `${map.position.latitude},${map.position.longitude}`, 
-                        `${locationInfo.latitude},${locationInfo.longitude}`,
-                        map.travalMode
-                    )
-                    .then(
-                        direction => {
-                            // console.log("DIRECTION");
-                            // console.log(direction);
-                            dispatch(mapActions.sOrigin(direction.origin));
-                            dispatch(mapActions.sDestination(direction.destination));
-                            dispatch(mapActions.sPolylines(direction.steps));
-                            dispatch(mapActions.sMarkers(direction.markers));
-                            
-                            if (direction.destination !== null) {
-                                destinationAddRef.current?.setAddressText(direction.destination.address);
-                            }
-                        }
-                    )
-                    .catch(
-                        err => {
-                            console.log("Something went wrong");
-                        }
-                    );
+                    updateDirection(map.position, locationInfo, map.travalMode);
                 }
             )
             .catch(
