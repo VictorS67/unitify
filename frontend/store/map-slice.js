@@ -3,6 +3,7 @@ import { createSlice } from '@reduxjs/toolkit';
 const mapSlice = createSlice({
     name: 'map',
     initialState: { 
+        centerLocation: false,
         position: null, // Current position of the user
         travalMode: "DRIVING", // Travel Mode
         origin: null, // Origin information
@@ -39,6 +40,9 @@ const mapSlice = createSlice({
         sErrorMsg(state, action) {
             const errorMsg = action.payload;
             state.errorMsg = errorMsg;
+        },
+        toggleCenterLocation(state) {
+            state.centerLocation = !state.centerLocation;
         }
     },
 });

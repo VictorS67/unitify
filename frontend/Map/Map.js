@@ -9,18 +9,18 @@ import { decode } from "@mapbox/polyline";
 
 import TalkBubble from "../UI/TalkBubble";
 import PolylineInfo from "../UI/PolylineInfo";
+import MapTool from "./MapTool";
 import { normalize } from "../Tool/FontSize";
-import { getDirections, getLocation, GOOGLE_MAP_API } from "../Utils/GoogleMap";
+import { updateDirection } from "../store/map-actions";
 import { mapActions } from "../store/map-slice";
 
 
 function Map() {
 
-    const mapRef = useRef(null);
-    const destinationAddRef = useRef(null);
-
     const dispatch = useDispatch();
     const map = useSelector((state) => state.map);
+
+    const mapRef = useRef(null);
 
     const polyline_colors = {
         "DRIVING": "#f07167",
@@ -32,41 +32,18 @@ function Map() {
     useEffect(() => {
         // console.log(travalMode, '- Has changed')
         if (map.position && map.origin && map.destination) {
-            updateDirection(map.position, map.destination, map.travalMode);
+            dispatch(updateDirection(map.position, map.destination, map.travalMode));
         }
     }, [map.travalMode, dispatch]) // <-- here put the parameter to listen
 
-    const goToCurrentPosition = () => {
-        //Animate the user to new region. Complete this animation in 3 seconds
-        mapRef.current.animateToRegion(map.position);
-    };
-
-    const updateDirection = (position, destination, travalMode) => {
-        getDirections(
-            `${position.latitude},${position.longitude}`, 
-            `${destination.latitude},${destination.longitude}`,
-            travalMode
-        )
-        .then(
-            direction => {
-                // console.log("DIRECTION");
-                // console.log(direction);
-                dispatch(mapActions.sOrigin(direction.origin));
-                dispatch(mapActions.sDestination(direction.destination));
-                dispatch(mapActions.sPolylines(direction.steps));
-                dispatch(mapActions.sMarkers(direction.markers));
-
-                if (direction.destination !== null) {
-                    destinationAddRef.current?.setAddressText(direction.destination.address);
-                }
-            }
-        )
-        .catch(
-            err => {
-                console.log("Something went wrong");
-            }
-        );
-    };
+    useEffect(() => {
+        // console.log(travalMode, '- Has changed')
+        if (map.position && mapRef.current && map.centerLocation === true) {
+            //Animate the user to new region. Complete this animation in 3 seconds
+            mapRef.current.animateToRegion(map.position);
+            dispatch(mapActions.toggleCenterLocation());
+        }
+    }, [map.centerLocation, dispatch]) // <-- here put the parameter to listen
 
     const onMapPress = (e) => {
         const coordinate = e.nativeEvent.coordinate;
@@ -82,28 +59,7 @@ function Map() {
         });
 
         //fetch the coordinates and then store its value into the coords Hook.
-        updateDirection(map.position, coordinate, map.travalMode);
-    }
-
-    const onSearchPress = () => {
-        if (destinationAddRef.current && destinationAddRef.current.getAddressText() !== "") {
-
-            getLocation(
-                destinationAddRef.current.getAddressText()
-            )
-            .then(
-                locationInfo => {
-                    // console.log("LOCATION INFO");
-                    // console.log(locationInfo);
-                    updateDirection(map.position, locationInfo, map.travalMode);
-                }
-            )
-            .catch(
-                err => {
-                    console.log("Something went wrong");
-                }
-            )
-        }
+        dispatch(updateDirection(map.position, coordinate, map.travalMode));
     }
 
     return (
@@ -201,98 +157,8 @@ function Map() {
 
                     </MapView>
 
-                    <View style={styles.inputContainer}>
-                        <GooglePlacesAutocomplete
-                            ref={destinationAddRef}
-                            placeholder="Type a place"
-                            query={{key: GOOGLE_MAP_API}}
-                            fetchDetails={true}
-                            onFail={error => console.log(error)}
-                            onNotFound={() => console.log('no results')}
-                            renderRightButton={() => {
-                                return (
-                                    <View style={{ flexDirection: "row", flex: 1}}>
-                                        <TouchableOpacity 
-                                            style={styles.buttonInputClear} 
-                                            onPress={
-                                                () => { 
-                                                    destinationAddRef.current.clear();
-                                                    destinationAddRef.current.blur();
-                                                }
-                                            }
-                                        > 
-                                            <Ionicons name="close" size={normalize(24)} color="black" />
-                                        </TouchableOpacity>
-                                        <TouchableOpacity 
-                                            style={styles.buttonInputClear} 
-                                            onPress={onSearchPress}
-                                        > 
-                                            <FontAwesome5 name="search" size={normalize(15)} color="black" />
-                                        </TouchableOpacity>
-                                    </View>
-                                );
-                            }}
-                            styles={googlePlaceStyles}
-                        />
-                    </View>
+                    <MapTool />
 
-                    <View style={styles.buttonContainer}>
-                        <TouchableOpacity 
-                            style={[styles.buttonSquare, (map.travalMode === "DRIVING") && styles.buttonActive]} 
-                            onPress={
-                                () => dispatch(mapActions.sTravalMode("DRIVING"))
-                            }
-                        > 
-                            <FontAwesome5 name="car" size={normalize(14)} color="black" />
-                        </TouchableOpacity>
-
-                        <TouchableOpacity 
-                            style={[styles.buttonSquare, (map.travalMode === "WALKING") && styles.buttonActive]} 
-                            onPress={
-                                () => dispatch(mapActions.sTravalMode("WALKING"))
-                            }
-                        > 
-                            <FontAwesome5 name="walking" size={normalize(14)} color="black" />
-                        </TouchableOpacity>
-
-                        <TouchableOpacity 
-                            style={[styles.buttonSquare, (map.travalMode === "SUBWAY") && styles.buttonActive]} 
-                            onPress={
-                                () => dispatch(mapActions.sTravalMode("SUBWAY"))
-                            }
-                        > 
-                            <FontAwesome5 name="subway" size={normalize(14)} color="black" />
-                        </TouchableOpacity>
-                        <TouchableOpacity 
-                            style={[styles.buttonSquare, (map.travalMode === "BUS") && styles.buttonActive]} 
-                            onPress={
-                                () => dispatch(mapActions.sTravalMode("BUS"))
-                            }
-                        > 
-                            <FontAwesome5 name="bus" size={normalize(14)} color="black" />
-                        </TouchableOpacity>
-                        <TouchableOpacity 
-                            style={[styles.buttonSquare, (map.travalMode === "BICYCLING") && styles.buttonActive]} 
-                            onPress={
-                                () => dispatch(mapActions.sTravalMode("BICYCLING"))
-                            }
-                        > 
-                            <FontAwesome5 name="bicycle" size={normalize(12)} color="black" />
-                        </TouchableOpacity>
-
-
-                        <TouchableOpacity 
-                            style={styles.button} 
-                            onPress={
-                                () => goToCurrentPosition()
-                            }
-                        > 
-                            <Ionicons name="locate" size={normalize(15)} color="black" />
-                            <Text style={styles.buttonText}>
-                                &nbsp;Locate Myself
-                            </Text>
-                        </TouchableOpacity>
-                    </View>
                 </View>
             }
         </SafeAreaView>

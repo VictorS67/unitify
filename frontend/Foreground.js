@@ -40,7 +40,7 @@ function Foreground() {
     }, [dispatch]);
 
     return (
-        <Map />
+        <MainPage />
     );
 }
 

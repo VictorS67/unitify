@@ -31,9 +31,9 @@ const TripCard = props => {
                     Your Trip
                 </Text>
             </View>
-            <TripPlanningCard trending={trending} />
+            {/* <TripPlanningCard trending={trending} /> */}
 
-            {/* <React.Fragment>
+            <React.Fragment>
                 <View style={styles.tripCardContent}>
                     <View style={styles.flexColumn}>
                         <Text style={styles.cardText}>
@@ -112,7 +112,7 @@ const TripCard = props => {
                         &nbsp;Not My Trip
                     </Text>
                 </Pressable>
-            </React.Fragment> */}
+            </React.Fragment>
         </View>
     );
 };
