@@ -79,7 +79,8 @@ export async function getDirections(startLoc, destinationLoc, travalModeString) 
             "longitude": leg.end_location.lng,
             "distance": leg.distance.text,
             "duration": leg.duration.text,
-            "address": leg.end_address
+            "address": leg.end_address,
+            "address_simple": leg.end_address.split(",")[0]
         }
         let steps = leg.steps;
         // console.log(respJson.routes[0]);

@@ -83,7 +83,7 @@ const MainPage = props => {
                     <Card style={[styles.userCard, {
                         top: normalize(35)
                     }]} childrenStyle={styles.userCardContent}>
-                        <FontAwesome5 name="user" size={normalize(26)} color="black" />
+                        <FontAwesome5 name="user" size={normalize(22)} color="black" />
                     </Card>
                     <Card 
                         style={[{

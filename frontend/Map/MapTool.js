@@ -19,17 +19,20 @@ const MapTool = (props) => {
 
     useEffect(() => {
         // console.log(travalMode, '- Has changed')
-        if (map.destination && map.destination.address) {
-            destinationAddRef.current?.setAddressText(map.destination.address);
+        if (map.destination && map.destination.address_simple) {
+            destinationAddRef.current?.setAddressText(map.destination.address_simple);
         }
     }, [map.destination, dispatch]) // <-- here put the parameter to listen
 
     const onSearchPress = () => {
         if (destinationAddRef.current && destinationAddRef.current.getAddressText() !== "") {
+            let text = destinationAddRef.current.getAddressText();
 
-            getLocation(
-                destinationAddRef.current.getAddressText()
-            )
+            if (map.destination && map.destination.address_simple && text === map.destination.address_simple) {
+                text = map.destination.address;
+            }
+
+            getLocation(text)
             .then(
                 locationInfo => {
                     // console.log("LOCATION INFO");
@@ -134,9 +137,9 @@ const MapTool = (props) => {
                     onNotFound={() => console.log('no results')}
                     renderLeftButton={() => {
                         return (
-                            <View style={{ flexDirection: "row", flex: 0.5}}>
+                            <View style={{ flexDirection: "row", flex: 0.3}}>
                                 <TouchableOpacity 
-                                    style={styles.buttonInputClear} 
+                                    style={[styles.buttonInputClear, {backgroundColor: "transparent"}]} 
                                     onPress={
                                         () => goToCurrentPosition()
                                     }
@@ -149,12 +152,21 @@ const MapTool = (props) => {
 
                     renderRightButton={() => {
                         return (
-                            <View style={{ flexDirection: "row", flex: (props.keyboardStatus && props.keyboardStatus === true)? 1: 0.5}}>
+                            <View style={{ flexDirection: "row", flex: (props.keyboardStatus && props.keyboardStatus === true)? 0.7: 0.5}}>
                                 {
                                     (props.keyboardStatus) &&
                                     (props.keyboardStatus === true) &&
                                     <TouchableOpacity 
-                                        style={styles.buttonInputClear} 
+                                        style={
+                                            {
+                                                flex: 0.7,
+                                                backgroundColor: "transparent",
+                                                borderRadius: normalize(5),
+                                                alignItems: "center",
+                                                justifyContent: "center",
+                                                marginHorizontal: normalize(3)
+                                            }
+                                        } 
                                         onPress={
                                             () => { 
                                                 destinationAddRef.current.clear();
@@ -166,7 +178,7 @@ const MapTool = (props) => {
                                     </TouchableOpacity>
                                 }
                                 <TouchableOpacity 
-                                    style={styles.buttonInputClear} 
+                                    style={[styles.buttonInputClear, {backgroundColor: "transparent"}]} 
                                     onPress={onSearchPress}
                                 > 
                                     <FontAwesome5 name="search" size={normalize(15)} color="black" />
@@ -255,7 +267,7 @@ const googlePlaceStyles = StyleSheet.create({
         marginBottom: normalize(2)
     },
     textInput: {
-        backgroundColor: '#FFFFFF',
+        backgroundColor: 'transparent',
         height: "100%",
         borderRadius: normalize(5),
         paddingVertical: normalize(5),
