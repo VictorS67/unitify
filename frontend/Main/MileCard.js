@@ -54,8 +54,7 @@ const styles = StyleSheet.create({
     mileCard: { 
         flex: 1, 
         backgroundColor: "orange", 
-        padding: normalize(10),
-        height: "100%"
+        padding: normalize(10)
     },
     mileCardTitle: { 
         flexDirection: "row", 

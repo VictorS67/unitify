@@ -157,8 +157,6 @@ function Map() {
 
                     </MapView>
 
-                    <MapTool />
-
                 </View>
             }
         </SafeAreaView>

@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { ScrollView , View, StyleSheet, Keyboard, useWindowDimensions } from 'react-native';
-import { FontAwesome5 } from '@expo/vector-icons';
+import { ScrollView , View, StyleSheet, Keyboard, useWindowDimensions, TouchableOpacity } from 'react-native';
+import { FontAwesome5, Ionicons } from '@expo/vector-icons';
+import { useDispatch, useSelector } from "react-redux";
+import { mapActions } from "../store/map-slice";
 
 import Card from "../UI/Card";
 import StatusBar from "../UI/StatusBar";
 import Map from "../Map/Map";
+import MapTool from "../Map/MapTool";
 import TripCard from "./TripCard";
 import UsageCard from "./UsageCard";
 import MileCard from "./MileCard";
@@ -19,7 +22,6 @@ const MainPage = props => {
     const [pageY, setPageY] = useState(null);
     const [locationYOffest, setLocationYOffest] = useState(0);
     const [pageYOffest, setPageYOffest] = useState(0);
-
 
     const { height, width, scale, fontScale } = useWindowDimensions();
 
@@ -55,7 +57,7 @@ const MainPage = props => {
         setPageY(e.nativeEvent.pageY);
 
         // setScrollOffset(currentOffset);
-        setScrollHeight(Math.max(Math.min(scrollHeight + pageYOffest / height * 100, 50), 17));
+        setScrollHeight(Math.max(Math.min(scrollHeight + pageYOffest / height * 100, 63), 17));
     }
 
     const onTouchEnd = (e) => {
@@ -69,24 +71,61 @@ const MainPage = props => {
         <View style={styles.container}>
             <View style={[{flexGrow: 1}]}>
                 <Map />
-                <Card style={styles.userCard} childrenStyle={styles.userCardContent}>
-                    <FontAwesome5 name="user" size={normalize(26)} color="black" />
-                </Card>
+                <View style={
+                    {
+                        ...StyleSheet.absoluteFillObject,
+                        flexDirection: "column",
+                        height: "100%",
+                        alignItems: "flex-end",
+                        justifyContent: "space-between"
+                    }
+                }>
+                    <Card style={[styles.userCard, {
+                        top: normalize(35)
+                    }]} childrenStyle={styles.userCardContent}>
+                        <FontAwesome5 name="user" size={normalize(26)} color="black" />
+                    </Card>
+                    <Card 
+                        style={[{
+                            bottom: normalize(5),
+                            alignSelf: "center",
+                            width: "95%",
+                            borderRadius: normalize(10),
+                            flexDirection: "row",
+                            backgroundColor: "green",
+                            paddingVertical: normalize(7),
+                            maxHeight: "100%"
+                        }]} 
+
+                        childrenStyle={{ 
+                            width: "100%", 
+                            flex: 1, 
+                            flexDirection: "row"
+                        }}
+                    >
+                        <MapTool style={{flex: 1}} keyboardStatus={keyboardStatus}/>
+                    </Card>
+                </View>
             </View>
             <ScrollView 
-                style={[(keyboardStatus === false) ? {maxHeight: `${scrollHeight}%`} : {maxHeight: "30%"}]}
+                style={[(keyboardStatus === false) ? {maxHeight: `${scrollHeight}%`} : {maxHeight: "0%"}]}
                 onTouchMove={onTouchMove}
                 onTouchEnd={onTouchEnd}
                 scrollEnabled={false}
                 contentContainerStyle={{ flexGrow: 1 }}
             >
-                {/* <View style={[styles.container, {flex: 1}]}>
+                <View style={[styles.container]}>
                     <TripCard distance={0.2} duration={320} speed={0.3} pause={3} />
-                </View> */}
+                </View>
                 {
                     keyboardStatus === false &&
-                    <View style={[styles.container, {flex: 2}]}>
+                    <View style={[styles.container, {maxHeight: normalize(120), minHeight: normalize(120)}]}>
                         <MileCard />
+                    </View>
+                }
+                {
+                    keyboardStatus === false &&
+                    <View style={[styles.container, {maxHeight: normalize(150), minHeight: normalize(150)}]}>
                         <UsageCard />
                     </View>
                 }
@@ -103,9 +142,10 @@ const styles = StyleSheet.create({
         backgroundColor: '#ecf0f1'
     },
     userCard: {
-        alignSelf: "flex-end",
+        // alignSelf: "flex-end",
         right: normalize(20),
-        top: normalize(35),
+        // top: normalize(35),
+
         width: normalize(50),
         height: normalize(50),
         borderRadius: normalize(50/2)
