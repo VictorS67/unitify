@@ -13,12 +13,14 @@ import MapTool from "./MapTool";
 import { normalize } from "../Tool/FontSize";
 import { updateDirection } from "../store/map-actions";
 import { mapActions } from "../store/map-slice";
+import { mainActions } from "../store/main-slice";
 
 
 function Map() {
 
     const dispatch = useDispatch();
     const map = useSelector((state) => state.map);
+    const main = useSelector((state) => state.main);
 
     const mapRef = useRef(null);
 
@@ -32,7 +34,14 @@ function Map() {
     useEffect(() => {
         // console.log(travalMode, '- Has changed')
         if (map.position && map.origin && map.destination) {
-            dispatch(updateDirection(map.position, map.destination, map.travalMode));
+
+            if (main.navStatus !== "NAV") {
+                dispatch(updateDirection(map.position, map.destination, map.travalMode));
+            }
+
+            if (main.navStatus === "INIT") {
+                dispatch(mainActions.moveToNextNavStatus());
+            }
         }
     }, [map.travalMode, dispatch]) // <-- here put the parameter to listen
 
@@ -59,7 +68,13 @@ function Map() {
         });
 
         //fetch the coordinates and then store its value into the coords Hook.
-        dispatch(updateDirection(map.position, coordinate, map.travalMode));
+        if (main.navStatus !== "NAV") {
+            dispatch(updateDirection(map.position, coordinate, map.travalMode));
+        }
+        if (main.navStatus === "INIT") {
+            dispatch(mainActions.moveToNextNavStatus());
+        }
+
     }
 
     return (

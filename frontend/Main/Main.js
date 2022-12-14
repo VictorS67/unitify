@@ -2,137 +2,110 @@ import React, { useState, useEffect } from "react";
 import { ScrollView , View, StyleSheet, Keyboard, useWindowDimensions, TouchableOpacity } from 'react-native';
 import { FontAwesome5, Ionicons } from '@expo/vector-icons';
 import { useDispatch, useSelector } from "react-redux";
-import { mapActions } from "../store/map-slice";
 
 import Card from "../UI/Card";
-import StatusBar from "../UI/StatusBar";
 import Map from "../Map/Map";
 import MapTool from "../Map/MapTool";
 import TripCard from "./TripCard";
 import UsageCard from "./UsageCard";
 import MileCard from "./MileCard";
 import { normalize } from "../Tool/FontSize";
+import { mainActions } from "../store/main-slice";
 
 
 const MainPage = props => {
 
-    const [keyboardStatus, setKeyboardStatus] = useState(false);
-    const [scrollHeight, setScrollHeight] = useState(50);
-    const [locationY, setLocationY] = useState(null);
-    const [pageY, setPageY] = useState(null);
-    const [locationYOffest, setLocationYOffest] = useState(0);
-    const [pageYOffest, setPageYOffest] = useState(0);
+    const dispatch = useDispatch();
+    const main = useSelector((state) => state.main);
+    
+    const [scrollHeight, sScrollHeight] = useState(30);
+    const [pageY, sPageY] = useState(null);
+    const [pageYOffest, sPageYOffset] = useState(0);
 
     const { height, width, scale, fontScale } = useWindowDimensions();
 
     useEffect(() => {
         const showSubscription = Keyboard.addListener("keyboardDidShow", () => {
-            setKeyboardStatus(true);
+            dispatch(mainActions.sKeyboardStatus(true));
         });
 
         const hideSubscription = Keyboard.addListener("keyboardDidHide", () => {
-            setKeyboardStatus(false);
+            dispatch(mainActions.sKeyboardStatus(false));
         });
 
         return () => {
             showSubscription.remove();
             hideSubscription.remove();
         };
-    }, []);
+    }, [dispatch]);
+
+    useEffect(() => {
+        sScrollHeight(Math.max(Math.min(scrollHeight, main.minHeight), main.maxHeight));
+    }, [scrollHeight])
 
     const onTouchMove = (e) => {
 
         // console.log("SCROLL");
         // console.log('touch info:', e.nativeEvent);
 
-        if (locationY !== null) {
-            setLocationYOffest(locationY - e.nativeEvent.locationY);
-        }
-
         if (pageY !== null) {
-            setPageYOffest(pageY - e.nativeEvent.pageY);
+            sPageYOffset(pageY - e.nativeEvent.pageY);
         }
 
-        setLocationY(e.nativeEvent.locationY);
-        setPageY(e.nativeEvent.pageY);
-
-        // setScrollOffset(currentOffset);
-        setScrollHeight(Math.max(Math.min(scrollHeight + pageYOffest / height * 100, 63), 17));
+        sPageY(e.nativeEvent.pageY);
+        sScrollHeight(scrollHeight + pageYOffest / height * 100);
     }
 
     const onTouchEnd = (e) => {
-        setLocationYOffest(0);
-        setPageYOffest(0);
-        setLocationY(null);
-        setPageY(null);
+        sPageY(null);
+        sPageYOffset(0);
     }
 
     return (
         <View style={styles.container}>
             <View style={[{flexGrow: 1}]}>
                 <Map />
-                <View style={
-                    {
-                        ...StyleSheet.absoluteFillObject,
-                        flexDirection: "column",
-                        height: "100%",
-                        alignItems: "flex-end",
-                        justifyContent: "space-between"
-                    }
-                }>
-                    <Card style={[styles.userCard, {
-                        top: normalize(35)
-                    }]} childrenStyle={styles.userCardContent}>
+                <View style={styles.mapToolContainer}>
+                    <Card style={styles.userCard} childrenStyle={styles.userCardContent}>
                         <FontAwesome5 name="user" size={normalize(22)} color="black" />
                     </Card>
-                    <Card 
-                        style={[{
-                            bottom: normalize(5),
-                            alignSelf: "center",
-                            width: "95%",
-                            borderRadius: normalize(10),
-                            flexDirection: "row",
-                            backgroundColor: "green",
-                            paddingVertical: normalize(7),
-                            maxHeight: "100%"
-                        }]} 
-
-                        childrenStyle={{ 
-                            width: "100%", 
-                            flex: 1, 
-                            flexDirection: "row"
-                        }}
-                    >
-                        <MapTool style={{flex: 1}} keyboardStatus={keyboardStatus}/>
+                    <Card style={styles.mapToolCard} childrenStyle={styles.mapToolCardContent}>
+                        <MapTool style={{flex: 1}} keyboardStatus={main.keyboardStatus}/>
                     </Card>
                 </View>
             </View>
-            <ScrollView 
-                style={[(keyboardStatus === false) ? {maxHeight: `${scrollHeight}%`} : {maxHeight: "0%"}]}
-                onTouchMove={onTouchMove}
-                onTouchEnd={onTouchEnd}
-                scrollEnabled={false}
-                contentContainerStyle={{ flexGrow: 1 }}
-            >
-                <View style={[styles.container]}>
-                    <TripCard distance={0.2} duration={320} speed={0.3} pause={3} />
-                </View>
-                {
-                    keyboardStatus === false &&
-                    <View style={[styles.container, {maxHeight: normalize(120), minHeight: normalize(120)}]}>
-                        <MileCard />
-                    </View>
-                }
-                {
-                    keyboardStatus === false &&
-                    <View style={[styles.container, {maxHeight: normalize(150), minHeight: normalize(150)}]}>
-                        <UsageCard />
-                    </View>
-                }
-            </ScrollView>
+            {
+                (main.keyboardStatus === false) &&
+                <ScrollView 
+                    style={{maxHeight: `${scrollHeight}%`}}
+                    onTouchMove={onTouchMove}
+                    onTouchEnd={onTouchEnd}
+                    scrollEnabled={false}
+                    contentContainerStyle={{ flexGrow: 1 }}
+                >
+                    {
+                        (main.navStatus !== "INIT") && 
+                        <View style={[styles.container]}>
+                            <TripCard />
+                        </View>
+                    }
+
+                    {
+                        (main.navStatus !== "PLAN") && 
+                        <View style={[styles.container, styles.mileCard]}>
+                            <MileCard />
+                        </View>
+                    }
+                    {
+                        (main.navStatus === "NAV") &&
+                        <View style={[styles.container, styles.usageCard]}>
+                            <UsageCard />
+                        </View>
+                    }
+                </ScrollView>
+            }
         </View>
     )
-
 }
 
 const styles = StyleSheet.create({
@@ -141,19 +114,47 @@ const styles = StyleSheet.create({
         flexDirection: 'column',
         backgroundColor: '#ecf0f1'
     },
+    mapToolContainer: {
+        ...StyleSheet.absoluteFillObject,
+        flexDirection: "column",
+        height: "100%",
+        alignItems: "flex-end",
+        justifyContent: "space-between"
+    },
     userCard: {
-        // alignSelf: "flex-end",
+        top: normalize(35),
         right: normalize(20),
-        // top: normalize(35),
-
         width: normalize(50),
         height: normalize(50),
         borderRadius: normalize(50/2)
+    },
+    mapToolCard: {
+        bottom: normalize(5),
+        alignSelf: "center",
+        width: "95%",
+        borderRadius: normalize(10),
+        flexDirection: "row",
+        backgroundColor: "green",
+        paddingVertical: normalize(7),
+        maxHeight: "100%"
     },
     userCardContent: {
         flex: 1,
         alignItems: 'center', 
         justifyContent: 'center'
+    },
+    mapToolCardContent: {
+        width: "100%", 
+        flex: 1, 
+        flexDirection: "row"
+    },
+    mileCard: {
+        maxHeight: normalize(120), 
+        minHeight: normalize(120)
+    },
+    usageCard: {
+        maxHeight: normalize(150), 
+        minHeight: normalize(150)
     }
 });
 

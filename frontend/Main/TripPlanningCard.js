@@ -1,12 +1,21 @@
 import React from "react";
 import { Text, View, StyleSheet, Pressable } from 'react-native';
+import { useDispatch, useSelector } from "react-redux";
 import { Divider, ProgressBar } from 'react-native-paper';
 import { FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons';
 
 import Card from "../UI/Card";
 import { normalize } from "../Tool/FontSize";
+import { mainActions } from "../store/main-slice";
 
 const TripPlanningCard = (props) => {
+
+    const dispatch = useDispatch();
+    const main = useSelector((state) => state.main);
+
+    const onNavPress = () => {
+        dispatch(mainActions.moveToNextNavStatus());
+    }
 
     return (
         <React.Fragment>
@@ -71,7 +80,7 @@ const TripPlanningCard = (props) => {
                     </View>
                 </Card>
             </View>
-            <Pressable style={styles.button}>
+            <Pressable style={styles.button} onPress={onNavPress}>
                 <Text style={styles.buttonTextLarge}>
                     Let's Go!
                 </Text>

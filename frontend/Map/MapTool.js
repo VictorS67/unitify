@@ -8,12 +8,14 @@ import { normalize } from "../Tool/FontSize";
 import { getLocation, GOOGLE_MAP_API } from "../Utils/GoogleMap";
 import { updateDirection } from "../store/map-actions";
 import { mapActions } from "../store/map-slice";
+import { mainActions } from "../store/main-slice";
 
 
 const MapTool = (props) => {
 
     const dispatch = useDispatch();
     const map = useSelector((state) => state.map);
+    const main = useSelector((state) => state.main);
 
     const destinationAddRef = useRef(null);
 
@@ -37,7 +39,14 @@ const MapTool = (props) => {
                 locationInfo => {
                     // console.log("LOCATION INFO");
                     // console.log(locationInfo);
-                    dispatch(updateDirection(map.position, locationInfo, map.travalMode));
+
+                    if (main.navStatus !== "NAV") {
+                        dispatch(updateDirection(map.position, locationInfo, map.travalMode));
+                    }
+
+                    if (main.navStatus === "INIT") {
+                        dispatch(mainActions.moveToNextNavStatus());
+                    }
                 }
             )
             .catch(
@@ -45,6 +54,12 @@ const MapTool = (props) => {
                     console.log("getLocation: Something went wrong");
                 }
             )
+        }
+    }
+
+    const onTravalModePress = (travalMode) => {
+        if (main.navStatus !== "NAV") {
+            dispatch(mapActions.sTravalMode(travalMode))
         }
     }
 
@@ -71,7 +86,7 @@ const MapTool = (props) => {
                 <TouchableOpacity 
                     style={[styles.buttonSquare, (map.travalMode === "DRIVING") && styles.buttonActive]} 
                     onPress={
-                        () => dispatch(mapActions.sTravalMode("DRIVING"))
+                        () => onTravalModePress("DRIVING")
                     }
                 > 
                     <FontAwesome5 name="car" size={normalize(14)} color="black" />
@@ -83,7 +98,7 @@ const MapTool = (props) => {
                 <TouchableOpacity 
                     style={[styles.buttonSquare, (map.travalMode === "WALKING") && styles.buttonActive]} 
                     onPress={
-                        () => dispatch(mapActions.sTravalMode("WALKING"))
+                        () => onTravalModePress("WALKING")
                     }
                 > 
                     <FontAwesome5 name="walking" size={normalize(14)} color="black" />
@@ -95,7 +110,7 @@ const MapTool = (props) => {
                 <TouchableOpacity 
                     style={[styles.buttonSquare, (map.travalMode === "SUBWAY") && styles.buttonActive]} 
                     onPress={
-                        () => dispatch(mapActions.sTravalMode("SUBWAY"))
+                        () => onTravalModePress("SUBWAY")
                     }
                 > 
                     <FontAwesome5 name="subway" size={normalize(14)} color="black" />
@@ -106,7 +121,7 @@ const MapTool = (props) => {
                 <TouchableOpacity 
                     style={[styles.buttonSquare, (map.travalMode === "BUS") && styles.buttonActive]} 
                     onPress={
-                        () => dispatch(mapActions.sTravalMode("BUS"))
+                        () => onTravalModePress("BUS")
                     }
                 > 
                     <FontAwesome5 name="bus" size={normalize(14)} color="black" />
@@ -117,7 +132,7 @@ const MapTool = (props) => {
                 <TouchableOpacity 
                     style={[styles.buttonSquare, (map.travalMode === "BICYCLING") && styles.buttonActive]} 
                     onPress={
-                        () => dispatch(mapActions.sTravalMode("BICYCLING"))
+                        () => onTravalModePress("BICYCLING")
                     }
                 > 
                     <FontAwesome5 name="bicycle" size={normalize(12)} color="black" />
