@@ -1,9 +1,10 @@
 import React, { useRef, useEffect, useImperativeHandle } from "react";
 import { Text, View, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { useSelector, useDispatch } from "react-redux";
-import { Ionicons, FontAwesome5 } from '@expo/vector-icons';
+import { Ionicons, FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 
+import Card from "../UI/Card";
 import { normalize } from "../Tool/FontSize";
 import { getLocation, GOOGLE_MAP_API } from "../Utils/GoogleMap";
 import { updateDirection } from "../store/map-actions";
@@ -70,152 +71,214 @@ const MapTool = (props) => {
     }
 
     return (
-        <View style={[{
-            width: "100%",
-            flex: 1,
-            paddingHorizontal: normalize(3)
-        }, props.style]}>
-            <ScrollView style={{
-                flexDirection: "row",
-                marginBottom: normalize(5),
-                backgroundColor: "transparent",
-                flexWrap: 'nowrap',
-                maxHeight: normalize(25),
-                paddingHorizontal: normalize(3)
-            }} horizontal={true} contentContainerStyle={{ flexGrow: 1, height: '100%' }} showsHorizontalScrollIndicator={false}>
-                <TouchableOpacity 
-                    style={[styles.buttonSquare, (map.travalMode === "DRIVING") && styles.buttonActive]} 
-                    onPress={
-                        () => onTravalModePress("DRIVING")
-                    }
-                > 
-                    <FontAwesome5 name="car" size={normalize(14)} color="black" />
-                    <Text style={styles.buttonText}>
-                        &nbsp;Car
-                    </Text>
-                </TouchableOpacity>
+        <React.Fragment>
+            <View style={{
+                ...StyleSheet.absoluteFillObject,
+                width: "100%",
+                alignItems: "flex-end",
+                justifyContent: "space-between"
+            }}>
+                <View style={{
+                    flexDirection: "row",
+                    width: "100%",
+                    top: normalize(-35),
+                    justifyContent: "flex-end"
+                }}>
+                    <Card style={{
+                        top: normalize(10),
+                        width: normalize(50),
+                        height: normalize(50),
+                        borderRadius: normalize(50/2),
+                        zIndex: 3, // works on ios
+                        elevation: 3, // works on android
+                    }} childrenStyle={{
+                        flex: 1,
+                        alignItems: 'center', 
+                        justifyContent: 'center'
+                    }}>
+                        <TouchableOpacity 
+                            style={{
+                                flex: 1,
+                                backgroundColor: "transparent",
+                                borderRadius: normalize(5),
+                                alignItems: "center",
+                                justifyContent: "center",
+                                marginHorizontal: normalize(3)
+                            }}
+                            onPress={
+                                () => goToCurrentPosition()
+                            }
+                        > 
+                            <Ionicons name="locate" size={normalize(24)} color="black" />
+                        </TouchableOpacity>
+                    </Card>
+                </View>
+            </View>
+            <View style={[{
+                width: "100%",
+                flex: 1,
+                paddingHorizontal: normalize(3),
+                paddingTop: normalize(5)
+            }, props.style]}>
+                <View style={{
+                    flexDirection: "row", 
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    width: "100%",
+                    paddingBottom: normalize(10),
+                    paddingHorizontal: normalize(10)
+                }}>
+                    <View style={{ flexDirection: "row" }}>
+                        <MaterialCommunityIcons name="transit-connection-variant" size={normalize(20)} color="black" />
+                        <Text style={{ fontSize: normalize(16), paddingHorizontal: normalize(10) }}>
+                            Planning Your Trip
+                        </Text>
+                    </View>
+                </View>
 
-                <TouchableOpacity 
-                    style={[styles.buttonSquare, (map.travalMode === "WALKING") && styles.buttonActive]} 
-                    onPress={
-                        () => onTravalModePress("WALKING")
-                    }
-                > 
-                    <FontAwesome5 name="walking" size={normalize(14)} color="black" />
-                    <Text style={styles.buttonText}>
-                        &nbsp;Walking
-                    </Text>
-                </TouchableOpacity>
+                <ScrollView style={{
+                    flexDirection: "row",
+                    marginBottom: normalize(5),
+                    backgroundColor: "transparent",
+                    flexWrap: 'nowrap',
+                    maxHeight: normalize(25),
+                    paddingHorizontal: normalize(3)
+                }} horizontal={true} contentContainerStyle={{ flexGrow: 1, height: '100%' }} showsHorizontalScrollIndicator={false}>
+                    <TouchableOpacity 
+                        style={[styles.buttonSquare, (map.travalMode === "DRIVING") && styles.buttonActive]} 
+                        onPress={
+                            () => onTravalModePress("DRIVING")
+                        }
+                    > 
+                        <FontAwesome5 name="car" size={normalize(14)} color="black" />
+                        <Text style={styles.buttonText}>
+                            &nbsp;Car
+                        </Text>
+                    </TouchableOpacity>
 
-                <TouchableOpacity 
-                    style={[styles.buttonSquare, (map.travalMode === "SUBWAY") && styles.buttonActive]} 
-                    onPress={
-                        () => onTravalModePress("SUBWAY")
-                    }
-                > 
-                    <FontAwesome5 name="subway" size={normalize(14)} color="black" />
-                    <Text style={styles.buttonText}>
-                        &nbsp;Subway
-                    </Text>
-                </TouchableOpacity>
-                <TouchableOpacity 
-                    style={[styles.buttonSquare, (map.travalMode === "BUS") && styles.buttonActive]} 
-                    onPress={
-                        () => onTravalModePress("BUS")
-                    }
-                > 
-                    <FontAwesome5 name="bus" size={normalize(14)} color="black" />
-                    <Text style={styles.buttonText}>
-                        &nbsp;Shuttle Bus
-                    </Text>
-                </TouchableOpacity>
-                <TouchableOpacity 
-                    style={[styles.buttonSquare, (map.travalMode === "BICYCLING") && styles.buttonActive]} 
-                    onPress={
-                        () => onTravalModePress("BICYCLING")
-                    }
-                > 
-                    <FontAwesome5 name="bicycle" size={normalize(12)} color="black" />
-                    <Text style={styles.buttonText}>
-                        &nbsp;Bicycling
-                    </Text>
-                </TouchableOpacity>
-            </ScrollView>
-            <View style={styles.inputContainer}>
-                <GooglePlacesAutocomplete
-                    ref={destinationAddRef}
-                    placeholder="Type a place"
-                    query={{key: GOOGLE_MAP_API}}
-                    enablePoweredByContainer={false}
-                    fetchDetails={true}
-                    onFail={error => console.log(error)}
-                    onNotFound={() => console.log('no results')}
-                    renderLeftButton={() => {
-                        return (
-                            <View style={{ flexDirection: "row", flex: 0.3}}>
-                                <TouchableOpacity 
-                                    style={[styles.buttonInputClear, {backgroundColor: "transparent"}]} 
-                                    onPress={
-                                        () => goToCurrentPosition()
-                                    }
-                                > 
-                                    <Ionicons name="locate" size={normalize(24)} color="black" />
-                                </TouchableOpacity>
-                            </View>
-                        );
-                    }}
+                    <TouchableOpacity 
+                        style={[styles.buttonSquare, (map.travalMode === "WALKING") && styles.buttonActive]} 
+                        onPress={
+                            () => onTravalModePress("WALKING")
+                        }
+                    > 
+                        <FontAwesome5 name="walking" size={normalize(14)} color="black" />
+                        <Text style={styles.buttonText}>
+                            &nbsp;Walking
+                        </Text>
+                    </TouchableOpacity>
 
-                    renderRightButton={() => {
-                        return (
-                            <View style={{ flexDirection: "row", flex: (props.keyboardStatus && props.keyboardStatus === true)? 0.7: 0.5}}>
-                                {
-                                    (props.keyboardStatus) &&
-                                    (props.keyboardStatus === true) &&
+                    <TouchableOpacity 
+                        style={[styles.buttonSquare, (map.travalMode === "SUBWAY") && styles.buttonActive]} 
+                        onPress={
+                            () => onTravalModePress("SUBWAY")
+                        }
+                    > 
+                        <FontAwesome5 name="subway" size={normalize(14)} color="black" />
+                        <Text style={styles.buttonText}>
+                            &nbsp;Subway
+                        </Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity 
+                        style={[styles.buttonSquare, (map.travalMode === "BUS") && styles.buttonActive]} 
+                        onPress={
+                            () => onTravalModePress("BUS")
+                        }
+                    > 
+                        <FontAwesome5 name="bus" size={normalize(14)} color="black" />
+                        <Text style={styles.buttonText}>
+                            &nbsp;Shuttle Bus
+                        </Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity 
+                        style={[styles.buttonSquare, (map.travalMode === "BICYCLING") && styles.buttonActive]} 
+                        onPress={
+                            () => onTravalModePress("BICYCLING")
+                        }
+                    > 
+                        <FontAwesome5 name="bicycle" size={normalize(12)} color="black" />
+                        <Text style={styles.buttonText}>
+                            &nbsp;Bicycling
+                        </Text>
+                    </TouchableOpacity>
+                </ScrollView>
+                <View style={styles.inputContainer}>
+                    <GooglePlacesAutocomplete
+                        ref={destinationAddRef}
+                        placeholder="Type a place"
+                        query={{key: GOOGLE_MAP_API}}
+                        enablePoweredByContainer={false}
+                        fetchDetails={true}
+                        onFail={error => console.log(error)}
+                        onNotFound={() => console.log('no results')}
+                        renderLeftButton={() => {
+                            return (
+                                <View style={{ flexDirection: "row", flex: 0.3}}>
                                     <TouchableOpacity 
-                                        style={
-                                            {
-                                                flex: 0.7,
-                                                backgroundColor: "transparent",
-                                                borderRadius: normalize(5),
-                                                alignItems: "center",
-                                                justifyContent: "center",
-                                                marginHorizontal: normalize(3)
-                                            }
-                                        } 
+                                        style={[styles.buttonInputClear, {backgroundColor: "transparent"}]} 
                                         onPress={
-                                            () => { 
-                                                destinationAddRef.current.clear();
-                                                destinationAddRef.current.blur();
-                                            }
+                                            () => goToCurrentPosition()
                                         }
                                     > 
-                                        <Ionicons name="close" size={normalize(24)} color="black" />
+                                        <Ionicons name="locate" size={normalize(24)} color="black" />
                                     </TouchableOpacity>
-                                }
-                                <TouchableOpacity 
-                                    style={[styles.buttonInputClear, {backgroundColor: "transparent"}]} 
-                                    onPress={onSearchPress}
-                                > 
-                                    <FontAwesome5 name="search" size={normalize(15)} color="black" />
-                                </TouchableOpacity>
-                            </View>
-                        );
-                    }}
+                                </View>
+                            );
+                        }}
 
-                    renderRow={(rowData) => {
-                        const title = rowData.structured_formatting.main_text;
-                        const address = rowData.structured_formatting.secondary_text;
-                        return (
-                            <View>
-                            <Text style={{ fontSize: 13 }}>{title}</Text>
-                            <Text style={{ fontSize: 10 }}>{address}</Text>
-                         </View>
-                        );
-                    }}
-                    styles={googlePlaceStyles}
-                />
+                        renderRightButton={() => {
+                            return (
+                                <View style={{ flexDirection: "row", flex: (props.keyboardStatus && props.keyboardStatus === true)? 0.7: 0.5}}>
+                                    {
+                                        (props.keyboardStatus) &&
+                                        (props.keyboardStatus === true) &&
+                                        <TouchableOpacity 
+                                            style={
+                                                {
+                                                    flex: 0.7,
+                                                    backgroundColor: "transparent",
+                                                    borderRadius: normalize(5),
+                                                    alignItems: "center",
+                                                    justifyContent: "center",
+                                                    marginHorizontal: normalize(3)
+                                                }
+                                            } 
+                                            onPress={
+                                                () => { 
+                                                    destinationAddRef.current.clear();
+                                                    destinationAddRef.current.blur();
+                                                }
+                                            }
+                                        > 
+                                            <Ionicons name="close" size={normalize(24)} color="black" />
+                                        </TouchableOpacity>
+                                    }
+                                    <TouchableOpacity 
+                                        style={[styles.buttonInputClear, {backgroundColor: "transparent"}]} 
+                                        onPress={onSearchPress}
+                                    > 
+                                        <FontAwesome5 name="search" size={normalize(15)} color="black" />
+                                    </TouchableOpacity>
+                                </View>
+                            );
+                        }}
+
+                        renderRow={(rowData) => {
+                            const title = rowData.structured_formatting.main_text;
+                            const address = rowData.structured_formatting.secondary_text;
+                            return (
+                                <View>
+                                <Text style={{ fontSize: 13 }}>{title}</Text>
+                                <Text style={{ fontSize: 10 }}>{address}</Text>
+                            </View>
+                            );
+                        }}
+                        styles={googlePlaceStyles}
+                    />
+                </View>
             </View>
-        </View>
+        </React.Fragment>
+
     );
 }
 

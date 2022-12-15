@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import Card from "../UI/Card";
 import Map from "../Map/Map";
 import MapTool from "../Map/MapTool";
+import MapPlanning from "../Map/MapPlanning";
 import TripCard from "./TripCard";
 import UsageCard from "./UsageCard";
 import MileCard from "./MileCard";
@@ -71,6 +72,7 @@ const MainPage = props => {
                     </Card>
                     <Card style={styles.mapToolCard} childrenStyle={styles.mapToolCardContent}>
                         <MapTool style={{flex: 1}} keyboardStatus={main.keyboardStatus}/>
+                        {/* <MapPlanning /> */}
                     </Card>
                 </View>
             </View>
