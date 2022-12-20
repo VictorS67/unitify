@@ -36,7 +36,7 @@ function Map() {
         if (map.position && map.origin && map.destination) {
 
             if (main.navStatus !== "NAV") {
-                dispatch(updateDirection(map.position, map.destination, map.travalMode));
+                dispatch(updateDirection(map.origin, map.destination, map.travalMode));
             }
 
             if (main.navStatus === "INIT") {

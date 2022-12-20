@@ -72,7 +72,8 @@ export async function getDirections(startLoc, destinationLoc, travalModeString) 
         let origin_info = {
             "latitude": leg.start_location.lat,
             "longitude": leg.start_location.lng,
-            "address": leg.start_address
+            "address": leg.start_address,
+            "address_simple": leg.start_address.split(",")[0]
         }
         let destination_info = {
             "latitude": leg.end_location.lat,

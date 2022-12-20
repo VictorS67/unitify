@@ -1,7 +1,7 @@
-import React, { useRef, useEffect, useImperativeHandle } from "react";
+import React, { useState, useRef, useEffect, useImperativeHandle } from "react";
 import { Text, View, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { useSelector, useDispatch } from "react-redux";
-import { Ionicons, FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons';
+import { Octicons, Ionicons, FontAwesome5, MaterialCommunityIcons, FontAwesome } from '@expo/vector-icons';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 
 import Card from "../UI/Card";
@@ -18,6 +18,7 @@ const MapTool = (props) => {
     const map = useSelector((state) => state.map);
     const main = useSelector((state) => state.main);
 
+    const originAddRef = useRef(null);
     const destinationAddRef = useRef(null);
 
     useEffect(() => {
@@ -27,7 +28,46 @@ const MapTool = (props) => {
         }
     }, [map.destination, dispatch]) // <-- here put the parameter to listen
 
-    const onSearchPress = () => {
+    useEffect(() => {
+        // console.log(travalMode, '- Has changed')
+        if (map.origin && map.origin.address_simple) {
+            originAddRef.current?.setAddressText(map.origin.address_simple);
+        }
+    }, [map.origin, dispatch]) // <-- here put the parameter to listen
+
+    const onSwitchPress = () => {
+        if (
+            destinationAddRef.current && 
+            destinationAddRef.current.getAddressText() !== "" &&
+            originAddRef.current &&
+            originAddRef.current.getAddressText() !== ""
+        ) {
+            let origin_info = map.origin;
+            let destination_info = map.destination;
+            
+            dispatch(mapActions.sOrigin({
+                "latitude": destination_info.latitude,
+                "longitude": destination_info.longitude,
+                "address": destination_info.address,
+                "address_simple": destination_info.address_simple
+            }));
+
+            dispatch(mapActions.sDestination({
+                "latitude": origin_info.latitude,
+                "longitude": origin_info.longitude,
+                "distance": destination_info.distance,
+                "duration": destination_info.duration,
+                "address": origin_info.address,
+                "address_simple": origin_info.address_simple
+            }));
+
+            if (main.navStatus !== "NAV") {
+                dispatch(updateDirection(destination_info, origin_info, map.travalMode));
+            }
+        }
+    }
+
+    const onSearchPress = async () => {
         if (destinationAddRef.current && destinationAddRef.current.getAddressText() !== "") {
             let text = destinationAddRef.current.getAddressText();
 
@@ -35,26 +75,27 @@ const MapTool = (props) => {
                 text = map.destination.address;
             }
 
-            getLocation(text)
-            .then(
-                locationInfo => {
-                    // console.log("LOCATION INFO");
-                    // console.log(locationInfo);
+            try {
+                const destinationLocInfo = await getLocation(text);
 
-                    if (main.navStatus !== "NAV") {
-                        dispatch(updateDirection(map.position, locationInfo, map.travalMode));
+                if (originAddRef.current && originAddRef.current.getAddressText() !== "") {
+                    let text = originAddRef.current.getAddressText();
+
+                    if (map.origin && map.origin.address_simple && text === map.origin.address_simple) {
+                        text = map.origin.address;
                     }
 
-                    if (main.navStatus === "INIT") {
-                        dispatch(mainActions.moveToNextNavStatus());
-                    }
+                    const originLocInfo = await getLocation(text);
+
+                    dispatch(updateDirection(originLocInfo, destinationLocInfo, map.travalMode));
+                } else {
+
+                    dispatch(updateDirection(map.position, destinationLocInfo, map.travalMode));
                 }
-            )
-            .catch(
-                err => {
-                    console.log("getLocation: Something went wrong");
-                }
-            )
+
+            } catch (err) {
+                console.log("getLocation: Something went wrong");
+            }
         }
     }
 
@@ -204,8 +245,80 @@ const MapTool = (props) => {
                 </ScrollView>
                 <View style={styles.inputContainer}>
                     <GooglePlacesAutocomplete
+                        ref={originAddRef}
+                        placeholder="Current Location"
+                        query={{key: GOOGLE_MAP_API}}
+                        enablePoweredByContainer={false}
+                        fetchDetails={true}
+                        onFail={error => console.log(error)}
+                        onNotFound={() => console.log('no results')}
+                        textInputHide={(originAddRef.current && originAddRef.current.getAddressText() !== "")? false :  true}
+                        renderLeftButton={() => {
+                            return (
+                                <View style={{ flexDirection: "row", flex: 0.3}}>
+                                    <View 
+                                        style={[styles.buttonInputClear, {backgroundColor: "transparent"}]} 
+                                    > 
+                                        <FontAwesome name="home" size={normalize(22)} color="black" />
+                                    </View>
+                                </View>
+                            );
+                        }}
+
+                        renderRightButton={() => {
+                            return (
+                                <View style={{ flexDirection: "row", flex: (props.keyboardStatus && props.keyboardStatus === true)? 0.7: 0.5}}>
+                                    {
+                                        (props.keyboardStatus) &&
+                                        (props.keyboardStatus === true) &&
+                                        <TouchableOpacity 
+                                            style={
+                                                {
+                                                    flex: 0.7,
+                                                    backgroundColor: "transparent",
+                                                    borderRadius: normalize(5),
+                                                    alignItems: "center",
+                                                    justifyContent: "center",
+                                                    marginHorizontal: normalize(3)
+                                                }
+                                            } 
+                                            onPress={
+                                                () => { 
+                                                    originAddRef.current.clear();
+                                                    originAddRef.current.blur();
+                                                }
+                                            }
+                                        > 
+                                            <Ionicons name="close" size={normalize(24)} color="black" />
+                                        </TouchableOpacity>
+                                    }
+                                    <TouchableOpacity 
+                                        style={[styles.buttonInputClear, {backgroundColor: "transparent"}]} 
+                                        onPress={onSwitchPress}
+                                    > 
+                                        <Octicons name="arrow-switch" size={normalize(20)} color="black" />
+                                    </TouchableOpacity>
+                                </View>
+                            );
+                        }}
+
+                        renderRow={(rowData) => {
+                            const title = rowData.structured_formatting.main_text;
+                            const address = rowData.structured_formatting.secondary_text;
+                            return (
+                                <View>
+                                <Text style={{ fontSize: 13 }}>{title}</Text>
+                                <Text style={{ fontSize: 10 }}>{address}</Text>
+                            </View>
+                            );
+                        }}
+                        styles={googlePlaceStyles}
+                    />
+                </View>
+                <View style={styles.inputContainer}>
+                    <GooglePlacesAutocomplete
                         ref={destinationAddRef}
-                        placeholder="Type a place"
+                        placeholder="Where To?"
                         query={{key: GOOGLE_MAP_API}}
                         enablePoweredByContainer={false}
                         fetchDetails={true}
@@ -214,14 +327,11 @@ const MapTool = (props) => {
                         renderLeftButton={() => {
                             return (
                                 <View style={{ flexDirection: "row", flex: 0.3}}>
-                                    <TouchableOpacity 
+                                    <View 
                                         style={[styles.buttonInputClear, {backgroundColor: "transparent"}]} 
-                                        onPress={
-                                            () => goToCurrentPosition()
-                                        }
                                     > 
-                                        <Ionicons name="locate" size={normalize(24)} color="black" />
-                                    </TouchableOpacity>
+                                        <Ionicons name="ios-location-sharp" size={normalize(22)} color="black" />
+                                    </View>
                                 </View>
                             );
                         }}
@@ -257,7 +367,7 @@ const MapTool = (props) => {
                                         style={[styles.buttonInputClear, {backgroundColor: "transparent"}]} 
                                         onPress={onSearchPress}
                                     > 
-                                        <FontAwesome5 name="search" size={normalize(15)} color="black" />
+                                        <FontAwesome5 name="search" size={normalize(18)} color="black" />
                                     </TouchableOpacity>
                                 </View>
                             );
@@ -362,7 +472,9 @@ const googlePlaceStyles = StyleSheet.create({
         borderTopWidth: 0.5,
     },
     powered: {},
-    listView: {},
+    listView: {
+        maxHeight: normalize(120)
+    },
     row: {
         height: normalize(45),
         backgroundColor: "transparent"
