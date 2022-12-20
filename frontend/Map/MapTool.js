@@ -93,6 +93,10 @@ const MapTool = (props) => {
                     dispatch(updateDirection(map.position, destinationLocInfo, map.travalMode));
                 }
 
+                if (main.navStatus === "INIT") {
+                    dispatch(mainActions.moveToNextNavStatus());
+                }
+
             } catch (err) {
                 console.log("getLocation: Something went wrong");
             }

@@ -31,6 +31,12 @@ const MapPlanning = (props) => {
         }
     }, [index]);
 
+    const goToCurrentPosition = () => {
+        if (map.centerLocation === false) {
+            dispatch(mapActions.toggleCenterLocation());
+        }
+    }
+
     return (
         <React.Fragment>
             <View style={{
@@ -94,6 +100,7 @@ const MapPlanning = (props) => {
                                 justifyContent: "center",
                                 marginHorizontal: normalize(3)
                             }}
+                            onPress={goToCurrentPosition}
                         > 
                             <Ionicons name="locate" size={normalize(24)} color="black" />
                         </TouchableOpacity>

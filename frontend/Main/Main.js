@@ -71,8 +71,14 @@ const MainPage = props => {
                         <FontAwesome5 name="user" size={normalize(22)} color="black" />
                     </Card>
                     <Card style={styles.mapToolCard} childrenStyle={styles.mapToolCardContent}>
-                        <MapTool style={{flex: 1}} keyboardStatus={main.keyboardStatus}/>
-                        {/* <MapPlanning /> */}
+                        {
+                            (main.navStatus !== "NAV") &&
+                            <MapTool style={{flex: 1}} keyboardStatus={main.keyboardStatus}/>
+                        }
+                        {
+                            (main.navStatus === "NAV") &&
+                            <MapPlanning />
+                        }
                     </Card>
                 </View>
             </View>
