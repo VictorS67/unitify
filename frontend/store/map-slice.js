@@ -10,7 +10,8 @@ const mapSlice = createSlice({
         destination: null, // Destination information
         polylines: [], // Polylines from origin destination
         markers: [], // Markers with customized text on map
-        errorMsg: null // Error message for getting locations from user
+        errorMsg: null, // Error message for getting locations from user
+        allDirection: null
     },
     reducers: {
         sPosition(state, action) {
@@ -41,8 +42,19 @@ const mapSlice = createSlice({
             const errorMsg = action.payload;
             state.errorMsg = errorMsg;
         },
+        sAllDirection(state, action) {
+            const allDirection = action.payload;
+            state.allDirection = allDirection;
+        },
         toggleCenterLocation(state) {
             state.centerLocation = !state.centerLocation;
+        },
+        updateDirectionFromAll(state, action) {
+            const mode = action.payload;
+            state.origin = allDirection[mode].origin;
+            state.destination = allDirection[mode].destination;
+            state.polylines = allDirection[mode].steps;
+            state.markers = allDirection[mode].markers;
         }
     },
 });

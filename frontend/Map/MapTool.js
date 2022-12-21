@@ -7,7 +7,7 @@ import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplet
 import Card from "../UI/Card";
 import { normalize } from "../Tool/FontSize";
 import { getLocation, GOOGLE_MAP_API } from "../Utils/GoogleMap";
-import { updateDirection } from "../store/map-actions";
+import { updateDirection, updateAllDirection } from "../store/map-actions";
 import { mapActions } from "../store/map-slice";
 import { mainActions } from "../store/main-slice";
 
@@ -62,7 +62,7 @@ const MapTool = (props) => {
             }));
 
             if (main.navStatus !== "NAV") {
-                dispatch(updateDirection(destination_info, origin_info, map.travalMode));
+                dispatch(updateAllDirection(destination_info, origin_info, map.travalMode));
             }
         }
     }
@@ -87,10 +87,9 @@ const MapTool = (props) => {
 
                     const originLocInfo = await getLocation(text);
 
-                    dispatch(updateDirection(originLocInfo, destinationLocInfo, map.travalMode));
+                    dispatch(updateAllDirection(originLocInfo, destinationLocInfo, map.travalMode));
                 } else {
-
-                    dispatch(updateDirection(map.position, destinationLocInfo, map.travalMode));
+                    dispatch(updateAllDirection(map.position, destinationLocInfo, map.travalMode));
                 }
 
                 if (main.navStatus === "INIT") {

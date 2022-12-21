@@ -6,6 +6,7 @@ import LoginUser from "./Users/LoginUser";
 import MainPage from "./Main/Main";
 import UserPage from "./Users/UserPage";
 import Map from "./Map/Map";
+import SkeletonView from "./UI/Skeleton";
 import { mapActions } from "./store/map-slice";
 
 function Foreground() {
@@ -40,7 +41,8 @@ function Foreground() {
     }, [dispatch]);
 
     return (
-        <MainPage />
+        // <MainPage />
+        <SkeletonView />
     );
 }
 

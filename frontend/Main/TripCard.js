@@ -21,12 +21,15 @@ const TripCard = props => {
                     Your Trip
                 </Text>
 
-                <Pressable style={styles.button}>
-                    <FontAwesome5 name="question-circle" size={normalize(14)} color="black" />
-                    <Text style={{ fontSize: normalize(12), textAlign: "center", textTransform: 'uppercase' }}>
-                        &nbsp;Not My Trip
-                    </Text>
-                </Pressable>
+                {
+                    main.navStatus === "NAV" &&
+                    <Pressable style={styles.button}>
+                        <FontAwesome5 name="question-circle" size={normalize(14)} color="black" />
+                        <Text style={{ fontSize: normalize(12), textAlign: "center", textTransform: 'uppercase' }}>
+                            &nbsp;Not My Trip
+                        </Text>
+                    </Pressable>
+                }
             </View>
 
             {

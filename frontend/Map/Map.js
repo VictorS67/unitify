@@ -11,7 +11,7 @@ import TalkBubble from "../UI/TalkBubble";
 import PolylineInfo from "../UI/PolylineInfo";
 import MapTool from "./MapTool";
 import { normalize } from "../Tool/FontSize";
-import { updateDirection } from "../store/map-actions";
+import { updateDirection, updateAllDirection } from "../store/map-actions";
 import { mapActions } from "../store/map-slice";
 import { mainActions } from "../store/main-slice";
 
@@ -36,7 +36,11 @@ function Map() {
         if (map.position && map.origin && map.destination) {
 
             if (main.navStatus !== "NAV") {
-                dispatch(updateDirection(map.origin, map.destination, map.travalMode));
+                if (map.allDirection !== null) {
+                    dispatch(mapActions.updateDirectionFromAll(map.travalMode));
+                } else {
+                    dispatch(updateAllDirection(map.origin, map.destination, map.travalMode));
+                }
             }
 
             if (main.navStatus === "INIT") {
@@ -69,12 +73,13 @@ function Map() {
 
         //fetch the coordinates and then store its value into the coords Hook.
         if (main.navStatus !== "NAV") {
-            dispatch(updateDirection(map.position, coordinate, map.travalMode));
-        }
-        if (main.navStatus === "INIT") {
-            dispatch(mainActions.moveToNextNavStatus());
-        }
+            // dispatch(updateDirection(map.position, coordinate, map.travalMode));
+            dispatch(updateAllDirection(map.position, coordinate, map.travalMode));
 
+            if (main.navStatus === "INIT") {
+                dispatch(mainActions.moveToNextNavStatus());
+            }   
+        }
     }
 
     return (
@@ -255,52 +260,6 @@ const styles = StyleSheet.create({
     buttonText: {
         fontSize: normalize(13)
     }
-});
-
-const googlePlaceStyles = StyleSheet.create({
-    container: {
-        flex: 1,
-        marginHorizontal: normalize(3),
-    },
-    textInputContainer: {
-        flexDirection: 'row',
-        marginBottom: normalize(2)
-    },
-    textInput: {
-        backgroundColor: '#FFFFFF',
-        height: "100%",
-        borderRadius: normalize(5),
-        paddingVertical: normalize(5),
-        paddingHorizontal: normalize(10),
-        fontSize: normalize(15),
-        flex: 2,
-    },
-    poweredContainer: {
-        justifyContent: 'flex-end',
-        alignItems: 'center',
-        borderBottomRightRadius: 5,
-        borderBottomLeftRadius: 5,
-        borderColor: '#c8c7cc',
-        borderTopWidth: 0.5,
-    },
-    powered: {},
-    listView: {},
-    row: {
-        backgroundColor: '#FFFFFF',
-        padding: 13,
-        height: normalize(35),
-        flexDirection: 'row',
-    },
-    separator: {
-        height: 0.5,
-        backgroundColor: '#c8c7cc',
-    },
-    description: {},
-    loader: {
-        flexDirection: 'row',
-        justifyContent: 'flex-end',
-        height: 20,
-    },
 });
 
 export default Map;

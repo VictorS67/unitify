@@ -7,11 +7,13 @@ import { FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons';
 import Card from "../UI/Card";
 import { normalize } from "../Tool/FontSize";
 import { mainActions } from "../store/main-slice";
+import { mapActions } from "../store/map-slice";
 
 const TripPlanningCard = (props) => {
 
     const dispatch = useDispatch();
     const main = useSelector((state) => state.main);
+    const map = useSelector((state) => state.map);
 
     const onNavPress = () => {
         dispatch(mainActions.moveToNextNavStatus());
@@ -19,7 +21,7 @@ const TripPlanningCard = (props) => {
 
     return (
         <React.Fragment>
-            <View style={styles.tripCardContent}>
+            {/* <View style={styles.tripCardContent}>
                 <Card  
                     style={styles.topChoiceTransCard}
                     childrenStyle={styles.topChoiceTransCardContent}
@@ -29,7 +31,26 @@ const TripPlanningCard = (props) => {
                         style={styles.topChoiceTransIconCard}
                         childrenStyle={styles.topChoiceTransIconCardContent}
                     >
-                        <FontAwesome5 name="subway" size={normalize(30)} color="black" />
+                        {
+                            map.travalMode === "SUBWAY" &&
+                            <FontAwesome5 name="subway" size={normalize(30)} color="black" />
+                        }
+                        {
+                            map.travalMode === "BUS" &&
+                            <FontAwesome5 name="bus" size={normalize(30)} color="black" />
+                        }
+                        {
+                            map.travalMode === "DRIVING" &&
+                            <FontAwesome5 name="car" size={normalize(30)} color="black" />
+                        }
+                        {
+                            map.travalMode === "WALKING" &&
+                            <FontAwesome5 name="walking" size={normalize(30)} color="black" />
+                        }
+                        {
+                            map.travalMode === "BICYCLING" &&
+                            <FontAwesome5 name="bicycle" size={normalize(30)} color="black" />
+                        }
                     </Card>
 
                     <View style={styles.topChoiceTransInfo}>
@@ -39,7 +60,7 @@ const TripPlanningCard = (props) => {
                                 numberOfLines={1} 
                                 ellipsizeMode='tail'
                             >
-                                40 St George St
+                                test
                             </Text>
                         </View>
 
@@ -140,7 +161,7 @@ const TripPlanningCard = (props) => {
                     </View>
                     <ProgressBar progress={0.6} />
                 </Pressable>
-            </View>
+            </View> */}
         </React.Fragment>
     );
 }
@@ -209,7 +230,7 @@ const styles = StyleSheet.create({
         backgroundColor: 'orange'
     },
     buttonTextLarge: { 
-        fontSize: normalize(22), 
+        fontSize: normalize(20), 
         textAlign: "center", 
         textTransform: 'uppercase' 
     },
