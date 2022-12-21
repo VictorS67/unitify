@@ -10,10 +10,10 @@ const SkeletonView = props => {
     useEffect(() => {
         Animated.loop(
             Animated.sequence([
-                Animated.delay(1000),
+                Animated.delay(750),
                 Animated.timing(circleAnimatedValue, {
                     toValue: 1,
-                    duration: 1000,
+                    duration: 750,
                     useNativeDriver: true, // Add this line
                 })
             ]),
@@ -23,58 +23,88 @@ const SkeletonView = props => {
         ).start();
     }, []);
 
-    const fadeOpacity = circleAnimatedValue.interpolate({
+    const fadeOpacity1 = circleAnimatedValue.interpolate({
         inputRange: [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1],
-        outputRange: [1, 0.8, 0.5, 0.4, 0.4, 0.2, 0.2, 0.4, 0.5, 0.8, 1]
+        outputRange: [1, 0.5, 0.4, 0.4, 0.2, 0.2, 0.4, 0.5, 0.8, 0.8, 1]
     });
 
     const fadeOpacity2 = circleAnimatedValue.interpolate({
         inputRange: [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1],
-        outputRange: [1, 0.6, 0.5, 0.4, 0.2, 0.2, 0.4, 0.5, 0.8, 0.8, 1]
+        outputRange: [1, 0.8, 0.5, 0.4, 0.4, 0.2, 0.2, 0.4, 0.5, 0.8, 1]
     });
 
     const fadeOpacity3 = circleAnimatedValue.interpolate({
         inputRange: [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1],
-        outputRange: [1, 0.8, 0.8, 0.6, 0.5, 0.4, 0.2, 0.2, 0.4, 0.5, 1]
+        outputRange: [1, 0.8, 0.8, 0.5, 0.4, 0.4, 0.2, 0.2, 0.5, 0.8, 1]
     });
 
+    const fadeOpacityChoices = {
+        "1": fadeOpacity1,
+        "2": fadeOpacity2,
+        "3": fadeOpacity3
+    }
+
     return (
-        <View style={styles.container}>
-            <View style={[{ marginBottom: 8 }, styles.card]}>
-                <Animated.View style={{ 
-                    width: 100, 
-                    height: 100, 
-                    borderRadius: 60, 
-                    backgroundColor: 
-                    '#ECEFF1', 
-                    overflow: 'hidden', 
-                    marginRight: 16,
-                    opacity: fadeOpacity2, 
-                }}>
+        <React.Fragment>
+            {
+                props.type === "CIRCLE" &&
+                <Animated.View style={[
+                    { 
+                        width: normalize(props.height), 
+                        height: normalize(props.height), 
+                        borderRadius: normalize(props.height / 2), 
+                        backgroundColor: '#ECEFF1', 
+                        overflow: 'hidden', 
+                        opacity: fadeOpacityChoices[`${props.order}`], 
+                    }, 
+                    props.style
+                ]}>
                 </Animated.View>
-                <View style={{ flex: 1, justifyContent: 'space-evenly', overflow: 'hidden' }}>
-                    <Animated.View style={{ backgroundColor: '#ECEFF1', height: 32, opacity: fadeOpacity }}></Animated.View>
-                    <Animated.View style={{ backgroundColor: '#ECEFF1', height: 32, opacity: fadeOpacity3 }}></Animated.View>
-                </View>
-            </View>
-            <View style={[styles.card, { flexDirection: 'column', flex: 1 }]}>
-                <View style={{ flex: 1, padding: 16, flexDirection: 'row', justifyContent: 'space-between' }}>
-                    <Animated.View style={{ width: Dimensions.get('window').width / 3 - 40, height: 80, backgroundColor: '#ECEFF1', overflow:'hidden', opacity: fadeOpacity2 }}></Animated.View>
-                    <Animated.View style={{ width: Dimensions.get('window').width / 3 - 40, height: 80, backgroundColor: '#ECEFF1', overflow:'hidden', opacity: fadeOpacity }}></Animated.View>
-                    <Animated.View style={{ width: Dimensions.get('window').width / 3 - 40, height: 80, backgroundColor: '#ECEFF1', overflow:'hidden', opacity: fadeOpacity3 }}></Animated.View>
-                </View>
-                <View style={{ flex: 1, padding: 16, flexDirection: 'row', justifyContent: 'space-between' }}>
-                    <Animated.View style={{ width: Dimensions.get('window').width / 3 - 40, height: 80, backgroundColor: '#ECEFF1', overflow:'hidden', opacity: fadeOpacity2 }}></Animated.View>
-                    <Animated.View style={{ width: Dimensions.get('window').width / 3 - 40, height: 80, backgroundColor: '#ECEFF1', overflow:'hidden', opacity: fadeOpacity }}></Animated.View>
-                    <Animated.View style={{ width: Dimensions.get('window').width / 3 - 40, height: 80, backgroundColor: '#ECEFF1', overflow:'hidden', opacity: fadeOpacity3 }}></Animated.View>
-                </View>
-                <View style={{ flex: 1, padding: 16, flexDirection: 'row', justifyContent: 'space-between' }}>
-                    <Animated.View style={{ width: Dimensions.get('window').width / 3 - 40, height: 80, backgroundColor: '#ECEFF1', overflow:'hidden', opacity: fadeOpacity2 }}></Animated.View>
-                    <Animated.View style={{ width: Dimensions.get('window').width / 3 - 40, height: 80, backgroundColor: '#ECEFF1', overflow:'hidden', opacity: fadeOpacity }}></Animated.View>
-                    <Animated.View style={{ width: Dimensions.get('window').width / 3 - 40, height: 80, backgroundColor: '#ECEFF1', overflow:'hidden', opacity: fadeOpacity3 }}></Animated.View>
-                </View>
-            </View>
-        </View>
+            }
+            {
+                props.type === "RECTANGLE" &&
+                <Animated.View style={[
+                    { 
+                        backgroundColor: '#ECEFF1',
+                        width: "100%",
+                        height: normalize(props.height), 
+                        opacity: fadeOpacityChoices[`${props.order}`] 
+                    }, 
+                    props.style
+                ]}>
+                </Animated.View>
+            }
+            {
+                props.type === "SQUARE" &&
+                <Animated.View style={[
+                    { 
+                        width: normalize(props.height), 
+                        height: normalize(props.height), 
+                        borderRadius: normalize(6), 
+                        backgroundColor: '#ECEFF1', 
+                        overflow: 'hidden',
+                        opacity: fadeOpacityChoices[`${props.order}`], 
+                    },
+                    props.style
+                ]}>
+                </Animated.View>
+            }
+            {
+                props.type === "CARD" &&
+                <Animated.View style={[
+                    { 
+                        width: normalize(props.height), 
+                        height: normalize(props.height), 
+                        backgroundColor: '#ECEFF1', 
+                        overflow: 'hidden',
+                        opacity: fadeOpacityChoices[`${props.order}`], 
+                    },
+                    styles.card,
+                    props.style
+                ]}>
+                </Animated.View>
+            }
+        </React.Fragment>
       );
 }
 
@@ -87,17 +117,14 @@ const styles = StyleSheet.create({
         paddingBottom: 24
     },
     card: {
-        padding: 16,
-        shadowColor: 'black',
-        borderRadius: 4,
-        backgroundColor: '#FAFAFA',
-        shadowColor: 'black',
-        shadowOffset: {
-            width: 1,
-            height: 1
-        },
-        shadowOpacity: 0.1,
-        flexDirection: 'row'
+        elevation: 3,
+        backgroundColor: '#ECEFF1',
+        shadowOffset: { width: 1, height: 1 },
+        shadowColor: '#333',
+        shadowOpacity: 0.3,
+        shadowRadius: normalize(2),
+        marginHorizontal: normalize(5),
+        marginVertical: normalize(5)
     },
     absolute: {
         position: "absolute",

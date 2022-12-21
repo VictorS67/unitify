@@ -39,7 +39,12 @@ function Map() {
                 if (map.allDirection !== null) {
                     dispatch(mapActions.updateDirectionFromAll(map.travalMode));
                 } else {
-                    dispatch(updateAllDirection(map.origin, map.destination, map.travalMode));
+                    dispatch(mapActions.updatingInfo());
+                    dispatch(updateAllDirection(map.origin, map.destination, map.travalMode))
+                    .then(() => {
+                        dispatch(mapActions.updatingInfoComplete())
+                    });
+                    
                 }
             }
 
@@ -74,7 +79,11 @@ function Map() {
         //fetch the coordinates and then store its value into the coords Hook.
         if (main.navStatus !== "NAV") {
             // dispatch(updateDirection(map.position, coordinate, map.travalMode));
-            dispatch(updateAllDirection(map.position, coordinate, map.travalMode));
+            dispatch(mapActions.updatingInfo());
+            dispatch(updateAllDirection(map.position, coordinate, map.travalMode))
+            .then(() => {
+                dispatch(mapActions.updatingInfoComplete())
+            });
 
             if (main.navStatus === "INIT") {
                 dispatch(mainActions.moveToNextNavStatus());

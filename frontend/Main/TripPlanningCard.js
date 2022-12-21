@@ -1,10 +1,11 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Text, View, StyleSheet, Pressable } from 'react-native';
 import { useDispatch, useSelector } from "react-redux";
 import { Divider, ProgressBar } from 'react-native-paper';
 import { FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons';
 
 import Card from "../UI/Card";
+import SkeletonView from "../UI/Skeleton";
 import { normalize } from "../Tool/FontSize";
 import { mainActions } from "../store/main-slice";
 import { mapActions } from "../store/map-slice";
@@ -21,147 +22,230 @@ const TripPlanningCard = (props) => {
 
     return (
         <React.Fragment>
-            {/* <View style={styles.tripCardContent}>
-                <Card  
-                    style={styles.topChoiceTransCard}
-                    childrenStyle={styles.topChoiceTransCardContent}
-                >
-
+        {
+            map.origin &&
+            map.destination &&
+            map.travalMode &&
+            map.allDirection &&
+            (map.updateInfo === false) &&
+            <React.Fragment>
+                <View style={styles.tripCardContent}>
                     <Card  
-                        style={styles.topChoiceTransIconCard}
-                        childrenStyle={styles.topChoiceTransIconCardContent}
+                        style={styles.topChoiceTransCard}
+                        childrenStyle={styles.topChoiceTransCardContent}
                     >
-                        {
-                            map.travalMode === "SUBWAY" &&
-                            <FontAwesome5 name="subway" size={normalize(30)} color="black" />
-                        }
-                        {
-                            map.travalMode === "BUS" &&
-                            <FontAwesome5 name="bus" size={normalize(30)} color="black" />
-                        }
-                        {
-                            map.travalMode === "DRIVING" &&
-                            <FontAwesome5 name="car" size={normalize(30)} color="black" />
-                        }
-                        {
-                            map.travalMode === "WALKING" &&
-                            <FontAwesome5 name="walking" size={normalize(30)} color="black" />
-                        }
-                        {
-                            map.travalMode === "BICYCLING" &&
-                            <FontAwesome5 name="bicycle" size={normalize(30)} color="black" />
-                        }
+                        <Card  
+                            style={styles.topChoiceTransIconCard}
+                            childrenStyle={styles.topChoiceTransIconCardContent}
+                        >
+                            {
+                                map.travalMode === "SUBWAY" &&
+                                <FontAwesome5 name="subway" size={normalize(30)} color="black" />
+                            }
+                            {
+                                map.travalMode === "BUS" &&
+                                <FontAwesome5 name="bus" size={normalize(30)} color="black" />
+                            }
+                            {
+                                map.travalMode === "DRIVING" &&
+                                <FontAwesome5 name="car" size={normalize(30)} color="black" />
+                            }
+                            {
+                                map.travalMode === "WALKING" &&
+                                <FontAwesome5 name="walking" size={normalize(30)} color="black" />
+                            }
+                            {
+                                map.travalMode === "BICYCLING" &&
+                                <FontAwesome5 name="bicycle" size={normalize(30)} color="black" />
+                            }
+                        </Card>
+
+                        <View style={styles.topChoiceTransInfo}>
+                            <View style={styles.topChoiceTransInfoRow}>
+                                <Text 
+                                    style={styles.topChoiceTransTitle}
+                                    numberOfLines={1} 
+                                    ellipsizeMode='tail'
+                                >
+                                    {map.destination.address_simple}
+                                </Text>
+                            </View>
+
+                            <View style={styles.topChoiceTransInfoRow}>
+                                <Text style={styles.topChoiceTransTag}>
+                                    <MaterialCommunityIcons name="molecule-co2" size={normalize(24)} color="black" style={{flexGrow: 1}}/>
+                                    <View style={styles.topChoiceTransTagText}>
+                                        {
+                                            (props.trending === "neutral") &&
+                                            <MaterialCommunityIcons name="arrow-right" size={normalize(12)} color="black" />
+                                        }
+                                        {
+                                            (props.trending === "up") &&
+                                            <MaterialCommunityIcons name="arrow-top-right" size={normalize(12)} color="black" />
+                                        }
+                                        {
+                                            (props.trending === "down") &&
+                                            <MaterialCommunityIcons name="arrow-bottom-right" size={normalize(12)} color="black" />
+                                        }
+                                        <Text style={{
+                                            textAlign: "center"
+                                        }}>
+                                            252 g/km
+                                        </Text>
+                                    </View>
+                                </Text>
+                                <Text style={styles.topChoiceTransTag}>
+                                    <MaterialCommunityIcons name="fire" size={normalize(22)} color="black" style={{flexGrow: 1}} />
+                                    <View style={styles.topChoiceTransTagText}>
+                                        <Text style={{
+                                            textAlign: "center"
+                                        }}>
+                                            91 cal/h
+                                        </Text>
+                                    </View>
+                                </Text>
+                            </View>
+                        </View>
                     </Card>
+                </View>
 
-                    <View style={styles.topChoiceTransInfo}>
-                        <View style={styles.topChoiceTransInfoRow}>
-                            <Text 
-                                style={styles.topChoiceTransTitle}
-                                numberOfLines={1} 
-                                ellipsizeMode='tail'
-                            >
-                                test
+                <Pressable style={styles.button} onPress={onNavPress}>
+                    <Text style={styles.buttonTextLarge}>
+                        Let's Go!
+                    </Text>
+                </Pressable>
+
+                <View style={styles.optionsChoice}>
+                    <Text style={styles.optionsChoiceTitle}>
+                        Other Options
+                    </Text>
+                    <Divider style={{ width: "100%" }} />
+                    <Pressable style={styles.optionsChoiceButton}>
+                        <View style={styles.optionsChoiceButtonText}>
+                            <Text style={styles.optionsChoiceText}>
+                                CAR
+                            </Text>
+                            <Text style={styles.optionsChoiceText}>
+                                5 mins
                             </Text>
                         </View>
-
-                        <View style={styles.topChoiceTransInfoRow}>
-                            <Text style={styles.topChoiceTransTag}>
-                                <MaterialCommunityIcons name="molecule-co2" size={normalize(24)} color="black" style={{flexGrow: 1}}/>
-                                <View style={styles.topChoiceTransTagText}>
-                                    {
-                                        (props.trending === "neutral") &&
-                                        <MaterialCommunityIcons name="arrow-right" size={normalize(12)} color="black" />
-                                    }
-                                    {
-                                        (props.trending === "up") &&
-                                        <MaterialCommunityIcons name="arrow-top-right" size={normalize(12)} color="black" />
-                                    }
-                                    {
-                                        (props.trending === "down") &&
-                                        <MaterialCommunityIcons name="arrow-bottom-right" size={normalize(12)} color="black" />
-                                    }
-                                    <Text style={{
-                                        textAlign: "center"
-                                    }}>
-                                        252 g/km
-                                    </Text>
-                                </View>
+                        <ProgressBar progress={0.5} />
+                    </Pressable>
+                    
+                    <Divider style={{ width: "100%" }} />
+                    <Pressable style={styles.optionsChoiceButton}>
+                        <View style={styles.optionsChoiceButtonText}>
+                            <Text style={styles.optionsChoiceText}>
+                                BUS
                             </Text>
-                            <Text style={styles.topChoiceTransTag}>
-                                <MaterialCommunityIcons name="fire" size={normalize(22)} color="black" style={{flexGrow: 1}} />
-                                <View style={styles.topChoiceTransTagText}>
-                                    <Text style={{
-                                        textAlign: "center"
-                                    }}>
-                                        91 cal/h
-                                    </Text>
-                                </View>
+                            <Text style={styles.optionsChoiceText}>
+                                10 mins
                             </Text>
                         </View>
-                    </View>
-                </Card>
-            </View>
-            <Pressable style={styles.button} onPress={onNavPress}>
-                <Text style={styles.buttonTextLarge}>
-                    Let's Go!
-                </Text>
-            </Pressable>
-            <View style={styles.optionsChoice}>
-                <Text style={styles.optionsChoiceTitle}>
-                    Other Options
-                </Text>
-                <Divider style={{ width: "100%" }} />
-                <Pressable style={styles.optionsChoiceButton}>
-                    <View style={styles.optionsChoiceButtonText}>
-                        <Text style={styles.optionsChoiceText}>
-                            CAR
-                        </Text>
-                        <Text style={styles.optionsChoiceText}>
-                            5 mins
-                        </Text>
-                    </View>
-                    <ProgressBar progress={0.5} />
-                </Pressable>
-                
-                <Divider style={{ width: "100%" }} />
-                <Pressable style={styles.optionsChoiceButton}>
-                    <View style={styles.optionsChoiceButtonText}>
-                        <Text style={styles.optionsChoiceText}>
-                            BUS
-                        </Text>
-                        <Text style={styles.optionsChoiceText}>
-                            10 mins
-                        </Text>
-                    </View>
-                    <ProgressBar progress={0.8} />
-                </Pressable>
-                                
-                <Divider style={{ width: "100%" }} />
-                <Pressable style={styles.optionsChoiceButton}>
-                    <View style={styles.optionsChoiceButtonText}>
-                        <Text style={styles.optionsChoiceText}>
-                            Walking
-                        </Text>
-                        <Text style={styles.optionsChoiceText}>
-                            15 mins
-                        </Text>
-                    </View>
-                    <ProgressBar progress={0.9} />
-                </Pressable>
+                        <ProgressBar progress={0.8} />
+                    </Pressable>
+                                    
+                    <Divider style={{ width: "100%" }} />
+                    <Pressable style={styles.optionsChoiceButton}>
+                        <View style={styles.optionsChoiceButtonText}>
+                            <Text style={styles.optionsChoiceText}>
+                                Walking
+                            </Text>
+                            <Text style={styles.optionsChoiceText}>
+                                15 mins
+                            </Text>
+                        </View>
+                        <ProgressBar progress={0.9} />
+                    </Pressable>
 
-                <Divider style={{ width: "100%" }} />
-                <Pressable style={styles.optionsChoiceButton}>
-                    <View style={styles.optionsChoiceButtonText}>
-                        <Text style={styles.optionsChoiceText}>
-                            Bicycling
-                        </Text>
-                        <Text style={styles.optionsChoiceText}>
-                            8 mins
-                        </Text>
-                    </View>
-                    <ProgressBar progress={0.6} />
-                </Pressable>
-            </View> */}
+                    <Divider style={{ width: "100%" }} />
+                    <Pressable style={styles.optionsChoiceButton}>
+                        <View style={styles.optionsChoiceButtonText}>
+                            <Text style={styles.optionsChoiceText}>
+                                Bicycling
+                            </Text>
+                            <Text style={styles.optionsChoiceText}>
+                                8 mins
+                            </Text>
+                        </View>
+                        <ProgressBar progress={0.6} />
+                    </Pressable>
+                </View>
+            </React.Fragment>
+        }
+        {
+            (!(map.origin &&
+            map.destination &&
+            map.travalMode &&
+            map.allDirection) ||
+            (map.updateInfo === true)) &&
+            <React.Fragment>
+                <View style={styles.tripCardContent}>
+                    <Card  
+                        style={styles.topChoiceTransCard}
+                        childrenStyle={styles.topChoiceTransCardContent}
+                    >
+                        <SkeletonView style={{ 
+                            borderRadius: normalize(6),
+                            marginHorizontal: normalize(5),
+                            marginVertical: normalize(5)
+                        }} type={"SQUARE"} height={45} order={1} />
+
+                        <View style={styles.topChoiceTransInfo}>
+                            <SkeletonView style={{ 
+                                borderRadius: normalize(6),
+                                marginHorizontal: normalize(10),
+                                width: "95%"
+                            }} type={"RECTANGLE"} height={20} order={2} />
+                            <SkeletonView style={{ 
+                                borderRadius: normalize(6),
+                                marginHorizontal: normalize(10),
+                                marginVertical: normalize(5),
+                                width: "95%"
+                            }} type={"RECTANGLE"} height={20} order={3} />
+                        </View>
+                    </Card>
+                </View>
+
+                <SkeletonView style={{ 
+                    borderRadius: normalize(4),
+                    width: "100%"
+                }} type={"RECTANGLE"} height={35} order={2} />
+
+                <View style={styles.optionsChoice}>
+                    <Text style={styles.optionsChoiceTitle}>
+                        Other Options
+                    </Text>
+                    <Divider style={{ width: "100%" }} />
+                    <SkeletonView style={{ 
+                        borderRadius: normalize(4),
+                        width: "100%",
+                        marginVertical: normalize(5)
+                    }} type={"RECTANGLE"} height={35} order={3} />
+                    
+                    <Divider style={{ width: "100%" }} />
+                    <SkeletonView style={{ 
+                        borderRadius: normalize(4),
+                        width: "100%",
+                        marginVertical: normalize(5)
+                    }} type={"RECTANGLE"} height={35} order={3} />
+                                    
+                    <Divider style={{ width: "100%" }} />
+                    <SkeletonView style={{ 
+                        borderRadius: normalize(4),
+                        width: "100%",
+                        marginVertical: normalize(5)
+                    }} type={"RECTANGLE"} height={35} order={3} />
+
+                    <Divider style={{ width: "100%" }} />
+                    <SkeletonView style={{ 
+                        borderRadius: normalize(4),
+                        width: "100%",
+                        marginVertical: normalize(5)
+                    }} type={"RECTANGLE"} height={35} order={3} />
+                </View>
+            </React.Fragment>
+        }
         </React.Fragment>
     );
 }

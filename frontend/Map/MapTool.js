@@ -62,7 +62,11 @@ const MapTool = (props) => {
             }));
 
             if (main.navStatus !== "NAV") {
-                dispatch(updateAllDirection(destination_info, origin_info, map.travalMode));
+                dispatch(mapActions.updatingInfo());
+                dispatch(updateAllDirection(destination_info, origin_info, map.travalMode))
+                .then(() => {
+                    dispatch(mapActions.updatingInfoComplete())
+                });
             }
         }
     }
@@ -78,6 +82,7 @@ const MapTool = (props) => {
             try {
                 const destinationLocInfo = await getLocation(text);
 
+                dispatch(mapActions.updatingInfo());
                 if (originAddRef.current && originAddRef.current.getAddressText() !== "") {
                     let text = originAddRef.current.getAddressText();
 
@@ -87,9 +92,15 @@ const MapTool = (props) => {
 
                     const originLocInfo = await getLocation(text);
 
-                    dispatch(updateAllDirection(originLocInfo, destinationLocInfo, map.travalMode));
+                    dispatch(updateAllDirection(originLocInfo, destinationLocInfo, map.travalMode))
+                    .then(() => {
+                        dispatch(mapActions.updatingInfoComplete())
+                    });
                 } else {
-                    dispatch(updateAllDirection(map.position, destinationLocInfo, map.travalMode));
+                    dispatch(updateAllDirection(map.position, destinationLocInfo, map.travalMode))
+                    .then(() => {
+                        dispatch(mapActions.updatingInfoComplete())
+                    });
                 }
 
                 if (main.navStatus === "INIT") {

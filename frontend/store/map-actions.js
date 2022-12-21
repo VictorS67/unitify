@@ -24,27 +24,31 @@ export const updateDirection = (position, destination, travalMode) => {
 
 export const updateAllDirection = (position, destination, travalMode) => {
     return async (dispatch) => {
-        try {
-            const modes = ["DRIVING", "WALKING", "SUBWAY", "BUS", "BYCICLING"];
-            let all_mode = {}
-
-            for (let index = 0; index < modes.length; index++) {
-                let direction = await getDirections(
-                    `${position.latitude},${position.longitude}`, 
-                    `${destination.latitude},${destination.longitude}`,
-                    modes[index]
-                );
-
-                all_mode[modes[index]] = direction;
+        return new Promise(async (resolve, reject) => {
+            try {
+                const modes = ["DRIVING", "WALKING", "SUBWAY", "BUS", "BICYCLING"];
+                let all_mode = {}
+    
+                for (let index = 0; index < modes.length; index++) {
+                    let direction = await getDirections(
+                        `${position.latitude},${position.longitude}`, 
+                        `${destination.latitude},${destination.longitude}`,
+                        modes[index]
+                    );
+    
+                    all_mode[modes[index]] = direction;
+                }
+    
+                dispatch(mapActions.sAllDirection(all_mode));
+                dispatch(mapActions.sOrigin(all_mode[travalMode].origin));
+                dispatch(mapActions.sDestination(all_mode[travalMode].destination));
+                dispatch(mapActions.sPolylines(all_mode[travalMode].steps));
+                dispatch(mapActions.sMarkers(all_mode[travalMode].markers));
+            } catch (error) {
+                console.log("updateAllDirection: Something went wrong");
             }
 
-            dispatch(mapActions.sAllDirection(all_mode));
-            dispatch(mapActions.sOrigin(all_mode[travalMode].origin));
-            dispatch(mapActions.sDestination(all_mode[travalMode].destination));
-            dispatch(mapActions.sPolylines(all_mode[travalMode].steps));
-            dispatch(mapActions.sMarkers(all_mode[travalMode].markers));
-        } catch (error) {
-            console.log("updateAllDirection: Something went wrong");
-        }
+            resolve();
+        });
     }
 }
