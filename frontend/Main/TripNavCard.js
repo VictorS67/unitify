@@ -101,9 +101,8 @@ const TripNavCard = (props) => {
                 </View>
             </View>
             <Pressable style={styles.button}>
-                <FontAwesome5 name="question-circle" size={normalize(20)} color="black" />
-                <Text style={{ fontSize: normalize(22), textAlign: "center", textTransform: 'uppercase' }}>
-                    &nbsp;Not My Trip
+                <Text style={{ fontSize: normalize(20), textAlign: "center", textTransform: 'uppercase' }}>
+                    Finish Trip
                 </Text>
             </Pressable>
         </React.Fragment>

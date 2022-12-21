@@ -1,6 +1,7 @@
 import React from "react";
-import { Text, View, StyleSheet } from 'react-native';
+import { Text, View, StyleSheet, Pressable } from 'react-native';
 import { useSelector } from "react-redux";
+import { FontAwesome5 } from '@expo/vector-icons';
 
 import TripPlanningCard from "./TripPlanningCard";
 import TripNavCard from "./TripNavCard";
@@ -19,6 +20,13 @@ const TripCard = props => {
                 <Text style={styles.titleText}>
                     Your Trip
                 </Text>
+
+                <Pressable style={styles.button}>
+                    <FontAwesome5 name="question-circle" size={normalize(14)} color="black" />
+                    <Text style={{ fontSize: normalize(12), textAlign: "center", textTransform: 'uppercase' }}>
+                        &nbsp;Not My Trip
+                    </Text>
+                </Pressable>
             </View>
 
             {
@@ -51,6 +59,16 @@ const styles = StyleSheet.create({
         fontSize: normalize(18),
         textAlign: "left",
         textTransform: 'uppercase'
+    },
+    button: {
+        flexDirection: "row",
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingVertical: normalize(5),
+        paddingHorizontal: normalize(10),
+        borderRadius: normalize(4),
+        elevation: normalize(3),
+        backgroundColor: 'orange'
     }
 });
 
