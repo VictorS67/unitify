@@ -75,7 +75,7 @@ const TripPlanningCard = (props) => {
     const dispatch = useDispatch();
     const main = useSelector((state) => state.main);
     const map = useSelector((state) => state.map);
-    const [emissionTrend, sEmissionTrend] = useState('netural');
+    const [otherPlans, sOtherPlans] = useState([]);
 
     const onNavPress = () => {
         dispatch(mainActions.moveToNextNavStatus());
@@ -115,6 +115,86 @@ const TripPlanningCard = (props) => {
         });
 
         return getEmissionTrendIcon(Math.round(Math.abs(km)), travalMode);
+    }
+
+    useEffect(() => {
+        if (map.allDirection === null || map.travalMode === null || map.updateInfo === true) return;
+
+        let largestDuration = 0;
+
+        ["DRIVING", "WALKING", "SUBWAY", "BUS", "BICYCLING"].forEach(mode => {
+            if (map.allDirection[mode].destination.duration.value > largestDuration) {
+                largestDuration = map.allDirection[mode].destination.duration.value;
+            }
+        });
+
+        Object.entries(map.allDirection).forEach(([key, value]) => {
+            if (value.destination.duration.value > largestDuration) {
+                largestDuration = value.destination.duration.value;
+            }
+        });
+
+        // console.log(map.allDirection)
+        // console.log(map.travalMode)
+
+        let count = 1;
+        let otherPlansTemp = Object.entries(map.allDirection).map(([key, value]) => {
+            count += 1;
+            if (key != map.travalMode) {
+                const anotherPlan = getOtherPlanDetails(
+                    value.destination.duration.text,
+                    value.destination.duration.value,
+                    largestDuration,
+                    key,
+                    count
+                )
+    
+                return anotherPlan;
+            }
+            return;
+        });
+
+        // console.log(otherPlansTemp);
+
+        sOtherPlans(otherPlansTemp);
+
+    }, [map.updateInfo, map.travalMode, dispatch]);
+
+    const getOtherPlanDetails = (durationText, duration, largestDuration, travalMode, key) => {
+        if (
+            durationText === null ||
+            travalMode === null || 
+            largestDuration === null || 
+            duration > largestDuration
+        ) return;
+    
+        // console.log("travalMode: ", travalMode);
+        // console.log("durationText: ", durationText);
+        // console.log("duration: ", duration);
+        // console.log("largestDuration: ", largestDuration);
+    
+        return (
+            <React.Fragment key={key}>
+                <Divider style={{ width: "100%" }} />
+                <Pressable style={styles.optionsChoiceButton} onPress={() => {onTravalModePress(travalMode)}}>
+                    <View style={styles.optionsChoiceButtonText}>
+                        <Text style={styles.optionsChoiceText}>
+                            {travalMode}
+                        </Text>
+                        <Text style={styles.optionsChoiceText}>
+                            {durationText}
+                        </Text>
+                    </View>
+                    <ProgressBar progress={duration/largestDuration} />
+                </Pressable>
+            </React.Fragment>
+        );
+    }
+
+    const onTravalModePress = (travalMode) => {
+        if (main.navStatus !== "NAV") {
+            dispatch(mapActions.sTravalMode(travalMode))
+        }
     }
 
     return (
@@ -207,7 +287,14 @@ const TripPlanningCard = (props) => {
                     <Text style={styles.optionsChoiceTitle}>
                         Other Options
                     </Text>
-                    <Divider style={{ width: "100%" }} />
+
+                    {
+                        otherPlans.map((anotherPlan) => {
+                            return anotherPlan;
+                        })
+                    }
+
+                    {/* <Divider style={{ width: "100%" }} />
                     <Pressable style={styles.optionsChoiceButton}>
                         <View style={styles.optionsChoiceButtonText}>
                             <Text style={styles.optionsChoiceText}>
@@ -257,7 +344,7 @@ const TripPlanningCard = (props) => {
                             </Text>
                         </View>
                         <ProgressBar progress={0.6} />
-                    </Pressable>
+                    </Pressable> */}
                 </View>
             </React.Fragment>
         }
