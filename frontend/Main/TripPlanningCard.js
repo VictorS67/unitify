@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Text, View, StyleSheet, Pressable } from 'react-native';
 import { useDispatch, useSelector } from "react-redux";
 import { Divider, ProgressBar } from 'react-native-paper';
@@ -10,14 +10,111 @@ import { normalize } from "../Tool/FontSize";
 import { mainActions } from "../store/main-slice";
 import { mapActions } from "../store/map-slice";
 
+const getEmissionFromDistance = (distance, travalMode) => {
+    if (distance === null) return 0;
+
+    let km = distance / 1000;
+    if (travalMode === "DRIVING") {
+        km = 250.93 * km;
+    } else if (travalMode === "WALKING") {
+        km = -250.93 * km;
+    } else if (travalMode === "SUBWAY") {
+        km = -(250.93 - 41) * km;
+    } else if (travalMode === "BUS") {
+        km = -(250.93 - 62) * km;
+    } else if (travalMode === "BICYCLING") {
+        km = -250.93 * km;
+    }
+
+    return km;
+}
+
+const getCaloriesFromDuration = (duration, travalMode) => {
+    if (duration === null) return 0;
+
+    let cal = duration / 3600;
+    if (travalMode === "DRIVING") {
+        cal = 150 * duration;
+    } else if (travalMode === "WALKING") {
+        cal = 267 * duration;
+    } else if (travalMode === "SUBWAY") {
+        cal = 200 * duration;
+    } else if (travalMode === "BUS") {
+        cal = 200 * duration;
+    } else if (travalMode === "BICYCLING") {
+        cal = 245 * duration;
+    }
+
+    return cal;
+}
+
+const getEmissionTrendIcon = (totalEmission, travalMode) => {
+    if (travalMode === null) return;
+
+    if (totalEmission === 0) {
+        return <MaterialCommunityIcons name="arrow-right" size={normalize(12)} color="black" />;
+    }
+
+    if (travalMode === "DRIVING") {
+        return <MaterialCommunityIcons name="arrow-top-right" size={normalize(12)} color="black" />;
+    } else if (travalMode === "WALKING") {
+        return <MaterialCommunityIcons name="arrow-bottom-right" size={normalize(12)} color="black" />;
+    } else if (travalMode === "SUBWAY") {
+        return <MaterialCommunityIcons name="arrow-bottom-right" size={normalize(12)} color="black" />;
+    } else if (travalMode === "BUS") {
+        return <MaterialCommunityIcons name="arrow-bottom-right" size={normalize(12)} color="black" />;
+    } else if (travalMode === "BICYCLING") {
+        return <MaterialCommunityIcons name="arrow-bottom-right" size={normalize(12)} color="black" />;
+    }
+
+    return;
+}
+
 const TripPlanningCard = (props) => {
 
     const dispatch = useDispatch();
     const main = useSelector((state) => state.main);
     const map = useSelector((state) => state.map);
+    const [emissionTrend, sEmissionTrend] = useState('netural');
 
     const onNavPress = () => {
         dispatch(mainActions.moveToNextNavStatus());
+    }
+
+    const getTotalCalories = (markers) => {
+        if (markers.length === 0) return `${0} cal`;
+
+        let cal = 0;
+        markers.forEach(marker => {
+            cal += getCaloriesFromDuration(marker.duration.value, marker.mode)
+        });
+
+        if (cal >= 1000) {
+            return `${Math.round(cal / 1000)} kcal`;
+        }
+        return `${Math.round(cal)} cal`;
+    }
+
+    const getTotalEmission = (markers) => {
+        if (markers.length === 0) return `${0} g/km`;
+
+        let km = 0;
+        markers.forEach(marker => {
+            km += getEmissionFromDistance(marker.distance.value, marker.mode)
+        });
+
+        return `${Math.round(Math.abs(km))} g/km`;
+    }
+
+    const computeEmissionTrend = (markers, travalMode) => {
+        if (markers.length === 0) return getEmissionTrendIcon(0, travalMode);
+
+        let km = 0;
+        markers.forEach(marker => {
+            km += getEmissionFromDistance(marker.distance.value, marker.mode)
+        });
+
+        return getEmissionTrendIcon(Math.round(Math.abs(km)), travalMode);
     }
 
     return (
@@ -26,6 +123,8 @@ const TripPlanningCard = (props) => {
             map.origin &&
             map.destination &&
             map.travalMode &&
+            (map.polylines.length >= 1) &&
+            (map.markers.length >= 1) &&
             map.allDirection &&
             (map.updateInfo === false) &&
             <React.Fragment>
@@ -75,22 +174,11 @@ const TripPlanningCard = (props) => {
                                 <Text style={styles.topChoiceTransTag}>
                                     <MaterialCommunityIcons name="molecule-co2" size={normalize(24)} color="black" style={{flexGrow: 1}}/>
                                     <View style={styles.topChoiceTransTagText}>
-                                        {
-                                            (props.trending === "neutral") &&
-                                            <MaterialCommunityIcons name="arrow-right" size={normalize(12)} color="black" />
-                                        }
-                                        {
-                                            (props.trending === "up") &&
-                                            <MaterialCommunityIcons name="arrow-top-right" size={normalize(12)} color="black" />
-                                        }
-                                        {
-                                            (props.trending === "down") &&
-                                            <MaterialCommunityIcons name="arrow-bottom-right" size={normalize(12)} color="black" />
-                                        }
+                                        {computeEmissionTrend(map.markers, map.travalMode)}
                                         <Text style={{
                                             textAlign: "center"
                                         }}>
-                                            252 g/km
+                                            {getTotalEmission(map.markers)}
                                         </Text>
                                     </View>
                                 </Text>
@@ -100,7 +188,7 @@ const TripPlanningCard = (props) => {
                                         <Text style={{
                                             textAlign: "center"
                                         }}>
-                                            91 cal/h
+                                            {getTotalCalories(map.markers)}
                                         </Text>
                                     </View>
                                 </Text>
@@ -177,6 +265,8 @@ const TripPlanningCard = (props) => {
             (!(map.origin &&
             map.destination &&
             map.travalMode &&
+            (map.polylines.length >= 1) &&
+            (map.markers.length >= 1) &&
             map.allDirection) ||
             (map.updateInfo === true)) &&
             <React.Fragment>

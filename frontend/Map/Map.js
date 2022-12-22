@@ -130,7 +130,7 @@ function Map() {
                                     "longitude": map.destination.longitude
                                 }}
                                 title={map.destination.address}
-                                description={`distance: ${map.destination.distance} duration: ${map.destination.duration}`}
+                                description={`distance: ${map.destination.distance.text} duration: ${map.destination.duration.text}`}
                                 key={`destination_loc`}
                             />
                         }
@@ -174,8 +174,8 @@ function Map() {
                                             <TalkBubble>
                                                 <PolylineInfo 
                                                     mode={element.mode} 
-                                                    distance={element.distance} 
-                                                    duration={element.duration}
+                                                    distance={element.distance.text} 
+                                                    duration={element.duration.text}
                                                 />
                                             </TalkBubble>
                                         </Marker>

@@ -78,13 +78,14 @@ export async function getDirections(startLoc, destinationLoc, travalModeString) 
         let destination_info = {
             "latitude": leg.end_location.lat,
             "longitude": leg.end_location.lng,
-            "distance": leg.distance.text,
-            "duration": leg.duration.text,
+            "distance": leg.distance,
+            "duration": leg.duration,
             "address": leg.end_address,
             "address_simple": leg.end_address.split(",")[0]
         }
         let steps = leg.steps;
-        // console.log(respJson.routes[0]);
+        // console.log("duration", leg.duration);
+        // console.log("distance", leg.distance);
 
         let markers = [];
         if ((travalModeString === "SUBWAY") || (travalModeString === "BUS")) {
@@ -109,8 +110,8 @@ export async function getDirections(startLoc, destinationLoc, travalModeString) 
                 return {
                     "latitude": mid_coord[0],
                     "longitude": mid_coord[1],
-                    "distance": step.distance.text,
-                    "duration": step.duration.text,
+                    "distance": step.distance,
+                    "duration": step.duration,
                     "mode": traval_mode
                 };
             });
@@ -124,8 +125,8 @@ export async function getDirections(startLoc, destinationLoc, travalModeString) 
             markers = [{
                 "latitude": mid_coord[0],
                 "longitude": mid_coord[1],
-                "distance": leg.distance.text,
-                "duration": leg.duration.text,
+                "distance": leg.distance,
+                "duration": leg.duration,
                 "mode": travalModeString
             }]
         }
