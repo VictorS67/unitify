@@ -357,8 +357,7 @@ const styles = StyleSheet.create({
     topChoiceTransCardContent: {
         flex: 1,
         flexDirection: "row",
-        alignItems: 'space-around', 
-        padding: normalize(5),
+        alignItems: 'space-around',
         width: "100%"
     },
     topChoiceTransIconCard: { 

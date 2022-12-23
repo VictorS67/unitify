@@ -154,7 +154,7 @@ const MapTool = (props) => {
                     }} childrenStyle={{
                         flex: 1,
                         alignItems: 'center', 
-                        justifyContent: 'center'
+                        justifyContent: 'center',
                     }}>
                         <TouchableOpacity 
                             style={{
@@ -164,8 +164,8 @@ const MapTool = (props) => {
                                 alignItems: "center",
                                 justifyContent: "center",
                                 marginHorizontal: normalize(3),
-                                height: "100%",
-                                width: "100%"
+                                width: normalize(50),
+                                height: normalize(50),
                             }}
                             onPress={
                                 () => goToCurrentPosition()

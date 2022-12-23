@@ -4,7 +4,7 @@ const mainSlice = createSlice({
     name: 'main',
     initialState: { 
         keyboardStatus: false,
-        scrollHeight: 30,
+        scrollHeight: 17,
         pageY: null,
         pageYOffest: 0,
         maxHeight: 17,

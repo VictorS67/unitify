@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { ScrollView , View, StyleSheet, Keyboard, useWindowDimensions, TouchableOpacity } from 'react-native';
+import { Platform, ScrollView , View, StyleSheet, Keyboard, useWindowDimensions, TouchableOpacity, KeyboardAvoidingView  } from 'react-native';
 import { FontAwesome5, Ionicons } from '@expo/vector-icons';
 import { useDispatch, useSelector } from "react-redux";
 
@@ -41,30 +41,40 @@ const MainPage = props => {
     }, [dispatch]);
 
     useEffect(() => {
-        sScrollHeight(Math.max(Math.min(scrollHeight, main.minHeight), main.maxHeight));
-    }, [scrollHeight])
-
-    const onTouchMove = (e) => {
-
-        // console.log("SCROLL");
-        // console.log('touch info:', e.nativeEvent);
-
-        if (pageY !== null) {
-            sPageYOffset(pageY - e.nativeEvent.pageY);
+        if (main.navStatus === "INIT") {
+            sScrollHeight(17);
+        } else if (main.navStatus === "PLAN") {
+            sScrollHeight(50);
+        } else if (main.navStatus === "NAV") {
+            sScrollHeight(40);
         }
+    }, [main.navStatus])
 
-        sPageY(e.nativeEvent.pageY);
-        sScrollHeight(scrollHeight + pageYOffest / height * 100);
-    }
+    // useEffect(() => {
+    //     sScrollHeight(Math.max(Math.min(scrollHeight, main.minHeight), main.maxHeight));
+    // }, [scrollHeight])
 
-    const onTouchEnd = (e) => {
-        sPageY(null);
-        sPageYOffset(0);
-    }
+    // const onTouchMove = (e) => {
+
+    //     // console.log("SCROLL");
+    //     // console.log('touch info:', e.nativeEvent);
+
+    //     if (pageY !== null) {
+    //         sPageYOffset(pageY - e.nativeEvent.pageY);
+    //     }
+
+    //     sPageY(e.nativeEvent.pageY);
+    //     sScrollHeight(scrollHeight + pageYOffest / height * 100);
+    // }
+
+    // const onTouchEnd = (e) => {
+    //     sPageY(null);
+    //     sPageYOffset(0);
+    // }
 
     return (
         <View style={styles.container}>
-            <View style={[{flexGrow: 1}]}>
+            <KeyboardAvoidingView style={[{flexGrow: 1}]} behavior={Platform.OS === "ios" ? "padding" : "height"}>
                 <Map />
 
                 <Card style={styles.userCard} childrenStyle={styles.userCardContent}>
@@ -81,13 +91,13 @@ const MainPage = props => {
                         <MapNav />
                     }
                 </Card>
-            </View>
+            </KeyboardAvoidingView>
             {
                 (main.keyboardStatus === false) &&
                 <ScrollView 
                     style={{maxHeight: `${scrollHeight}%`}}
-                    onTouchMove={onTouchMove}
-                    onTouchEnd={onTouchEnd}
+                    // onTouchMove={onTouchMove}
+                    // onTouchEnd={onTouchEnd}
                     scrollEnabled={false}
                     contentContainerStyle={{ flexGrow: 1 }}
                 >
@@ -104,12 +114,12 @@ const MainPage = props => {
                             <MileCard />
                         </View>
                     }
-                    {
+                    {/* {
                         (main.navStatus === "NAV") &&
                         <View style={[styles.container, styles.usageCard]}>
                             <UsageCard />
                         </View>
-                    }
+                    } */}
                 </ScrollView>
             }
         </View>

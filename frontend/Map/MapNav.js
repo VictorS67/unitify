@@ -54,7 +54,7 @@ const MapNav = (props) => {
                 }}>
                     <Card style={{
                         position: "absolute",
-                        right: normalize(5),
+                        left: normalize(5),
                         top: normalize(15),
                         width: normalize(140),
                         height: normalize(30),
@@ -83,6 +83,8 @@ const MapNav = (props) => {
                     </Card>
 
                     <Card style={{
+                        position: "absolute",
+                        right: normalize(5),
                         top: normalize(5),
                         width: normalize(50),
                         height: normalize(50),
@@ -92,7 +94,7 @@ const MapNav = (props) => {
                     }} childrenStyle={{
                         flex: 1,
                         alignItems: 'center', 
-                        justifyContent: 'center'
+                        justifyContent: 'center',
                     }}>
                         <TouchableOpacity 
                             style={{
@@ -101,7 +103,9 @@ const MapNav = (props) => {
                                 borderRadius: normalize(5),
                                 alignItems: "center",
                                 justifyContent: "center",
-                                marginHorizontal: normalize(3)
+                                marginHorizontal: normalize(3),
+                                width: normalize(50),
+                                height: normalize(50),
                             }}
                             onPress={goToCurrentPosition}
                         > 
