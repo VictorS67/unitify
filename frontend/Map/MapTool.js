@@ -142,7 +142,9 @@ const MapTool = (props) => {
                     justifyContent: "flex-end"
                 }}>
                     <Card style={{
+                        position: "absolute",
                         top: normalize(10),
+                        right: normalize(5),
                         width: normalize(50),
                         height: normalize(50),
                         borderRadius: normalize(50/2),

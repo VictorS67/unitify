@@ -53,6 +53,8 @@ const MapNav = (props) => {
                     justifyContent: "space-between"
                 }}>
                     <Card style={{
+                        position: "absolute",
+                        right: normalize(5),
                         top: normalize(15),
                         width: normalize(140),
                         height: normalize(30),
