@@ -66,21 +66,21 @@ const MainPage = props => {
         <View style={styles.container}>
             <View style={[{flexGrow: 1}]}>
                 <Map />
-                <View style={styles.mapToolContainer}>
-                    <Card style={styles.userCard} childrenStyle={styles.userCardContent}>
-                        <FontAwesome5 name="user" size={normalize(22)} color="black" />
-                    </Card>
-                    <Card style={styles.mapToolCard} childrenStyle={styles.mapToolCardContent}>
-                        {
-                            (main.navStatus !== "NAV") &&
-                            <MapTool style={{flex: 1}} keyboardStatus={main.keyboardStatus}/>
-                        }
-                        {
-                            (main.navStatus === "NAV") &&
-                            <MapNav />
-                        }
-                    </Card>
-                </View>
+
+                <Card style={styles.userCard} childrenStyle={styles.userCardContent}>
+                    <FontAwesome5 name="user" size={normalize(22)} color="black" />
+                </Card>
+
+                <Card style={styles.mapToolCard} childrenStyle={styles.mapToolCardContent}>
+                    {
+                        (main.navStatus !== "NAV") &&
+                        <MapTool style={{flex: 1}} keyboardStatus={main.keyboardStatus}/>
+                    }
+                    {
+                        (main.navStatus === "NAV") &&
+                        <MapNav />
+                    }
+                </Card>
             </View>
             {
                 (main.keyboardStatus === false) &&
@@ -130,6 +130,7 @@ const styles = StyleSheet.create({
         justifyContent: "space-between"
     },
     userCard: {
+        position: "absolute",
         top: normalize(35),
         right: normalize(20),
         width: normalize(50),
@@ -137,6 +138,7 @@ const styles = StyleSheet.create({
         borderRadius: normalize(50/2)
     },
     mapToolCard: {
+        position: "absolute",
         bottom: normalize(5),
         alignSelf: "center",
         width: "95%",

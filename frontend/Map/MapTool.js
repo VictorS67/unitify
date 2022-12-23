@@ -120,6 +120,8 @@ const MapTool = (props) => {
     }
 
     const goToCurrentPosition = () => {
+
+        console.log("Pressed!")
         if (map.centerLocation === false) {
             dispatch(mapActions.toggleCenterLocation());
         }

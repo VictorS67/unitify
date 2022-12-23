@@ -86,6 +86,7 @@ function Map() {
     }, [map.centerLocation, dispatch]) // <-- here put the parameter to listen
 
     const onMapPress = (e) => {
+        console.log("On Map Pressed!");
         const coordinate = e.nativeEvent.coordinate;
 
         // console.log("COORDINATE");
