@@ -12,12 +12,26 @@ const mapSlice = createSlice({
         markers: [], // Markers with customized text on map
         errorMsg: null, // Error message for getting locations from user
         allDirection: null,
-        updateInfo: true
+        updateInfo: true,
+        zoom: false
     },
     reducers: {
         sPosition(state, action) {
             const position = action.payload;
-            state.position = position;
+
+            let zoom = 0.02;
+            if (state.zoom === true) {
+                zoom = 0.002;
+            }
+
+            state.position = {
+                latitude: position.latitude,
+                longitude: position.longitude,
+                latitudeDelta: zoom, 
+                longitudeDelta: zoom
+            };
+
+            console.log("POSITION: ", state.position)
         },
         sTravalMode(state, action) {
             const travalMode = action.payload;
@@ -62,6 +76,42 @@ const mapSlice = createSlice({
         },
         updatingInfoComplete(state) {
             state.updateInfo = false;
+        },
+        zoomIn(state) {
+            state.zoom = true;
+
+            state.position = {
+                latitude: state.position.latitude,
+                longitude: state.position.longitude,
+                latitudeDelta: 0.002, 
+                longitudeDelta: 0.002
+            };
+
+            state.centerLocation = true;
+
+            console.log("POSITION: ", state.position);
+        },
+        zoomOut(state) {
+            state.zoom = false;
+
+            state.position = {
+                latitude: state.position.latitude,
+                longitude: state.position.longitude,
+                latitudeDelta: 0.02, 
+                longitudeDelta: 0.02
+            };
+
+            state.centerLocation = true;
+
+            console.log("POSITION: ", state.position);
+        },
+        resetMap(state) {
+            state.travalMode = "DRIVING"; // Travel Mode
+            state.origin = null; // Origin information
+            state.destination = null; // Destination information
+            state.polylines = []; // Polylines from origin destination
+            state.markers = []; // Markers with customized text on map
+            state.allDirection = null;
         }
     },
 });

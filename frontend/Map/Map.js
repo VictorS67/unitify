@@ -3,7 +3,7 @@ import { Text, View, SafeAreaView, StyleSheet, Button, TouchableOpacity } from '
 import { useSelector, useDispatch } from "react-redux";
 import { Ionicons, FontAwesome5 } from '@expo/vector-icons';
 import * as Location from "expo-location";
-import MapView, { Marker, Polyline } from "react-native-maps";
+import MapView, { Marker, Polyline, Geojson } from "react-native-maps";
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import { decode } from "@mapbox/polyline";
 
@@ -30,6 +30,28 @@ function Map() {
         "WALKING":  "#ef8354",
         "BICYCLING": "#60d394"
     }
+
+    useEffect(() => {
+        if (main.navStatus === "NAV" && map.zoom === false) {
+            dispatch(mapActions.zoomIn());
+
+            mapRef.current.animateCamera({
+                center: {
+                    latitude: map.position.latitude,
+                    longitude: map.position.longitude,
+                },
+                pitch: 2, 
+                heading: 20,
+                altitude: 200, 
+                zoom: 40
+            });
+            console.log("CAMERA: ", mapRef.current.getCamera());
+        }
+
+        if (main.navStatus === "INIT" && map.zoom === true) {
+            dispatch(mapActions.zoomOut());
+        }
+    }, [main.navStatus, map.zoom, dispatch])
 
     useEffect(() => {
         // console.log(travalMode, '- Has changed')
@@ -106,6 +128,7 @@ function Map() {
                         showsCompass={false}
                         showsIndoors={true}
                         showsIndoorLevelPicker={true}
+                        toolbarEnabled={false}
                         loadingEnabled={true}
                         showsBuildings={false}
                         showsTraffic={false}

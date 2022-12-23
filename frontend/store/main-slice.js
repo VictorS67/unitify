@@ -43,13 +43,21 @@ const mainSlice = createSlice({
             if (state.navStatus === "INIT") {
                 state.navStatus = "PLAN";
                 state.minHeight = 50;
+                state.scrollHeight = 30;
             } else if (state.navStatus === "PLAN") {
                 state.navStatus = "NAV";
                 state.minHeight = 63;
+                state.scrollHeight = 40;
             } else if (state.navStatus === "NAV") {
-                state.navStatus === "INIT";
+                state.navStatus = "INIT";
                 state.minHeight = 17;
+                state.scrollHeight = 17;
             }
+        },
+        resetNavStatusToInit(state) {
+            state.navStatus = "INIT";
+            state.minHeight = 17;
+            state.scrollHeight = 17;
         }
     },
 });

@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import Card from "../UI/Card";
 import Map from "../Map/Map";
 import MapTool from "../Map/MapTool";
-import MapPlanning from "../Map/MapPlanning";
+import MapNav from "../Map/MapNav";
 import TripCard from "./TripCard";
 import UsageCard from "./UsageCard";
 import MileCard from "./MileCard";
@@ -77,7 +77,7 @@ const MainPage = props => {
                         }
                         {
                             (main.navStatus === "NAV") &&
-                            <MapPlanning />
+                            <MapNav />
                         }
                     </Card>
                 </View>

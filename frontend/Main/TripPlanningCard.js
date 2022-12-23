@@ -9,76 +9,31 @@ import SkeletonView from "../UI/Skeleton";
 import { normalize } from "../Tool/FontSize";
 import { mainActions } from "../store/main-slice";
 import { mapActions } from "../store/map-slice";
-
-const getEmissionFromDistance = (distance, travalMode) => {
-    if (distance === null) return 0;
-
-    let km = distance / 1000;
-    if (travalMode === "DRIVING") {
-        km = 250.93 * km;
-    } else if (travalMode === "WALKING") {
-        km = -250.93 * km;
-    } else if (travalMode === "SUBWAY") {
-        km = -(250.93 - 41) * km;
-    } else if (travalMode === "BUS") {
-        km = -(250.93 - 62) * km;
-    } else if (travalMode === "BICYCLING") {
-        km = -250.93 * km;
-    }
-
-    return km;
-}
-
-const getCaloriesFromDuration = (duration, travalMode) => {
-    if (duration === null) return 0;
-
-    let cal = duration / 3600;
-    if (travalMode === "DRIVING") {
-        cal = 150 * duration;
-    } else if (travalMode === "WALKING") {
-        cal = 267 * duration;
-    } else if (travalMode === "SUBWAY") {
-        cal = 200 * duration;
-    } else if (travalMode === "BUS") {
-        cal = 200 * duration;
-    } else if (travalMode === "BICYCLING") {
-        cal = 245 * duration;
-    }
-
-    return cal;
-}
-
-const getEmissionTrendIcon = (totalEmission, travalMode) => {
-    if (travalMode === null) return;
-
-    if (totalEmission === 0) {
-        return <MaterialCommunityIcons name="arrow-right" size={normalize(12)} color="black" />;
-    }
-
-    if (travalMode === "DRIVING") {
-        return <MaterialCommunityIcons name="arrow-top-right" size={normalize(12)} color="black" />;
-    } else if (travalMode === "WALKING") {
-        return <MaterialCommunityIcons name="arrow-bottom-right" size={normalize(12)} color="black" />;
-    } else if (travalMode === "SUBWAY") {
-        return <MaterialCommunityIcons name="arrow-bottom-right" size={normalize(12)} color="black" />;
-    } else if (travalMode === "BUS") {
-        return <MaterialCommunityIcons name="arrow-bottom-right" size={normalize(12)} color="black" />;
-    } else if (travalMode === "BICYCLING") {
-        return <MaterialCommunityIcons name="arrow-bottom-right" size={normalize(12)} color="black" />;
-    }
-
-    return;
-}
+import { tripnavActions } from "../store/tripnav-slice";
+import { getEmissionFromDistance, getCaloriesFromDuration, getEmissionTrendIcon } from "../Utils/TravalInfo";
 
 const TripPlanningCard = (props) => {
 
     const dispatch = useDispatch();
     const main = useSelector((state) => state.main);
     const map = useSelector((state) => state.map);
+    const tripnav = useSelector((state) => state.tripnav);
     const [otherPlans, sOtherPlans] = useState([]);
+
+    const option_colors = {
+        "DRIVING": "#f07167",
+        "SUBWAY": "#00afb9",
+        "BUS": "#00afb9",
+        "WALKING":  "#ef8354",
+        "BICYCLING": "#60d394"
+    }
 
     const onNavPress = () => {
         dispatch(mainActions.moveToNextNavStatus());
+        dispatch(tripnavActions.sTravalModes([
+            ...tripnav.travalModes,
+            map.travalMode
+        ]));
     }
 
     const getTotalCalories = (markers) => {
@@ -118,45 +73,57 @@ const TripPlanningCard = (props) => {
     }
 
     useEffect(() => {
-        if (map.allDirection === null || map.travalMode === null || map.updateInfo === true) return;
 
-        let largestDuration = 0;
+        try {
+            if (map.allDirection === null) return;
 
-        ["DRIVING", "WALKING", "SUBWAY", "BUS", "BICYCLING"].forEach(mode => {
-            if (map.allDirection[mode].destination.duration.value > largestDuration) {
-                largestDuration = map.allDirection[mode].destination.duration.value;
-            }
-        });
+            let largestDuration = 0;
 
-        Object.entries(map.allDirection).forEach(([key, value]) => {
-            if (value.destination.duration.value > largestDuration) {
-                largestDuration = value.destination.duration.value;
-            }
-        });
-
-        // console.log(map.allDirection)
-        // console.log(map.travalMode)
-
-        let count = 1;
-        let otherPlansTemp = Object.entries(map.allDirection).map(([key, value]) => {
-            count += 1;
-            if (key != map.travalMode) {
-                const anotherPlan = getOtherPlanDetails(
-                    value.destination.duration.text,
-                    value.destination.duration.value,
-                    largestDuration,
-                    key,
-                    count
-                )
+            ["DRIVING", "WALKING", "SUBWAY", "BUS", "BICYCLING"].forEach(mode => {
+                if (map.allDirection.hasOwnProperty(mode) && map.allDirection[mode].destination.duration.value > largestDuration) {
+                    largestDuration = map.allDirection[mode].destination.duration.value;
+                }
+            });
     
-                return anotherPlan;
-            }
-            return;
-        });
+            Object.entries(map.allDirection).forEach(([key, value]) => {
+                if (value.destination.duration.value > largestDuration) {
+                    largestDuration = value.destination.duration.value;
+                }
+            });
+    
+            // console.log(map.allDirection)
+            // console.log(map.travalMode)
+    
+            let count = 1;
+            let otherPlansTemp = Object.entries(map.allDirection).map(([key, value]) => {
+                count += 1;
+                if (key != map.travalMode) {
+                    const anotherPlan = getOtherPlanDetails(
+                        value.destination.duration.text,
+                        value.destination.duration.value,
+                        largestDuration,
+                        key,
+                        count
+                    )
+        
+                    return anotherPlan;
+                }
+                return;
+            });
+    
+            // console.log(otherPlansTemp);
+    
+            sOtherPlans(otherPlansTemp);
+        } catch (error) {
+            console.log(error);
+            console.log("update NavPlans failed");
 
-        // console.log(otherPlansTemp);
-
-        sOtherPlans(otherPlansTemp);
+            dispatch(mapActions.sErrorMsg(
+                {
+                    message: "update NavPlans failed"
+                }
+            ));
+        }
 
     }, [map.updateInfo, map.travalMode, dispatch]);
 
@@ -185,7 +152,7 @@ const TripPlanningCard = (props) => {
                             {durationText}
                         </Text>
                     </View>
-                    <ProgressBar progress={duration/largestDuration} />
+                    <ProgressBar progress={duration/largestDuration} color={option_colors[travalMode]} />
                 </Pressable>
             </React.Fragment>
         );
@@ -294,57 +261,6 @@ const TripPlanningCard = (props) => {
                         })
                     }
 
-                    {/* <Divider style={{ width: "100%" }} />
-                    <Pressable style={styles.optionsChoiceButton}>
-                        <View style={styles.optionsChoiceButtonText}>
-                            <Text style={styles.optionsChoiceText}>
-                                CAR
-                            </Text>
-                            <Text style={styles.optionsChoiceText}>
-                                5 mins
-                            </Text>
-                        </View>
-                        <ProgressBar progress={0.5} />
-                    </Pressable>
-                    
-                    <Divider style={{ width: "100%" }} />
-                    <Pressable style={styles.optionsChoiceButton}>
-                        <View style={styles.optionsChoiceButtonText}>
-                            <Text style={styles.optionsChoiceText}>
-                                BUS
-                            </Text>
-                            <Text style={styles.optionsChoiceText}>
-                                10 mins
-                            </Text>
-                        </View>
-                        <ProgressBar progress={0.8} />
-                    </Pressable>
-                                    
-                    <Divider style={{ width: "100%" }} />
-                    <Pressable style={styles.optionsChoiceButton}>
-                        <View style={styles.optionsChoiceButtonText}>
-                            <Text style={styles.optionsChoiceText}>
-                                Walking
-                            </Text>
-                            <Text style={styles.optionsChoiceText}>
-                                15 mins
-                            </Text>
-                        </View>
-                        <ProgressBar progress={0.9} />
-                    </Pressable>
-
-                    <Divider style={{ width: "100%" }} />
-                    <Pressable style={styles.optionsChoiceButton}>
-                        <View style={styles.optionsChoiceButtonText}>
-                            <Text style={styles.optionsChoiceText}>
-                                Bicycling
-                            </Text>
-                            <Text style={styles.optionsChoiceText}>
-                                8 mins
-                            </Text>
-                        </View>
-                        <ProgressBar progress={0.6} />
-                    </Pressable> */}
                 </View>
             </React.Fragment>
         }

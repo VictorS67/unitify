@@ -11,13 +11,14 @@ import { getLocation, GOOGLE_MAP_API } from "../Utils/GoogleMap";
 import { updateDirection } from "../store/map-actions";
 import { mapActions } from "../store/map-slice";
 import { mainActions } from "../store/main-slice";
+import { getEmissionFromDistance, getCaloriesFromDuration, getEmissionTrendIcon } from "../Utils/TravalInfo";
 
-
-const MapPlanning = (props) => {
+const MapNav = (props) => {
 
     const dispatch = useDispatch();
     const map = useSelector((state) => state.map);
     const main = useSelector((state) => state.main);
+    const tripnav = useSelector((state) => state.tripnav);
 
     const [index, sIndex] = useState(0);
 
@@ -160,7 +161,7 @@ const MapPlanning = (props) => {
                     width: "100%"
                 }}>
                     <Text>
-                        Start at 20:30pm
+                        Start at 20:30
                     </Text>
                     <Text>
                         <MaterialCommunityIcons name="molecule-co2" size={normalize(24)} color="black" style={{flexGrow: 1}}/>
@@ -194,4 +195,4 @@ const styles = StyleSheet.create({
 
 });
 
-export default MapPlanning;
+export default MapNav;
