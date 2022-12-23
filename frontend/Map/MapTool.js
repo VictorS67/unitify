@@ -136,6 +136,7 @@ const MapTool = (props) => {
                 justifyContent: "space-between"
             }}>
                 <View style={{
+                    position: "absolute",
                     flexDirection: "row",
                     width: "100%",
                     top: normalize(-35),
@@ -162,7 +163,9 @@ const MapTool = (props) => {
                                 borderRadius: normalize(5),
                                 alignItems: "center",
                                 justifyContent: "center",
-                                marginHorizontal: normalize(3)
+                                marginHorizontal: normalize(3),
+                                height: "100%",
+                                width: "100%"
                             }}
                             onPress={
                                 () => goToCurrentPosition()
