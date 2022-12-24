@@ -3,6 +3,7 @@ import { createSlice } from '@reduxjs/toolkit';
 const mapSlice = createSlice({
     name: 'map',
     initialState: { 
+        initUpdateTask: false,
         centerLocation: false,
         position: null, // Current position of the user
         travalMode: "DRIVING", // Travel Mode
@@ -16,6 +17,9 @@ const mapSlice = createSlice({
         zoom: false
     },
     reducers: {
+        initUpdate(state) {
+            state.initUpdateTask = true;
+        },
         sPosition(state, action) {
             const position = action.payload;
 

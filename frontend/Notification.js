@@ -19,6 +19,29 @@ import { normalize } from "./Tool/FontSize";
 
 const NOTIFICATION_TASK_NAME = "BACKGROUND-NOTIFICATION-TASK";
 
+TaskManager.defineTask(NOTIFICATION_TASK_NAME, ({ data, error }) => {
+    if (error) {
+        // Error occurred - check `error.message` for more details.
+        return;
+    }
+    if (data) {
+        // do something with the locations captured in the background
+
+        console.log("notification: ", data);
+        return;
+    }
+});
+
+Notifications.registerTaskAsync(NOTIFICATION_TASK_NAME);
+
+Notifications.setNotificationHandler({
+    handleNotification: async () => ({
+        shouldShowAlert: true,
+        shouldPlaySound: true,
+        shouldSetBadge: true,
+    }),
+});
+
 function Notification() {
 
     const dispatch = useDispatch();
@@ -29,29 +52,6 @@ function Notification() {
     const notificationListener = useRef();
     const responseListener = useRef();
 
-    TaskManager.defineTask(NOTIFICATION_TASK_NAME, ({ data, error }) => {
-        if (error) {
-            // Error occurred - check `error.message` for more details.
-            return;
-        }
-        if (data) {
-            // do something with the locations captured in the background
-
-            console.log("notification: ", data);
-            return;
-        }
-    });
-
-    Notifications.registerTaskAsync(NOTIFICATION_TASK_NAME);
-
-    Notifications.setNotificationHandler({
-        handleNotification: async () => ({
-            shouldShowAlert: true,
-            shouldPlaySound: true,
-            shouldSetBadge: true,
-        }),
-    });
-
     const triggerNotifications = async () => {
         await Notifications.scheduleNotificationAsync({
             content: {
@@ -59,7 +59,8 @@ function Notification() {
                 body: "Here is the notification body",
                 data: {
                     data: "this is data"
-                }
+                },
+                sound: true,
             },
             trigger: {
                 seconds: 2
