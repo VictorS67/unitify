@@ -7,6 +7,7 @@ const tripnavSlice = createSlice({
         duration: 320,
         speed: 0.3, 
         pause: 3,
+        idletimestamp: null,
         travalModes: [], // Travel Mode during navigation
         polylines: [], // Polylines from initial position during navigation
     },
@@ -24,6 +25,22 @@ const tripnavSlice = createSlice({
         sPolylines(state, action) {
             const polylines = action.payload;
             state.polylines = polylines;
+        },
+        sSpeed(state, action) {
+            const speed = action.payload;
+            state.speed = speed;
+
+            if (speed !== 0) {
+                state.idletimestamp = null;
+            }
+        },
+        addDistance(state, action) {
+            const distance = action.distance;
+            state.distance += distance;
+        },
+        addDuration(state, action) {
+            const duration = action.duration;
+            state.duration += duration;
         }
     },
 });

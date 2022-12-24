@@ -29,11 +29,12 @@ const TripPlanningCard = (props) => {
     }
 
     const onNavPress = () => {
-        dispatch(mainActions.moveToNextNavStatus());
+        dispatch(tripnavActions.resetTripNav());
         dispatch(tripnavActions.sTravalModes([
             ...tripnav.travalModes,
             map.travalMode
         ]));
+        dispatch(mainActions.moveToNextNavStatus());
     }
 
     const getTotalCalories = (markers) => {

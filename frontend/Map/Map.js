@@ -80,7 +80,12 @@ function Map() {
         // console.log(travalMode, '- Has changed')
         if (map.position && mapRef.current && map.centerLocation === true) {
             //Animate the user to new region. Complete this animation in 3 seconds
-            mapRef.current.animateToRegion(map.position);
+            mapRef.current.animateToRegion({
+                latitude: map.position.latitude,
+                latitudeDelta: map.position.latitudeDelta,
+                longitude: map.position.longitude,
+                longitudeDelta: map.position.longitudeDelta
+            });
             dispatch(mapActions.toggleCenterLocation());
         }
     }, [map.centerLocation, dispatch]) // <-- here put the parameter to listen
@@ -123,7 +128,12 @@ function Map() {
                         onPress={onMapPress}
                         style={styles.map} 
                         showsUserLocation={true}
-                        initialRegion={map.position}
+                        initialRegion={{
+                            latitude: map.position.latitude,
+                            latitudeDelta: map.position.latitudeDelta,
+                            longitude: map.position.longitude,
+                            longitudeDelta: map.position.longitudeDelta
+                        }}
                         provider={MapView.PROVIDER_GOOGLE}
                         showsMyLocationButton={false}
                         showsCompass={false}

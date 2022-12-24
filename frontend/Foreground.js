@@ -17,29 +17,30 @@ function Foreground() {
     const dispatch = useDispatch();
     const map = useSelector((state) => state.map);
 
-    useEffect(() => {
-        (async () => {
+    // useEffect(() => {
+    //     (async () => {
         
-            let { status } = await Location.requestForegroundPermissionsAsync();
-            if (status !== 'granted') {
-                dispatch(mapActions.sErrorMsg(
-                    {
-                        message: 'Permission to access location was denied'
-                    }
-                ));
-                return;
-            }
+    //         let { status: foregroundStatus  } = await Location.requestForegroundPermissionsAsync();
+
+    //         if (foregroundStatus !== 'granted') {
+    //             dispatch(mapActions.sErrorMsg(
+    //                 {
+    //                     message: 'Foreground: Permission to access location was denied'
+    //                 }
+    //             ));
+    //             return;
+    //         }
         
-            let curr_location = await Location.getCurrentPositionAsync({});
-            // console.log(curr_location)
-            dispatch(mapActions.sPosition(
-                {
-                    latitude: curr_location.coords.latitude,
-                    longitude: curr_location.coords.longitude
-                }
-            ));
-        })();
-    }, [dispatch]);
+    //         let curr_location = await Location.getCurrentPositionAsync({});
+    //         console.log("Foreground: ", curr_location)
+    //         dispatch(mapActions.sPosition(
+    //             {
+    //                 latitude: curr_location.coords.latitude,
+    //                 longitude: curr_location.coords.longitude
+    //             }
+    //         ));
+    //     })();
+    // }, [dispatch]);
 
     useEffect(() => {
         if (map.errorMsg !== null) {

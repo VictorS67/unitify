@@ -1,5 +1,8 @@
 import { mapActions } from "./map-slice";
+import { tripnavActions } from "./tripnav-slice";
 import { getDirections, getLocation, GOOGLE_MAP_API } from "../Utils/GoogleMap";
+
+import haversine from "haversine";
 
 export const updateDirection = (position, destination, travalMode) => {
     return async (dispatch) => {
@@ -46,6 +49,47 @@ export const updateAllDirection = (position, destination, travalMode) => {
                 dispatch(mapActions.sMarkers(all_mode[travalMode].markers));
             } catch (error) {
                 console.log("updateAllDirection: Something went wrong");
+            }
+
+            resolve();
+        });
+    }
+}
+
+export const updateNavInfo = (oldPosition, newPosition) => {
+    return (dispatch) => {
+        return new Promise(async (resolve, reject) => {
+
+            if (oldPosition !== null && newPosition !== null) {
+                const distance = haversine(
+                    {
+                        latitude: oldPosition.latitude,
+                        longitude: oldPosition.longitude
+                    }, 
+                    {
+                        latitude: newPosition.latitude,
+                        longitude: newPosition.longitude
+                    }, 
+                    {
+                        unit: 'meter'
+                    }
+                );
+                const duration = Math.floor((newPosition.timestamp - oldPosition.timestamp) / 1000);
+                const speed = 3.6 * newPosition.speed;
+
+                console.log("distance: ", distance);
+                console.log("duration: ", duration);
+                console.log("speed: ", speed);
+
+                if (distance >= 30) {
+                    dispatch(tripnavActions.addDistance(distance));
+                    dispatch(tripnavActions.sSpeed(speed));
+                } else {
+                    dispatch(tripnavActions.sSpeed(0));
+                }
+
+                dispatch(tripnavActions.addDuration(duration));
+
             }
 
             resolve();

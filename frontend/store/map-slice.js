@@ -25,8 +25,7 @@ const mapSlice = createSlice({
             }
 
             state.position = {
-                latitude: position.latitude,
-                longitude: position.longitude,
+                ...position,
                 latitudeDelta: zoom, 
                 longitudeDelta: zoom
             };
@@ -81,8 +80,7 @@ const mapSlice = createSlice({
             state.zoom = true;
 
             state.position = {
-                latitude: state.position.latitude,
-                longitude: state.position.longitude,
+                ...state.position,
                 latitudeDelta: 0.002, 
                 longitudeDelta: 0.002
             };
@@ -95,8 +93,7 @@ const mapSlice = createSlice({
             state.zoom = false;
 
             state.position = {
-                latitude: state.position.latitude,
-                longitude: state.position.longitude,
+                ...state.position,
                 latitudeDelta: 0.02, 
                 longitudeDelta: 0.02
             };
