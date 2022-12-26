@@ -24,8 +24,35 @@ function Background() {
     const main = useSelector((state) => state.main);
     const tripnav = useSelector((state) => state.tripnav);
 
+    const [prevPosition, sPrevPosition] = useState(null);
+
     useEffect(() => {
-        if (map.initUpdateTask === false) {
+        if (map.position === null) {
+            // dispatch(mapActions.initUpdate());
+
+            (async () => {
+        
+                let { status } = await Location.requestForegroundPermissionsAsync();
+                if (status !== 'granted') {
+                    dispatch(mapActions.sErrorMsg(
+                        {
+                            message: 'Permission to access location was denied'
+                        }
+                    ));
+                    return;
+                }
+            
+                let curr_location = await Location.getCurrentPositionAsync({});
+                // console.log("init position: ", curr_location);
+                dispatch(mapActions.sPosition(
+                    {
+                        ...curr_location.coords,
+                        timestamp: curr_location.timestamp
+                    }
+                ));
+            })();
+        } else {
+            // console.log("update: ", map.initUpdateTask);
             TaskManager.defineTask(LOCATION_TASK_NAME, ({ data, error }) => {
                 if (error) {
                     // Error occurred - check `error.message` for more details.
@@ -34,7 +61,9 @@ function Background() {
                 if (data) {
                     const { locations } = data;
                     // do something with the locations captured in the background
-                    // console.log("Background: ", locations);
+                    console.log("Background: ", locations);
+                    console.log("map.position: ", map.position);
+                    console.log("main.navStatus: ", main.navStatus);
         
                     let curr_location = locations[locations.length - 1];
         
@@ -61,32 +90,6 @@ function Background() {
                     }
                 }
             });
-
-            dispatch(mapActions.initUpdate());
-
-            (async () => {
-        
-                let { status } = await Location.requestForegroundPermissionsAsync();
-                if (status !== 'granted') {
-                    dispatch(mapActions.sErrorMsg(
-                        {
-                            message: 'Permission to access location was denied'
-                        }
-                    ));
-                    return;
-                }
-            
-                let curr_location = await Location.getCurrentPositionAsync({});
-                // console.log("init position: ", curr_location);
-                dispatch(mapActions.sPosition(
-                    {
-                        ...curr_location.coords,
-                        timestamp: curr_location.timestamp
-                    }
-                ));
-            })();
-        } else {
-            // console.log("update: ", map.initUpdateTask);
 
             (async () => {
                 let { status: foregroundStatus  } = await Location.requestForegroundPermissionsAsync();
@@ -123,7 +126,13 @@ function Background() {
                 });
             })();
         }
-    }, [map.initUpdateTask, dispatch]);
+    }, [map.position, dispatch]);
+
+    // useEffect(() => {
+    //     sPrevPosition(map.position);
+
+    //     console.log("prevPosition: ", prevPosition);
+    // }, [map.position]);
 
     return (
         null

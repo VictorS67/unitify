@@ -12,7 +12,7 @@ function App() {
         <Provider store={store}>
             <Foreground />
             <Background />
-            <Notification />
+            {/* <Notification /> */}
         </Provider>
     );
 }

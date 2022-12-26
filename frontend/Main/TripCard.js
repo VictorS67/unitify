@@ -12,8 +12,6 @@ const TripCard = props => {
 
     const main = useSelector((state) => state.main);
 
-    const trending = "up";
-
     return (
         <View style={styles.tripCard}>
             <View style={styles.tripCardTitle}>
@@ -34,7 +32,7 @@ const TripCard = props => {
 
             {
                 main.navStatus === "PLAN" &&
-                <TripPlanningCard trending={trending} />
+                <TripPlanningCard />
             }
 
             {

@@ -91,7 +91,7 @@ const mapSlice = createSlice({
 
             state.centerLocation = true;
 
-            console.log("POSITION: ", state.position);
+            // console.log("POSITION: ", state.position);
         },
         zoomOut(state) {
             state.zoom = false;
@@ -104,7 +104,7 @@ const mapSlice = createSlice({
 
             state.centerLocation = true;
 
-            console.log("POSITION: ", state.position);
+            // console.log("POSITION: ", state.position);
         },
         resetMap(state) {
             state.travalMode = "DRIVING"; // Travel Mode

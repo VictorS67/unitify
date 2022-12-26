@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Text, View, StyleSheet, Pressable, useWindowDimensions, KeyboardAvoidingView, Platform } from 'react-native';
 import { useSelector, useDispatch } from "react-redux";
 import { FontAwesome5, MaterialCommunityIcons, Ionicons, Octicons } from '@expo/vector-icons';
@@ -38,7 +38,7 @@ const TripNavCard = (props) => {
                     </Card>
                     <Text style={styles.cardText}>
                         <Text style={styles.statText}>
-                            {tripnav.distance}
+                            {Number((tripnav.distance).toFixed(1))}
                         </Text>
                         <Text>
                             &nbsp;km
@@ -78,7 +78,7 @@ const TripNavCard = (props) => {
                     </Card>
                     <Text style={styles.cardText}>
                         <Text style={styles.statText}>
-                            {tripnav.speed}
+                            {Number((tripnav.speed).toFixed(1))}
                         </Text>
                         <Text>
                             &nbsp;km/h

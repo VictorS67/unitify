@@ -30,10 +30,7 @@ const TripPlanningCard = (props) => {
 
     const onNavPress = () => {
         dispatch(tripnavActions.resetTripNav());
-        dispatch(tripnavActions.sTravalModes([
-            ...tripnav.travalModes,
-            map.travalMode
-        ]));
+        dispatch(tripnavActions.addTravalMode(map.travalMode));
         dispatch(mainActions.moveToNextNavStatus());
     }
 

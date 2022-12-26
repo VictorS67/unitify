@@ -1,6 +1,18 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { normalize } from '../Tool/FontSize';
 
+export function getEmissionTrendIconByNumber(totalEmission) {
+    if (totalEmission === 0) {
+        return <MaterialCommunityIcons name="arrow-right" size={normalize(12)} color="black" />;
+    }
+
+    if (totalEmission > 0) {
+        return <MaterialCommunityIcons name="arrow-top-right" size={normalize(12)} color="red" />;
+    }
+
+    return <MaterialCommunityIcons name="arrow-bottom-right" size={normalize(12)} color="green" />;
+}
+
 export function getEmissionTrendIcon(totalEmission, travalMode) {
     if (travalMode === null) return;
 

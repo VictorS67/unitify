@@ -11,7 +11,67 @@ import { getLocation, GOOGLE_MAP_API } from "../Utils/GoogleMap";
 import { updateDirection } from "../store/map-actions";
 import { mapActions } from "../store/map-slice";
 import { mainActions } from "../store/main-slice";
-import { getEmissionFromDistance, getCaloriesFromDuration, getEmissionTrendIcon } from "../Utils/TravalInfo";
+import { getEmissionFromDistance, getCaloriesFromDuration, getEmissionTrendIconByNumber } from "../Utils/TravalInfo";
+
+const renderTripInfo = (currentTravalMode) => {
+
+    if (currentTravalMode === "SUBWAY") {
+        return (
+            <React.Fragment>
+                <FontAwesome5 name="subway" size={normalize(20)} color="black" />
+                <Text style={{ fontSize: normalize(16), paddingHorizontal: normalize(10) }}>
+                    Taking Subway
+                </Text>
+            </React.Fragment>
+        );
+    }
+
+    if (currentTravalMode === "BUS") {
+        return (
+            <React.Fragment>
+                <FontAwesome5 name="bus" size={normalize(20)} color="black" />
+                <Text style={{ fontSize: normalize(16), paddingHorizontal: normalize(10) }}>
+                    Taking Shuttle Bus
+                </Text>
+            </React.Fragment>
+        );
+    }
+
+    if (currentTravalMode === "WALKING") {
+        return (
+            <React.Fragment>
+                <FontAwesome5 name="walking" size={normalize(20)} color="black" />
+                <Text style={{ fontSize: normalize(16), paddingHorizontal: normalize(10) }}>
+                    Walking
+                </Text>
+            </React.Fragment>
+        );
+    }
+
+    if (currentTravalMode === "DRIVING") {
+        return(
+            <React.Fragment>
+                <FontAwesome5 name="car" size={normalize(20)} color="black" />
+                <Text style={{ fontSize: normalize(16), paddingHorizontal: normalize(10) }}>
+                    Driving A Car
+                </Text>
+            </React.Fragment>
+        );
+    }
+
+    if (currentTravalMode === "BICYCLING") {
+        return(
+            <React.Fragment>
+                <FontAwesome5 name="bicycle" size={normalize(20)} color="black" />
+                <Text style={{ fontSize: normalize(16), paddingHorizontal: normalize(10) }}>
+                    Bicycling
+                </Text>
+            </React.Fragment>
+        );
+    }
+
+    return;
+}
 
 const MapNav = (props) => {
 
@@ -20,17 +80,56 @@ const MapNav = (props) => {
     const main = useSelector((state) => state.main);
     const tripnav = useSelector((state) => state.tripnav);
 
-    const [index, sIndex] = useState(0);
+    const [progressChildren, sProgressChildren] = useState([]);
+    const [totalDuration, sTotalDuration] = useState(map.destination.duration.value);
+    const [emission, sEmission] = useState(0);
+    const [calories, sCalories] = useState(0);
+    const [startTime, sStartTime] = useState("00:00");
 
     useEffect(() => {
-        const interval = setInterval(() => {
-            sIndex((index + 1) % (10 + 1))
-        }, 1000);
-
-        return () => {
-            clearInterval(interval);
+        const colors = {
+            "DRIVING": "#f07167",
+            "TRANSIT": "#00afb9",
+            "WALKING":  "#ef8354",
+            "BICYCLING": "#60d394"
         }
-    }, [index]);
+
+        const progressChildrenTemp = [];
+        let actualCalories = 0;
+        let actualEmission = 0;
+        let actualDuration = 0;
+        let durationLength = Object.keys(tripnav.travalDurations).length;
+        let durations = [];
+    
+        for (const [travalMode, value] of Object.entries(tripnav.travalDurations)) {
+            progressChildrenTemp.push({
+                progressColor: colors[travalMode],
+                steps: Number(value.duration)
+            });
+            durations.push(Number(value.duration));
+    
+            actualDuration += Number(value.duration);
+            actualEmission += getEmissionFromDistance(Number(value.distance) * 1000, travalMode);
+            actualCalories += getCaloriesFromDuration(Number(value.duration), travalMode);
+        }
+
+        let finalDuration = totalDuration > actualDuration? totalDuration : actualDuration;
+        sTotalDuration(finalDuration);
+        sEmission(actualEmission);
+        sCalories(actualCalories);
+
+        if (durationLength === 1) {
+            progressChildrenTemp[durationLength - 1].steps = finalDuration;
+        } else if (durationLength > 1) {
+            progressChildrenTemp[durationLength - 1].steps += finalDuration - durations.reduce((a, b) => a + b, 0);
+        }
+
+        sProgressChildren(progressChildrenTemp);
+
+        const [hour, minute, second] = (new Date(tripnav.startTimestamp)).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', hour12: false}).split(':')
+        sStartTime(`${hour}:${minute}`);
+
+    }, [tripnav.travalDurations, dispatch]);
 
     const goToCurrentPosition = () => {
         if (map.centerLocation === false) {
@@ -130,17 +229,13 @@ const MapNav = (props) => {
                     paddingBottom: normalize(10)
                 }}>
                     <View style={{ flexDirection: "row" }}>
-                        <FontAwesome5 name="subway" size={normalize(20)} color="black" />
-                        <Text style={{ fontSize: normalize(16), paddingHorizontal: normalize(10) }}>
-                            Taking Shuttle Bus
-                        </Text>
+                        {renderTripInfo(tripnav.currTravalMode)}
                     </View>
                 </View>
 
-
                 <ProgressBar 
-                    step={index} 
-                    steps={10} 
+                    step={Number(tripnav.duration.toFixed(0))} 
+                    steps={totalDuration} 
                     style={
                         {
                             progressBackColor: "transparent",
@@ -148,16 +243,7 @@ const MapNav = (props) => {
                             borderRadius: 3
                         }
                     }
-                    progressChildren={[
-                        {
-                            progressColor: "orange",
-                            steps: 3
-                        },
-                        {
-                            progressColor: "blue",
-                            steps: 7
-                        }
-                    ]}
+                    progressChildren={progressChildren}
                 />
 
                 <View style={{
@@ -167,16 +253,16 @@ const MapNav = (props) => {
                     width: "100%"
                 }}>
                     <Text>
-                        Start at 20:30
+                        Start at {startTime}
                     </Text>
                     <Text>
                         <MaterialCommunityIcons name="molecule-co2" size={normalize(24)} color="black" style={{flexGrow: 1}}/>
                         <View style={{flexDirection: "row", flex: 1}}>
-                            <MaterialCommunityIcons name="arrow-top-right" size={normalize(12)} color="black" />
+                            {getEmissionTrendIconByNumber(emission)}
                             <Text style={{
                                 textAlign: "center"
                             }}>
-                                252 g/km
+                                {Number(Math.abs(emission).toFixed(1))} g/km
                             </Text>
                         </View>
                     </Text>
@@ -186,7 +272,7 @@ const MapNav = (props) => {
                             <Text style={{
                                 textAlign: "center"
                             }}>
-                                91 cal
+                                { calories >= 1000? `${Number((calories / 1000).toFixed(1))} kcal` : `${calories} cal`}
                             </Text>
                         </View>
                     </Text>

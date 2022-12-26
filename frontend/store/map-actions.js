@@ -81,15 +81,17 @@ export const updateNavInfo = (oldPosition, newPosition) => {
                 console.log("duration: ", duration);
                 console.log("speed: ", speed);
 
-                if (distance >= 30) {
-                    dispatch(tripnavActions.addDistance(distance));
-                    dispatch(tripnavActions.sSpeed(speed));
-                } else {
-                    dispatch(tripnavActions.sSpeed(0));
-                }
+                // if (distance >= 30) {
+                //     dispatch(tripnavActions.addDistance(distance));
+                //     dispatch(tripnavActions.sSpeed(speed));
+                // } else {
+                //     dispatch(tripnavActions.sSpeed(0));
+                // }
 
+                dispatch(tripnavActions.addDistance(distance / 1000));
+                dispatch(tripnavActions.sSpeed(speed));
                 dispatch(tripnavActions.addDuration(duration));
-
+                dispatch(tripnavActions.addTravalMode("CURRENT"));
             }
 
             resolve();
