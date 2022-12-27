@@ -10,8 +10,8 @@ import { getLocation, GOOGLE_MAP_API, searchNearBy } from "../Utils/GoogleMap";
 import { updateDirection } from "../store/map-actions";
 import { mapActions } from "../store/map-slice";
 import { mainActions } from "../store/main-slice";
-import { getEmissionFromDistance, getCaloriesFromDuration, getEmissionTrendIconByNumber } from "../Utils/TravalInfo";
 import { tripnavActions } from "../store/tripnav-slice";
+import { getEmissionFromDistance, getCaloriesFromDuration, getEmissionTrendIconByNumber } from "../Utils/TravalInfo";
 
 const renderTripInfo = (currentTravalMode) => {
 
@@ -88,6 +88,8 @@ const MapNav = (props) => {
     const [calories, sCalories] = useState(0);
     const [startTime, sStartTime] = useState("00:00");
     const [showTravalModes, sShowTravalModes] = useState(false);
+    const [showFinishReport, sShowFinishReport] = useState(false);
+    const [showTerminateReport, sShowTerminateReport] = useState(false);
     const [changeTravalModes, sChangeTravalModes] = useState([]);
 
     useEffect(() => {
@@ -134,7 +136,19 @@ const MapNav = (props) => {
         const [hour, minute, second] = (new Date(tripnav.startTimestamp)).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', hour12: false}).split(':')
         sStartTime(`${hour}:${minute}`);
 
-    }, [tripnav.travalDurations, tripnav.currTravalMode, dispatch]);
+    }, [tripnav.travalDurations, tripnav.currTravalMode]);
+
+    useEffect(() => {
+        if (tripnav.isTerminated === true) {
+            sShowFinishReport(true);
+        }
+    }, [tripnav.isTerminated]);
+
+    useEffect(() => {
+        if (tripnav.isColdTerminated === true) {
+            sShowTerminateReport(true);
+        }
+    }, [tripnav.isColdTerminated]);
 
     const goToCurrentPosition = () => {
         if (map.centerLocation === false) {
@@ -463,6 +477,200 @@ const MapNav = (props) => {
                     </View>
                 </View>
             </Modal>
+
+            <Modal
+                animationType="fade"
+                transparent={true}
+                visible={showFinishReport}
+                onRequestClose={() => {
+                    // Alert.alert("Modal has been closed.");
+                    sShowFinishReport(!showFinishReport);
+                    dispatch(mainActions.moveToNextNavStatus());
+                    dispatch(mapActions.resetMap());
+                }}
+            >
+                <View style={styles.centeredView}>
+                    <View style={{
+                        flex: 0.25,
+                        flexDirection: 'row',
+                        flexWrap: 'wrap',
+                        justifyContent: 'center',
+                        backgroundColor: "white",
+                        borderRadius: normalize(20),
+                        padding: normalize(20),
+                        alignItems: "center",
+                        shadowColor: "#000",
+                        shadowOffset: {
+                            width: 0,
+                            height: 2
+                        },
+                        shadowOpacity: 0.25,
+                        shadowRadius: 4,
+                        elevation: 5,
+                        width: normalize(width * 2.5/3.5)
+                    }}>
+                        <Card style={{
+                            position: "absolute",
+                            top: -normalize(35),
+                            width: normalize(70),
+                            height: normalize(70),
+                            borderRadius: normalize(70/2)
+                        }} childrenStyle={{
+                            flex: 1,
+                            alignItems: 'center', 
+                            justifyContent: 'center'
+                        }}>
+                            <View style={{
+                                width: normalize(65),
+                                height: normalize(65),
+                                borderRadius: normalize(65/2),
+                                backgroundColor: "green",
+                                flex: 1,
+                                alignItems: 'center', 
+                                justifyContent: 'center'
+                            }}>
+                                <FontAwesome5 name="crown" size={normalize(24)} color="black" />
+                            </View>
+                        </Card>
+
+                        <View style={{
+                            flex: 1,
+                            justifyContent: "flex-start",
+                            alignItems: "center",
+                            marginTop: normalize(50)
+                        }}>
+                            <Text style={{ fontSize: normalize(20), fontWeight: "bold" }}>
+                                Congratulations
+                            </Text>
+                            <Text style={{ fontSize: normalize(16), marginTop: normalize(10) }}>
+                                Your trip has been successfully saved!
+                            </Text>
+                        </View>
+
+                        <View style={{
+                            position: "absolute",
+                            bottom: normalize(20),
+                            flexDirection: "row",
+                            width: "100%"
+                        }}>
+                            <Pressable style={[
+                                styles.button, 
+                                { 
+                                    position: "absolute", 
+                                    right: normalize(10), 
+                                    bottom: 0 
+                                }
+                            ]} 
+                            onPress={() => {
+                                sShowFinishReport(false);
+                                dispatch(mainActions.moveToNextNavStatus());
+                                dispatch(mapActions.resetMap());
+                            }}>
+                                <Text style={{ fontSize: normalize(16), textAlign: "center", textTransform: 'uppercase' }}>
+                                    Got it
+                                </Text>
+                            </Pressable>
+                        </View>
+                    </View>
+                </View>
+            </Modal>
+
+            <Modal
+                animationType="fade"
+                transparent={true}
+                visible={showTerminateReport}
+                onRequestClose={() => {
+                    // Alert.alert("Modal has been closed.");
+                    sShowTerminateReport(!showTerminateReport);
+                    dispatch(mainActions.moveToNextNavStatus());
+                    dispatch(mapActions.resetMap());
+                }}
+            >
+                <View style={styles.centeredView}>
+                    <View style={{
+                        flex: 0.25,
+                        flexDirection: 'row',
+                        flexWrap: 'wrap',
+                        justifyContent: 'center',
+                        backgroundColor: "white",
+                        borderRadius: normalize(20),
+                        padding: normalize(20),
+                        alignItems: "center",
+                        shadowColor: "#000",
+                        shadowOffset: {
+                            width: 0,
+                            height: 2
+                        },
+                        shadowOpacity: 0.25,
+                        shadowRadius: 4,
+                        elevation: 5,
+                        width: normalize(width * 2.5/3.5)
+                    }}>
+                        <Card style={{
+                            position: "absolute",
+                            top: -normalize(35),
+                            width: normalize(70),
+                            height: normalize(70),
+                            borderRadius: normalize(70/2)
+                        }} childrenStyle={{
+                            flex: 1,
+                            alignItems: 'center', 
+                            justifyContent: 'center'
+                        }}>
+                            <View style={{
+                                width: normalize(65),
+                                height: normalize(65),
+                                borderRadius: normalize(65/2),
+                                backgroundColor: "dodgerblue",
+                                flex: 1,
+                                alignItems: 'center', 
+                                justifyContent: 'center'
+                            }}>
+                                <Ionicons name="information" size={normalize(24)} color="black" />
+                            </View>
+                        </Card>
+
+                        <View style={{
+                            flex: 1,
+                            justifyContent: "flex-start",
+                            alignItems: "center",
+                            marginTop: normalize(50)
+                        }}>
+                            <Text style={{ fontSize: normalize(20), fontWeight: "bold" }}>
+                                Information
+                            </Text>
+                            <Text style={{ fontSize: normalize(16), marginTop: normalize(10) }}>
+                                {tripnav.coldTerminatedInfo}Your trip has been terminated!
+                            </Text>
+                        </View>
+
+                        <View style={{
+                            position: "absolute",
+                            bottom: normalize(20),
+                            flexDirection: "row",
+                            width: "100%"
+                        }}>
+                            <Pressable style={[
+                                styles.button, 
+                                { 
+                                    position: "absolute", 
+                                    right: normalize(10), 
+                                    bottom: 0 
+                                }
+                            ]} 
+                            onPress={() => {
+                                sShowTerminateReport(false);
+                                dispatch(mainActions.moveToNextNavStatus());
+                                dispatch(mapActions.resetMap());
+                            }}>
+                                <Text style={{ fontSize: normalize(16), textAlign: "center", textTransform: 'uppercase' }}>
+                                    Got it
+                                </Text>
+                            </Pressable>
+                        </View>
+                    </View>
+                </View>
+            </Modal>
         </React.Fragment>
 
     );
@@ -505,7 +713,17 @@ const styles = StyleSheet.create({
     modalText: {
         marginBottom: 15,
         textAlign: "center"
-    }
+    },
+    button: {
+        flexDirection: "row",
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingVertical: normalize(5),
+        paddingHorizontal: normalize(10),
+        borderRadius: normalize(4),
+        // elevation: 3,
+        backgroundColor: 'orange'
+    },
 });
 
 export default MapNav;

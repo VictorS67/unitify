@@ -1,19 +1,20 @@
 import React, { useState } from "react";
 import { Text, View, StyleSheet, Pressable, Modal, useWindowDimensions } from 'react-native';
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { FontAwesome5 } from '@expo/vector-icons';
 
 import Card from "../UI/Card";
 import TripPlanningCard from "./TripPlanningCard";
 import TripNavCard from "./TripNavCard";
 import { normalize } from "../Tool/FontSize";
+import { tripnavActions } from "../store/tripnav-slice";
 
 
 const TripCard = props => {
 
+    const dispatch = useDispatch();
     const main = useSelector((state) => state.main);
     const [showNotMyTrip, sShowNotMyTrip] = useState(false);
-    
 
     const { height, width, scale, fontScale } = useWindowDimensions();
 
@@ -127,7 +128,18 @@ const TripCard = props => {
                                     Cancel
                                 </Text>
                             </Pressable>
-                            <Pressable style={[styles.button, { position: "absolute", right: normalize(10), bottom: 0 }]} onPress={() => {sShowNotMyTrip(false)}}>
+                            <Pressable style={[
+                                styles.button, 
+                                { 
+                                    position: "absolute", 
+                                    right: normalize(10), 
+                                    bottom: 0 
+                                }
+                            ]} 
+                            onPress={() => {
+                                sShowNotMyTrip(false);
+                                dispatch(tripnavActions.coldTerminate());
+                            }}>
                                 <Text style={{ fontSize: normalize(16), textAlign: "center", textTransform: 'uppercase' }}>
                                     Stop My Trip
                                 </Text>

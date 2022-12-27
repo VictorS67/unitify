@@ -189,7 +189,18 @@ const TripNavCard = (props) => {
                                     Cancel
                                 </Text>
                             </Pressable>
-                            <Pressable style={[styles.button, { position: "absolute", right: normalize(10), bottom: 0 }]} onPress={() => {sShowFinishTrip(false)}}>
+                            <Pressable style={[
+                                styles.button, 
+                                { 
+                                    position: "absolute", 
+                                    right: normalize(10), 
+                                    bottom: 0 
+                                }
+                            ]} 
+                            onPress={() => {
+                                sShowFinishTrip(false);
+                                dispatch(tripnavActions.terminate());
+                            }}>
                                 <Text style={{ fontSize: normalize(16), textAlign: "center", textTransform: 'uppercase' }}>
                                     Finish
                                 </Text>

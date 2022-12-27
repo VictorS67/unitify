@@ -11,11 +11,11 @@ const tripnavSlice = createSlice({
         startTimestamp: null,
         isPaused: false,
         isTerminated: false, 
+        isColdTerminated: false,
+        coldTerminatedInfo: "",
         travalDurations: [], // Travel Mode during navigation
         currTravalMode: "DRIVING",
         otherTravalDistance: 0.0,
-        travalModes: [],
-        polylines: [], // Polylines from initial position during navigation
     },
     reducers: {
         resetTripNav(state) {
@@ -23,8 +23,11 @@ const tripnavSlice = createSlice({
             state.duration = 0;
             state.speed = 0.0; 
             state.pause = 0;
+            coldTerminatedInfo = "";
         },
         addTravalMode(state, action) {
+            if (state.isPaused || state.isTerminated || state.isColdTerminated) return;
+
             const travalMode = action.payload;
 
             console.log("travalDurations: ", state.travalDurations);
@@ -64,50 +67,56 @@ const tripnavSlice = createSlice({
                 state.currTravalMode = travalMode;
                 state.otherTravalDistance = state.distance;
             }
-        },
-        sPolylines(state, action) {
-            const polylines = action.payload;
-            state.polylines = polylines;
+
         },
         sSpeed(state, action) {
-            if (state.isPaused === false) {
-                const speed = action.payload;
-                state.speed = speed;
-    
-                if (speed !== 0) {
-                    state.idleTimestamp = null;
-                    state.idleTimestamp = Date.now();
-                } else if (state.idleTimestamp === null) {
-                    state.idleTimestamp = Date.now();
-                } else if (Math.floor(Date.now() - state.idleTimestamp / 1000) > 300) {
-                    // Auto-Terminated if user is paused for 2 mins
-                    state.isTerminated = true;
-                }
+            if (state.isPaused || state.isTerminated || state.isColdTerminated) return;
+
+            const speed = action.payload;
+            state.speed = speed;
+
+            if (speed !== 0) {
+                state.idleTimestamp = null;
+                state.idleTimestamp = Date.now();
+            } else if (state.idleTimestamp === null) {
+                state.idleTimestamp = Date.now();
+            } else if (Math.floor(Date.now() - state.idleTimestamp / 1000) > 300) {
+                // Auto-Terminated (Cold) if user is paused for 5 mins
+                state.isColdTerminated = true;
+                state.coldTerminatedInfo = "You are idle for 5 minutes! ";
             }
         },
         addDistance(state, action) {
-            if (state.isPaused === false) {
-                const distance = action.payload;
+            if (state.isPaused || state.isTerminated || state.isColdTerminated) return;
 
-                console.log("add distance: ", distance);
-                state.distance += distance;
-            }
+            const distance = action.payload;
+
+            console.log("add distance: ", distance);
+            state.distance += distance;
         },
         addDuration(state, action) {
-            if (state.isPaused === false) {
-                const duration = action.payload;
+            if (state.isPaused || state.isTerminated || state.isColdTerminated) return;
 
-                console.log("add duration: ", duration);
-                state.duration += duration;
-            }
+            const duration = action.payload;
+
+            console.log("add duration: ", duration);
+            state.duration += duration;
         },
         togglePause(state) {
-            if (state.isPaused === false) {
+            if (state.isTerminated || state.isColdTerminated) return;
+
+            if (!state.isPaused) {
                 state.pause += 1;
                 state.speed = 0;
             }
 
             state.isPaused = !state.isPaused;
+        },
+        terminate(state) {
+            state.isTerminated = true;
+        },
+        coldTerminate(state) {
+            state.isColdTerminated = true;
         }
     },
 });

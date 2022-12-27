@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { 
     Platform, ScrollView, View, StyleSheet, Keyboard, 
     useWindowDimensions, TouchableOpacity, KeyboardAvoidingView,
-    Text, Dimensions, PanResponder, Animated  } from 'react-native';
+    Text, Dimensions, PanResponder, Animated, Modal, Pressable  } from 'react-native';
 import { FontAwesome5, Ionicons } from '@expo/vector-icons';
 import { useDispatch, useSelector } from "react-redux";
 
@@ -25,8 +25,6 @@ const MainPage = props => {
     const [scrollHeight, sScrollHeight] = useState(30);
     const [pageY, sPageY] = useState(null);
     const [pageYOffest, sPageYOffset] = useState(0);
-
-    const [showFinishReport, sShowFinishReport] = useState(false);
 
     useEffect(() => {
         const showSubscription = Keyboard.addListener("keyboardDidShow", () => {
