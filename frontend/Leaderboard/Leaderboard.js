@@ -1,6 +1,6 @@
 // import React from "react";
 // import { View } from "react-native-web";
-import Navibar from "./Navibar";
+// import Navibar from "./Navibar";
 import ChampCard from "./ChampCard";
 import RankList from "./RankList";
 import Homebutton from "./Homebutton";
@@ -18,19 +18,68 @@ import {
   Button,
   SafeAreaView
 } from "react-native";
+import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
+import { NavigationContainer } from '@react-navigation/native';
 
 const oddRowColor = "white";
 const evenRowColor = "#f2f5f7";
+function Sevenboard(){
+  return (
+    <View style={styles.background}>
+      <ChampCard style = {styles.championcard}>
+      </ChampCard>
+      {/* <Navibar>ygh9 5</Navibar> */}
+      <RankList style = {styles.ranklist}></RankList>
+    </View>)
+}
+
+function Monthboard(){
+  return (
+    <View style={styles.background}>
+      <ChampCard style = {styles.championcard}>
+      </ChampCard>
+      {/* <Navibar>ygh9 5</Navibar> */}
+      <RankList style = {styles.ranklist}></RankList>
+    </View>)
+}
+const Tab = createMaterialTopTabNavigator();
+
+function Navibar() {
+  return (
+    <SafeAreaView style={styles.container}>
+        <NavigationContainer>
+          <Tab.Navigator>
+          <Tab.Screen name="7DAYS" component={Sevenboard}/>
+          <Tab.Screen name="1MONTH" component={Monthboard} />
+          </Tab.Navigator>
+        </NavigationContainer>
+      </SafeAreaView>
+    
+  );
+}
+
+// const styles = StyleSheet.create({
+//     container:{
+//         flex:0.1
+//     }
+// });
 
 function Leaderboard(){
  
     return (
-        <View style={styles.background}>
-          <ChampCard style = {styles.championcard}>
-          </ChampCard>
-          <Navibar>ygh9 5</Navibar>
-          <RankList style = {styles.ranklist}></RankList>
-        </View>)
+        <SafeAreaView style={styles.background}>
+        {/* //   <ChampCard style = {styles.championcard}>
+        //   </ChampCard> */}
+
+          <NavigationContainer style={styles.container}>
+            <Tab.Navigator>
+            <Tab.Screen name="7DAYS" component={Sevenboard}/>
+            <Tab.Screen name="1MONTH" component={Monthboard} />
+            </Tab.Navigator>
+          </NavigationContainer>
+        {/* //   <RankList style = {styles.ranklist}></RankList> */}
+        </SafeAreaView>)
+
         
 }
 const styles = StyleSheet.create({
@@ -38,6 +87,10 @@ const styles = StyleSheet.create({
     height:'100%',
     width:'100%',
     flexDirection:'column',
+  },
+  container:{
+    flex:0.1,
+    marginTop:10
   },
   championcard:{
     flex:0.4,
