@@ -1,17 +1,17 @@
 import React, { useRef, useEffect, useImperativeHandle, useState } from "react";
-import { Text, View, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import { Text, View, StyleSheet, TouchableOpacity, ScrollView, Modal, Alert, Pressable, useWindowDimensions } from 'react-native';
 import { useSelector, useDispatch } from "react-redux";
 import { Ionicons, FontAwesome5, Entypo, MaterialCommunityIcons } from '@expo/vector-icons';
-import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 
 import ProgressBar from "../UI/ProgressBar";
 import Card from "../UI/Card";
 import { normalize } from "../Tool/FontSize";
-import { getLocation, GOOGLE_MAP_API } from "../Utils/GoogleMap";
+import { getLocation, GOOGLE_MAP_API, searchNearBy } from "../Utils/GoogleMap";
 import { updateDirection } from "../store/map-actions";
 import { mapActions } from "../store/map-slice";
 import { mainActions } from "../store/main-slice";
 import { getEmissionFromDistance, getCaloriesFromDuration, getEmissionTrendIconByNumber } from "../Utils/TravalInfo";
+import { tripnavActions } from "../store/tripnav-slice";
 
 const renderTripInfo = (currentTravalMode) => {
 
@@ -80,11 +80,15 @@ const MapNav = (props) => {
     const main = useSelector((state) => state.main);
     const tripnav = useSelector((state) => state.tripnav);
 
+    const { height, width, scale, fontScale } = useWindowDimensions();
+
     const [progressChildren, sProgressChildren] = useState([]);
     const [totalDuration, sTotalDuration] = useState(map.destination.duration.value);
     const [emission, sEmission] = useState(0);
     const [calories, sCalories] = useState(0);
     const [startTime, sStartTime] = useState("00:00");
+    const [showTravalModes, sShowTravalModes] = useState(false);
+    const [changeTravalModes, sChangeTravalModes] = useState([]);
 
     useEffect(() => {
         const colors = {
@@ -98,20 +102,21 @@ const MapNav = (props) => {
         let actualCalories = 0;
         let actualEmission = 0;
         let actualDuration = 0;
-        let durationLength = Object.keys(tripnav.travalDurations).length;
+        let durationLength = tripnav.travalDurations.length;
         let durations = [];
     
-        for (const [travalMode, value] of Object.entries(tripnav.travalDurations)) {
+        tripnav.travalDurations.forEach(travalDuration => {
             progressChildrenTemp.push({
-                progressColor: colors[travalMode],
-                steps: Number(value.duration)
+                progressColor: colors[travalDuration.travalMode],
+                steps: Number(travalDuration.duration)
             });
-            durations.push(Number(value.duration));
+
+            durations.push(Number(travalDuration.duration));
     
-            actualDuration += Number(value.duration);
-            actualEmission += getEmissionFromDistance(Number(value.distance) * 1000, travalMode);
-            actualCalories += getCaloriesFromDuration(Number(value.duration), travalMode);
-        }
+            actualDuration += Number(travalDuration.duration);
+            actualEmission += getEmissionFromDistance(Number(travalDuration.distance) * 1000, travalDuration.travalMode);
+            actualCalories += getCaloriesFromDuration(Number(travalDuration.duration), travalDuration.travalMode);
+        });
 
         let finalDuration = totalDuration > actualDuration? totalDuration : actualDuration;
         sTotalDuration(finalDuration);
@@ -129,12 +134,152 @@ const MapNav = (props) => {
         const [hour, minute, second] = (new Date(tripnav.startTimestamp)).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', hour12: false}).split(':')
         sStartTime(`${hour}:${minute}`);
 
-    }, [tripnav.travalDurations, dispatch]);
+    }, [tripnav.travalDurations, tripnav.currTravalMode, dispatch]);
 
     const goToCurrentPosition = () => {
         if (map.centerLocation === false) {
             dispatch(mapActions.toggleCenterLocation());
         }
+    }
+
+    const searchAvailableTravalModes = async () => {
+        try {
+            const modes = ["DRIVING", "WALKING", "SUBWAY", "BUS", "BICYCLING"];
+    
+            let changeTravalModesTemp = [];
+            for (let index = 0; index < modes.length; index++) {
+                if (modes[index] !== tripnav.currTravalMode) {
+                    let testTravalMode = modes[index];
+                    console.log("testTravalMode: ", testTravalMode);
+
+                    if (testTravalMode === "BUS" || testTravalMode === "SUBWAY") {
+                        const nearBy = await searchNearBy(
+                            `${map.position.latitude},${map.position.longitude}`, 
+                            testTravalMode
+                        );
+                        console.log("nearBy: ", nearBy);
+
+                        changeTravalModesTemp.push(renderChangeTravalMode(testTravalMode, nearBy, index));
+
+                    } else {
+                        changeTravalModesTemp.push(renderChangeTravalMode(testTravalMode, true, index));
+                    }
+                } 
+            }
+
+            sShowTravalModes(true);
+            sChangeTravalModes(changeTravalModesTemp);
+        } catch (error) {
+            console.log("SearchNearBy: Something is wrong.")
+        }
+    }
+
+    const changeTravalMode = (travalMode, isAvailable) => {
+        if (isAvailable === true) {
+            console.log("add travalMode... ", travalMode);
+            dispatch(tripnavActions.addTravalMode(travalMode));
+        }
+
+        sShowTravalModes(false);
+        sChangeTravalModes([]);
+    }
+
+    const renderChangeTravalMode = (travalMode, isAvailable, key) => {
+
+        return (
+            <Pressable 
+                style={{
+                    width: normalize(width/3.5),
+                    height: normalize(width/3),
+                    backgroundColor: 'green',
+                    borderColor: 'white',
+                    borderWidth: 1,
+                    margin: normalize(5),
+                    justifyContent: "center",
+                    alignItems: "center",
+                    borderRadius: normalize(10),
+                    elevation: 2
+                }} 
+                key={key}
+                onPress={() => {changeTravalMode(travalMode, isAvailable)}}
+            >
+                {
+                    travalMode === "SUBWAY" &&
+                    <React.Fragment>
+                        <FontAwesome5 name="subway" size={normalize(45)} color="black" />
+                        <Text style={{ fontSize: normalize(16), marginTop: normalize(5) }}>
+                            Subway
+                        </Text>
+                        {
+                            isAvailable === false &&
+                            <Text style={{ fontSize: normalize(10), bottom: normalize(15), position: "absolute" }}>
+                                Not Available
+                            </Text>
+                        }
+                    </React.Fragment>
+                }
+                {
+                    travalMode === "BUS" &&
+                    <React.Fragment>
+                        <FontAwesome5 name="bus" size={normalize(45)} color="black" />
+                        <Text style={{ fontSize: normalize(16), marginTop: normalize(5) }}>
+                            Bus
+                        </Text>
+                        {
+                            isAvailable === false &&
+                            <Text style={{ fontSize: normalize(10), bottom: normalize(15), position: "absolute" }}>
+                                Not Available
+                            </Text>
+                        }
+                    </React.Fragment>
+                }
+                {
+                    travalMode === "DRIVING" &&
+                    <React.Fragment>
+                        <FontAwesome5 name="car" size={normalize(45)} color="black" />
+                        <Text style={{ fontSize: normalize(16), marginTop: normalize(5) }}>
+                            Driving
+                        </Text>
+                        {
+                            isAvailable === false &&
+                            <Text style={{ fontSize: normalize(10), bottom: normalize(15), position: "absolute" }}>
+                                Not Available
+                            </Text>
+                        }
+                    </React.Fragment>
+                }
+                {
+                    travalMode === "WALKING" &&
+                    <React.Fragment>
+                        <FontAwesome5 name="walking" size={normalize(45)} color="black" />
+                        <Text style={{ fontSize: normalize(16), marginTop: normalize(5) }}>
+                            Walking
+                        </Text>
+                        {
+                            isAvailable === false &&
+                            <Text style={{ fontSize: normalize(10), bottom: normalize(15), position: "absolute" }}>
+                                Not Available
+                            </Text>
+                        }
+                    </React.Fragment>
+                }
+                {
+                    travalMode === "BICYCLING" &&
+                    <React.Fragment>
+                        <FontAwesome5 name="bicycle" size={normalize(45)} color="black" />
+                        <Text style={{ fontSize: normalize(16), marginTop: normalize(5) }}>
+                            Bicycling
+                        </Text>
+                        {
+                            isAvailable === false &&
+                            <Text style={{ fontSize: normalize(10), bottom: normalize(15), position: "absolute" }}>
+                                Not Available
+                            </Text>
+                        }
+                    </React.Fragment>
+                }
+            </Pressable>
+        );
     }
 
     return (
@@ -174,6 +319,7 @@ const MapNav = (props) => {
                                 justifyContent: "center",
                                 marginHorizontal: normalize(3)
                             }}
+                            onPress={searchAvailableTravalModes}
                         > 
                             <Text style={{ fontSize: normalize(14) }}>
                                 Change Transit Type
@@ -278,13 +424,88 @@ const MapNav = (props) => {
                     </Text>
                 </View>
             </View>
+
+            <Modal
+                animationType="fade"
+                transparent={true}
+                visible={showTravalModes}
+                onRequestClose={() => {
+                    // Alert.alert("Modal has been closed.");
+                    sShowTravalModes(!showTravalModes);
+                    sChangeTravalModes([]);
+                }}
+            >
+                <View style={styles.centeredView}>
+                    <View style={{
+                        flex: 0.45,
+                        flexDirection: 'row',
+                        flexWrap: 'wrap',
+                        justifyContent: 'center',
+                        backgroundColor: "white",
+                        borderRadius: normalize(20),
+                        padding: normalize(20),
+                        alignItems: "center",
+                        shadowColor: "#000",
+                        shadowOffset: {
+                            width: 0,
+                            height: 2
+                        },
+                        shadowOpacity: 0.25,
+                        shadowRadius: 4,
+                        elevation: 5,
+                        width: normalize(width * 2.5/3.5)
+                    }}>
+                        {
+                            changeTravalModes.map((changeTravalMode) => {
+                                return changeTravalMode;
+                            })
+                        }
+                    </View>
+                </View>
+            </Modal>
         </React.Fragment>
 
     );
 }
 
 const styles = StyleSheet.create({
-
+    centeredView: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center"
+    },
+    modalView: {
+        backgroundColor: "white",
+        borderRadius: normalize(20),
+        padding: normalize(30),
+        alignItems: "center",
+        shadowColor: "#000",
+        shadowOffset: {
+            width: 0,
+            height: 2
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 4,
+        elevation: 5,
+        height: normalize(400)
+    },
+    button: {
+        borderRadius: 20,
+        padding: 10,
+        elevation: 2
+    },
+    buttonClose: {
+        backgroundColor: "#2196F3",
+    },
+    textStyle: {
+        color: "white",
+        fontWeight: "bold",
+        textAlign: "center"
+    },
+    modalText: {
+        marginBottom: 15,
+        textAlign: "center"
+    }
 });
 
 export default MapNav;

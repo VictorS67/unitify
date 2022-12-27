@@ -2,6 +2,30 @@ import { decode } from "@mapbox/polyline";
 
 export const GOOGLE_MAP_API = "AIzaSyAtc6gbQfdI-YdE7SoIeBXJMPmSV_LuOCk";
 
+export async function searchNearBy(locationString, travalMode) {
+    try {
+        const KEY = GOOGLE_MAP_API; //put your API key here.
+        //otherwise, you'll have an 'unauthorized' error.
+
+        let travalCondition = "";
+        if (travalMode === "BUS") {
+            travalCondition = "&type=bus_station";
+        } else if (travalMode === "SUBWAY") {
+            travalCondition = "&type=subway_station"
+        }
+
+        let resp = await fetch(
+            `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${locationString}&radius=500${travalCondition}&key=${KEY}`
+        );
+        let respJson = await resp.json();
+        console.log(respJson.status);
+
+        return respJson.status !== "ZERO_RESULTS";
+    } catch (error) {
+        return error;
+    }
+}
+
 export async function getLocation(addressString) {
     try {
         const KEY = GOOGLE_MAP_API; //put your API key here.

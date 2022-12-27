@@ -11,7 +11,7 @@ const tripnavSlice = createSlice({
         startTimestamp: null,
         isPaused: false,
         isTerminated: false, 
-        travalDurations: {}, // Travel Mode during navigation
+        travalDurations: [], // Travel Mode during navigation
         currTravalMode: "DRIVING",
         otherTravalDistance: 0.0,
         travalModes: [],
@@ -26,34 +26,41 @@ const tripnavSlice = createSlice({
         },
         addTravalMode(state, action) {
             const travalMode = action.payload;
+
+            console.log("travalDurations: ", state.travalDurations);
+            console.log("new TravalMode: ", travalMode);
                         
-            if (state.startTimestamp === null) {
+            if (state.startTimestamp === null || state.travalDurations.length === 0) {
+                if (travalMode === "CURRENT") return;
+
                 state.startTimestamp = Date.now();
-                state.travalDurations[travalMode] = {
+                state.travalDurations.push({
+                    travalMode: travalMode,
                     duration: 0,
                     distance: 0.0
-                };
+                });
                 state.currTravalMode = travalMode;
                 state.otherTravalDistance = state.distance;
                 return;
             }
 
-            if (travalMode === "CURRENT") {
-                state.travalDurations[state.currTravalMode] = {
-                    duration: Number(((Date.now() - state.startTimestamp) / 1000).toFixed(0)),
-                    distance: state.distance - state.otherTravalDistance
-                };
-            } else if (travalMode in state.travalDurations) {
-                state.travalDurations[travalMode] = {
+            if (
+                travalMode === "CURRENT" || 
+                travalMode === state.travalDurations[state.travalDurations.length - 1].travalMode
+            ) {
+                state.travalDurations[state.travalDurations.length - 1] = {
+                    travalMode: state.travalDurations[state.travalDurations.length - 1].travalMode,
                     duration: Number(((Date.now() - state.startTimestamp) / 1000).toFixed(0)),
                     distance: state.distance - state.otherTravalDistance
                 };
             } else {
+                console.log("what is my travalMode? ", travalMode);
                 state.startTimestamp = Date.now();
-                state.travalDurations[travalMode] = {
+                state.travalDurations.push({
+                    travalMode: travalMode,
                     duration: 0,
                     distance: 0.0
-                };
+                });
                 state.currTravalMode = travalMode;
                 state.otherTravalDistance = state.distance;
             }
