@@ -26,6 +26,8 @@ const MainPage = props => {
     const [pageY, sPageY] = useState(null);
     const [pageYOffest, sPageYOffset] = useState(0);
 
+    const [showFinishReport, sShowFinishReport] = useState(false);
+
     useEffect(() => {
         const showSubscription = Keyboard.addListener("keyboardDidShow", () => {
             dispatch(mainActions.sKeyboardStatus(true));

@@ -1,5 +1,5 @@
-import React, { useEffect } from "react";
-import { Text, View, StyleSheet, Pressable, useWindowDimensions, KeyboardAvoidingView, Platform } from 'react-native';
+import React, { useState } from "react";
+import { Text, View, StyleSheet, Pressable, useWindowDimensions, KeyboardAvoidingView, Platform, Modal } from 'react-native';
 import { useSelector, useDispatch } from "react-redux";
 import { FontAwesome5, MaterialCommunityIcons, Ionicons, Octicons } from '@expo/vector-icons';
 
@@ -25,6 +25,8 @@ const TripNavCard = (props) => {
 
     const [hour, minute] = secondsToHms(tripnav.duration);
     const { height, width, scale, fontScale } = useWindowDimensions();
+
+    const [showFinishTrip, sShowFinishTrip] = useState(false);
 
     return (
         <React.Fragment>
@@ -100,11 +102,103 @@ const TripNavCard = (props) => {
                     </Text>
                 </View>
             </View>
-            <Pressable style={styles.button}>
+            <Pressable style={styles.button} onPress={() => {sShowFinishTrip(true)}}>
                 <Text style={{ fontSize: normalize(20), textAlign: "center", textTransform: 'uppercase' }}>
                     Finish Trip
                 </Text>
             </Pressable>
+
+            <Modal
+                animationType="fade"
+                transparent={true}
+                visible={showFinishTrip}
+                onRequestClose={() => {
+                    // Alert.alert("Modal has been closed.");
+                    sShowFinishTrip(!showFinishTrip);
+                }}
+            >
+                <View style={{
+                    flex: 1,
+                    justifyContent: "center",
+                    alignItems: "center"
+                }}>
+                    <View style={{
+                        flex: 0.3,
+                        flexDirection: 'column',
+                        justifyContent: 'center',
+                        backgroundColor: "white",
+                        borderRadius: normalize(20),
+                        padding: normalize(20),
+                        alignItems: "center",
+                        shadowColor: "#000",
+                        shadowOffset: {
+                            width: 0,
+                            height: 2
+                        },
+                        shadowOpacity: 0.25,
+                        shadowRadius: 4,
+                        elevation: 5,
+                        width: normalize(width * 2.5/3.5)
+                    }}>
+                        <Card style={{
+                            position: "absolute",
+                            top: -normalize(35),
+                            width: normalize(70),
+                            height: normalize(70),
+                            borderRadius: normalize(70/2)
+                        }} childrenStyle={{
+                            flex: 1,
+                            alignItems: 'center', 
+                            justifyContent: 'center'
+                        }}>
+                            <View style={{
+                                width: normalize(65),
+                                height: normalize(65),
+                                borderRadius: normalize(65/2),
+                                backgroundColor: "green",
+                                flex: 1,
+                                alignItems: 'center', 
+                                justifyContent: 'center'
+                            }}>
+                                <FontAwesome5 name="check" size={normalize(24)} color="black" />
+                            </View>
+                        </Card>
+
+                        <View style={{
+                            flex: 1,
+                            justifyContent: "flex-start",
+                            alignItems: "center",
+                            marginTop: normalize(30)
+                        }}>
+                            <Text style={{ fontSize: normalize(20), fontWeight: "bold" }}>
+                                Complete My Trip
+                            </Text>
+                            <Text style={{ fontSize: normalize(16), marginTop: normalize(10) }}>
+                                Are you sure you want to finish your trip? Complete this action will save your current trip records and stop navigation.
+                            </Text>
+                        </View>
+
+                        <View style={{
+                            position: "absolute",
+                            bottom: normalize(20),
+                            flexDirection: "row",
+                            width: "100%"
+                        }}>
+                            <Pressable style={[styles.button, { backgroundColor: "lightgrey", position: "absolute", left: normalize(10), bottom: 0 }]} onPress={() => {sShowFinishTrip(false)}}>
+                                <Text style={{ fontSize: normalize(16), textAlign: "center", textTransform: 'uppercase' }}>
+                                    Cancel
+                                </Text>
+                            </Pressable>
+                            <Pressable style={[styles.button, { position: "absolute", right: normalize(10), bottom: 0 }]} onPress={() => {sShowFinishTrip(false)}}>
+                                <Text style={{ fontSize: normalize(16), textAlign: "center", textTransform: 'uppercase' }}>
+                                    Finish
+                                </Text>
+                            </Pressable>
+                        </View>
+
+                    </View>
+                </View>
+            </Modal>
         </React.Fragment>
     );
 };
