@@ -91,7 +91,7 @@ const tripnavSlice = createSlice({
                 state.idleTimestamp = Date.now();
             } else if (state.idleTimestamp === null) {
                 state.idleTimestamp = Date.now();
-            } else if (Math.floor((Date.now() - state.idleTimestamp) / 1000) > 60) {
+            } else if (Math.floor((Date.now() - state.idleTimestamp) / 1000) > 300) {
                 // Auto-Terminated (Cold) if user is paused for 5 mins
                 state.isColdTerminated = true;
                 state.coldTerminatedInfo = "You are idle for 5 minutes! ";

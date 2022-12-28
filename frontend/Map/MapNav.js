@@ -203,11 +203,9 @@ const MapNav = (props) => {
         return (
             <Pressable 
                 style={{
-                    width: normalize(width/3.5),
-                    height: normalize(width/3),
+                    width: "40%",
+                    height: "45%",
                     backgroundColor: 'green',
-                    borderColor: 'white',
-                    borderWidth: 1,
                     margin: normalize(5),
                     justifyContent: "center",
                     alignItems: "center",
@@ -314,9 +312,9 @@ const MapNav = (props) => {
                         position: "absolute",
                         left: normalize(5),
                         top: normalize(15),
-                        width: normalize(140),
                         height: normalize(30),
                         borderRadius: normalize(10),
+                        paddingHorizontal: normalize(5),
                         zIndex: 3, // works on ios
                         elevation: 3, // works on android
                     }} childrenStyle={{
@@ -412,10 +410,20 @@ const MapNav = (props) => {
                     justifyContent: "space-between",
                     width: "100%"
                 }}>
-                    <Text>
+                    <Text style={{ 
+                        flex: 1.2,
+                        flexDirection: "row",
+                        alignItems: "center",
+                        justifyContent: "center"
+                    }}>
                         Start at {startTime}
                     </Text>
-                    <Text>
+                    <Text style={{ 
+                        flex: 1.3,
+                        flexDirection: "row",
+                        alignItems: "center",
+                        justifyContent: "center"
+                    }}>
                         <MaterialCommunityIcons name="molecule-co2" size={normalize(24)} color="black" style={{flexGrow: 1}}/>
                         <View style={{flexDirection: "row", flex: 1}}>
                             {getEmissionTrendIconByNumber(emission)}
@@ -426,7 +434,12 @@ const MapNav = (props) => {
                             </Text>
                         </View>
                     </Text>
-                    <Text>
+                    <Text style={{ 
+                        flex: 1,
+                        flexDirection: "row",
+                        alignItems: "center",
+                        justifyContent: "center"
+                    }}>
                         <MaterialCommunityIcons name="fire" size={normalize(22)} color="black" style={{flexGrow: 1}} />
                         <View style={{flexDirection: "row", flex: 1}}>
                             <Text style={{

@@ -24,6 +24,8 @@
         "googleMapsApiKey": "AIzaSyAtc6gbQfdI-YdE7SoIeBXJMPmSV_LuOCk"
       },
       "infoPlist": {
+        "NSLocationAlwaysUsageDescription": "App requires user location.",
+        "NSLocationWhenInUseUsageDescription": "App requires user location.",
         "NSLocationAlwaysAndWhenInUseUsageDescription": "App requires location even when the App is backgrounded.",
         "UIBackgroundModes": [
           "location",

@@ -377,7 +377,8 @@ const styles = StyleSheet.create({
         paddingHorizontal: normalize(5),
         flex: 1,
         flexDirection: "row",
-        alignItems: "space-between",
+        alignItems: "center",
+        justifyContent: "flex-start",
         width: "100%"
     },
     topChoiceTransTitle: {
