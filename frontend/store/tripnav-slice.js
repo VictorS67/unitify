@@ -23,7 +23,15 @@ const tripnavSlice = createSlice({
             state.duration = 0;
             state.speed = 0.0; 
             state.pause = 0;
-            coldTerminatedInfo = "";
+            state.coldTerminatedInfo = "";
+            state.isColdTerminated = false;
+            state.isPaused = false;
+            state.isTerminated = false;
+            state.idleTimestamp = null;
+            state.startTimestamp = null;
+            state.travalDurations = [];
+            state.otherTravalDistance = 0.0;
+            state.currTravalMode = "DRIVING";
         },
         addTravalMode(state, action) {
             if (state.isPaused || state.isTerminated || state.isColdTerminated) return;
@@ -75,12 +83,15 @@ const tripnavSlice = createSlice({
             const speed = action.payload;
             state.speed = speed;
 
+            console.log("date now: ", Date.now());
+            console.log("idleTimestamp: ", state.idleTimestamp);
+
             if (speed !== 0) {
                 state.idleTimestamp = null;
                 state.idleTimestamp = Date.now();
             } else if (state.idleTimestamp === null) {
                 state.idleTimestamp = Date.now();
-            } else if (Math.floor(Date.now() - state.idleTimestamp / 1000) > 300) {
+            } else if (Math.floor((Date.now() - state.idleTimestamp) / 1000) > 60) {
                 // Auto-Terminated (Cold) if user is paused for 5 mins
                 state.isColdTerminated = true;
                 state.coldTerminatedInfo = "You are idle for 5 minutes! ";
