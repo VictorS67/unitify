@@ -11,6 +11,7 @@ import {
   } from "react-native"; 
 import Homebutton from "./Homebutton";
 import MainPage from '../Main/Main';
+import Leaderboard from './Leaderboard';
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -19,7 +20,7 @@ function Navibar() {
     <SafeAreaView style={styles.container}>
         <NavigationContainer>
           <Tab.Navigator>
-          <Tab.Screen name="7DAYS" component={MainPage}/>
+          <Tab.Screen name="7DAYS" component={Leaderboard}/>
           <Tab.Screen name="1MONTH" component={MainPage} />
           </Tab.Navigator>
         </NavigationContainer>

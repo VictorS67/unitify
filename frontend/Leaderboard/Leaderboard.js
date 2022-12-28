@@ -20,7 +20,7 @@ import {
 } from "react-native";
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import { NavigationContainer } from '@react-navigation/native';
-
+import MonthlyRankList from "./MonthlyRankList";
 const oddRowColor = "white";
 const evenRowColor = "#f2f5f7";
 function Sevenboard(){
@@ -39,7 +39,7 @@ function Monthboard(){
       <ChampCard style = {styles.championcard}>
       </ChampCard>
       {/* <Navibar>ygh9 5</Navibar> */}
-      <RankList style = {styles.ranklist}></RankList>
+      <MonthlyRankList style = {styles.ranklist}></MonthlyRankList>
     </View>)
 }
 const Tab = createMaterialTopTabNavigator();
