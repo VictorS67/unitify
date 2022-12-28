@@ -3,6 +3,7 @@ import { Text, View, StyleSheet, Pressable, Alert } from 'react-native';
 import { Provider, useSelector, useDispatch } from "react-redux";
 import * as Location from "expo-location";
 
+import SignupUser from "./Users/SignupUser";
 import LoginUser from "./Users/LoginUser";
 import MainPage from "./Main/Main";
 import UserPage from "./Users/UserPage";
@@ -16,34 +17,10 @@ function Foreground() {
 
     const dispatch = useDispatch();
     const map = useSelector((state) => state.map);
-
-    // useEffect(() => {
-    //     (async () => {
-        
-    //         let { status: foregroundStatus  } = await Location.requestForegroundPermissionsAsync();
-
-    //         if (foregroundStatus !== 'granted') {
-    //             dispatch(mapActions.sErrorMsg(
-    //                 {
-    //                     message: 'Foreground: Permission to access location was denied'
-    //                 }
-    //             ));
-    //             return;
-    //         }
-        
-    //         let curr_location = await Location.getCurrentPositionAsync({});
-    //         console.log("Foreground: ", curr_location)
-    //         dispatch(mapActions.sPosition(
-    //             {
-    //                 latitude: curr_location.coords.latitude,
-    //                 longitude: curr_location.coords.longitude
-    //             }
-    //         ));
-    //     })();
-    // }, [dispatch]);
+    const user = useSelector((state) => state.user);
 
     useEffect(() => {
-        if (map.errorMsg !== null) {
+        if (user.isLogin === true && map.errorMsg !== null) {
             dispatch(mainActions.resetNavStatusToInit());
             dispatch(mapActions.resetMap());
 
@@ -58,10 +35,19 @@ function Foreground() {
                 ]
             );
         }
-    }, [map.errorMsg, dispatch]);
+    }, [map.errorMsg, user.isLogin, dispatch]);
 
     return (
-        <MainPage />
+        <React.Fragment>
+            {
+                (user.isLogin === true) &&
+                <MainPage />
+            }
+            {
+                (user.isLogin === false) &&
+                <SignupUser />
+            }
+        </React.Fragment>
     );
 }
 

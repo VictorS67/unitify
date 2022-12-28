@@ -22,11 +22,11 @@ function Background() {
     const dispatch = useDispatch();
     const map = useSelector((state) => state.map);
     const main = useSelector((state) => state.main);
-    const tripnav = useSelector((state) => state.tripnav);
-
-    const [prevPosition, sPrevPosition] = useState(null);
+    const user = useSelector((state) => state.user);
 
     useEffect(() => {
+        if (user.isLogin === false) return;
+
         if (map.position === null) {
             // dispatch(mapActions.initUpdate());
 
@@ -126,7 +126,7 @@ function Background() {
                 });
             })();
         }
-    }, [map.position, dispatch]);
+    }, [map.position, user.isLogin, dispatch]);
 
     // useEffect(() => {
     //     sPrevPosition(map.position);
