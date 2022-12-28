@@ -1,8 +1,10 @@
 import React, { useEffect } from "react";
 import { Text, View, StyleSheet, Pressable, Alert } from 'react-native';
 import { Provider, useSelector, useDispatch } from "react-redux";
-import * as Location from "expo-location";
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
 
+import Auth from "./Users/Auth";
 import SignupUser from "./Users/SignupUser";
 import LoginUser from "./Users/LoginUser";
 import MainPage from "./Main/Main";
@@ -18,6 +20,8 @@ function Foreground() {
     const dispatch = useDispatch();
     const map = useSelector((state) => state.map);
     const user = useSelector((state) => state.user);
+
+    const Stack = createStackNavigator();
 
     useEffect(() => {
         if (user.isLogin === true && map.errorMsg !== null) {
@@ -38,7 +42,11 @@ function Foreground() {
     }, [map.errorMsg, user.isLogin, dispatch]);
 
     return (
-        <React.Fragment>
+        <NavigationContainer>
+            <Stack.Navigator>
+                <Stack.Screen name="Home" component={MainPage} />
+                <Stack.Screen name="Auth" component={Auth} />
+            </Stack.Navigator>
             {
                 (user.isLogin === true) &&
                 <MainPage />
@@ -47,7 +55,7 @@ function Foreground() {
                 (user.isLogin === false) &&
                 <SignupUser />
             }
-        </React.Fragment>
+        </NavigationContainer>
     );
 }
 
