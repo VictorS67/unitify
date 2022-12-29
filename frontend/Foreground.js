@@ -14,7 +14,7 @@ import Card from "./UI/Card";
 import { mapActions } from "./store/map-slice";
 import { mainActions } from "./store/main-slice";
 import { normalize } from "./Tool/FontSize";
-
+import Leaderboard from "./Leaderboard/Leaderboard";
 function Foreground() {
 
     const dispatch = useDispatch();
@@ -60,6 +60,13 @@ function Foreground() {
                                 component={UserPage} 
                                 options={{
                                     headerShown: false
+                                }}
+                            />
+                            <Stack.Screen 
+                                name="Leaderboard"
+                                component={Leaderboard} 
+                                options={{
+                                    headerShown: true
                                 }}
                             />
                         </>

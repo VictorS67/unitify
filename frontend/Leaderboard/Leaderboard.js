@@ -14,8 +14,7 @@ import {
   Text,
   TouchableOpacity,
   View,
-  ViewPropTypes,
-  Button,
+  Pressable,
   SafeAreaView
 } from "react-native";
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
@@ -64,19 +63,22 @@ function Navibar() {
 //     }
 // });
 
-function Leaderboard(){
+function Leaderboard(props){
  
     return (
         <SafeAreaView style={styles.background}>
         {/* //   <ChampCard style = {styles.championcard}>
         //   </ChampCard> */}
-
-          <NavigationContainer style={styles.container}>
+          <Pressable 
+              style={styles.button}
+              onPress={() => {props.navigation.navigate('Home');}}
+          ></Pressable>
+          {/* <NavigationContainer style={styles.container}> */}
             <Tab.Navigator>
             <Tab.Screen name="7DAYS" component={Sevenboard}/>
             <Tab.Screen name="1MONTH" component={Monthboard} />
             </Tab.Navigator>
-          </NavigationContainer>
+          {/* </NavigationContainer> */}
         {/* //   <RankList style = {styles.ranklist}></RankList> */}
         </SafeAreaView>)
 
@@ -130,6 +132,7 @@ const styles = StyleSheet.create({
         // marginVertical: normalize(20),
         paddingTop:0,
   },
+  
   left: {
     flexDirection: "row",
     alignItems: "center"

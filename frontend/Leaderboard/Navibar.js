@@ -20,8 +20,8 @@ function Navibar() {
     <SafeAreaView style={styles.container}>
         <NavigationContainer>
           <Tab.Navigator>
-          <Tab.Screen name="7DAYS" component={Leaderboard}/>
-          <Tab.Screen name="1MONTH" component={MainPage} />
+            <Tab.Screen name="7DAYS" component={Leaderboard}/>
+            <Tab.Screen name="1MONTH" component={MainPage} />
           </Tab.Navigator>
         </NavigationContainer>
       </SafeAreaView>
