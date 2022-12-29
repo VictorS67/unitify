@@ -2,6 +2,30 @@ import { decode } from "@mapbox/polyline";
 
 export const GOOGLE_MAP_API = "AIzaSyAtc6gbQfdI-YdE7SoIeBXJMPmSV_LuOCk";
 
+export async function searchNearBy(locationString, travalMode) {
+    try {
+        const KEY = GOOGLE_MAP_API; //put your API key here.
+        //otherwise, you'll have an 'unauthorized' error.
+
+        let travalCondition = "";
+        if (travalMode === "BUS") {
+            travalCondition = "&type=bus_station";
+        } else if (travalMode === "SUBWAY") {
+            travalCondition = "&type=subway_station"
+        }
+
+        let resp = await fetch(
+            `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${locationString}&radius=500${travalCondition}&key=${KEY}`
+        );
+        let respJson = await resp.json();
+        console.log(respJson.status);
+
+        return respJson.status !== "ZERO_RESULTS";
+    } catch (error) {
+        return error;
+    }
+}
+
 export async function getLocation(addressString) {
     try {
         const KEY = GOOGLE_MAP_API; //put your API key here.
@@ -72,17 +96,20 @@ export async function getDirections(startLoc, destinationLoc, travalModeString) 
         let origin_info = {
             "latitude": leg.start_location.lat,
             "longitude": leg.start_location.lng,
-            "address": leg.start_address
+            "address": leg.start_address,
+            "address_simple": leg.start_address.split(",")[0]
         }
         let destination_info = {
             "latitude": leg.end_location.lat,
             "longitude": leg.end_location.lng,
-            "distance": leg.distance.text,
-            "duration": leg.duration.text,
-            "address": leg.end_address
+            "distance": leg.distance,
+            "duration": leg.duration,
+            "address": leg.end_address,
+            "address_simple": leg.end_address.split(",")[0]
         }
         let steps = leg.steps;
-        // console.log(respJson.routes[0]);
+        // console.log("duration", leg.duration);
+        // console.log("distance", leg.distance);
 
         let markers = [];
         if ((travalModeString === "SUBWAY") || (travalModeString === "BUS")) {
@@ -107,8 +134,8 @@ export async function getDirections(startLoc, destinationLoc, travalModeString) 
                 return {
                     "latitude": mid_coord[0],
                     "longitude": mid_coord[1],
-                    "distance": step.distance.text,
-                    "duration": step.duration.text,
+                    "distance": step.distance,
+                    "duration": step.duration,
                     "mode": traval_mode
                 };
             });
@@ -122,8 +149,8 @@ export async function getDirections(startLoc, destinationLoc, travalModeString) 
             markers = [{
                 "latitude": mid_coord[0],
                 "longitude": mid_coord[1],
-                "distance": leg.distance.text,
-                "duration": leg.duration.text,
+                "distance": leg.distance,
+                "duration": leg.duration,
                 "mode": travalModeString
             }]
         }

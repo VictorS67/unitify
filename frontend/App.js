@@ -1,14 +1,19 @@
 import React from "react";
+import { Provider } from "react-redux";
+import store from "./store/store";
 
-import LoginUser from "./Users/LoginUser";
-import MainPage from "./Main/Main";
-import UserPage from "./Users/UserPage";
-import Map from "./Map/Map";
+import Foreground from "./Foreground";
+import Background from "./Background";
+import Notification from "./Notification";
 
 function App() {
 
     return (
-        <MainPage />
+        <Provider store={store}>
+            <Foreground />
+            <Background />
+            {/* <Notification /> */}
+        </Provider>
     );
 }
 

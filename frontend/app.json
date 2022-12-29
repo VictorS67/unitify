@@ -22,6 +22,15 @@
       "supportsTablet": true,
       "config":{
         "googleMapsApiKey": "AIzaSyAtc6gbQfdI-YdE7SoIeBXJMPmSV_LuOCk"
+      },
+      "infoPlist": {
+        "NSLocationAlwaysUsageDescription": "App requires user location.",
+        "NSLocationWhenInUseUsageDescription": "App requires user location.",
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "App requires location even when the App is backgrounded.",
+        "UIBackgroundModes": [
+          "location",
+          "fetch"
+        ]
       }
     },
     "android": {
@@ -34,7 +43,11 @@
         "googleMaps":{
           "apiKey": "AIzaSyAtc6gbQfdI-YdE7SoIeBXJMPmSV_LuOCk"
         }
-      }
+      },
+      "permissions": [
+        "ACCESS_BACKGROUND_LOCATION"
+      ],
+      "useNextNotificationsApi": true
     },
     "web": {
       "favicon": "./assets/favicon.png"

@@ -1,39 +1,45 @@
 import React, { useState } from "react";
-import { useSelector, useDispatch } from "react-redux";
 import { Text, Alert, Button, TextInput, View, StyleSheet, Linking } from 'react-native';
 
 import Card from "../UI/Card";
 import { normalize } from "../Tool/FontSize";
-import { userActions } from "../store/user-slice";
 
-const LoginUser = props => {
+const SignupUser = props => {
 
-    const dispatch = useDispatch();
-    const user = useSelector((state) => state.user);
-
+    const [email, setEmail] = useState('');
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const [passwordAgain, setPasswordAgain] = useState('');
 
-    const loginUserHandler = (event) => {
+    const signupUserHandler = (event) => {
         event.preventDefault();
 
-        // TODO: login user
-        
-        dispatch(userActions.login());
+        // TODO: Register new user
+
+        props.navigation.navigate('Login');
     }
 
     return (
         <View style={styles.container}>
 
             <Text style={styles.titleText}>
-                Login
+                Sign Up
             </Text>
 
             <Text style={styles.subtitleText}>
-                Welcome back!
+                Register an Account to start your journey!
             </Text>
 
-            <View style={styles.loginBox}>
+            <View style={styles.signupBox}>
+                <Card>
+                    <TextInput
+                        value={email}
+                        onChangeText={(email) => setEmail(email)}
+                        placeholder={'Email'}
+                        style={styles.input}
+                    />
+                </Card>
+
                 <Card>
                     <TextInput
                         value={username}
@@ -53,26 +59,23 @@ const LoginUser = props => {
                     />
                 </Card>
 
-                {/* <Text style={[styles.linkText, styles.normalText]} onPress={() => Linking.openURL(url)}>
-                    Forgot your password?
-                </Text> */}
+                <Card>
+                    <TextInput
+                        value={passwordAgain}
+                        onChangeText={(passwordAgain) => setPasswordAgain(passwordAgain)}
+                        placeholder={'Password Again'}
+                        secureTextEntry={true}
+                        style={styles.input}
+                    />
+                </Card>
             </View>
 
-            <View style={styles.loginButton}>
+            <View style={styles.signupButton}>
                 <Button
-                    title={'Login'}
-                    onPress={loginUserHandler}
+                    title={'Sign Up'}
+                    onPress={signupUserHandler}
                 />
             </View>
-
-            <Text style={styles.signupText}>
-                <Text>
-                    Don't have account?&nbsp;
-                </Text>
-                <Text style={styles.linkText} onPress={() => props.navigation.navigate('Signup')}>
-                    Register one
-                </Text>
-            </Text>
         </View>
     )
 };
@@ -89,7 +92,7 @@ const styles = StyleSheet.create({
         height: normalize(40),
         padding: normalize(5)
     },
-    loginButton: {
+    signupButton: {
         width: normalize(250),
         height: normalize(40),
         marginHorizontal: normalize(5),
@@ -119,9 +122,9 @@ const styles = StyleSheet.create({
         textAlign: "right",
         marginEnd: normalize(10)
     },
-    loginBox: {
+    signupBox: {
         marginVertical: normalize(20)
     }
 });
 
-export default LoginUser;
+export default SignupUser;
