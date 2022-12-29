@@ -12,6 +12,7 @@
     "@expo/webpack-config": "^0.17.2",
     "@mapbox/polyline": "^1.1.1",
     "@react-native-community/blur": "^4.3.0",
+    "@react-navigation/bottom-tabs": "^6.5.2",
     "@react-navigation/native": "^6.1.1",
     "@react-navigation/native-stack": "^6.9.7",
     "@reduxjs/toolkit": "^1.9.1",

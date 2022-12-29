@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { Text, View, StyleSheet, Pressable, Alert } from 'react-native';
 import { Provider, useSelector, useDispatch } from "react-redux";
 import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
 import Auth from "./Users/Auth";
 import SignupUser from "./Users/SignupUser";
@@ -21,7 +21,7 @@ function Foreground() {
     const map = useSelector((state) => state.map);
     const user = useSelector((state) => state.user);
 
-    const Stack = createStackNavigator();
+    const Stack = createNativeStackNavigator();
 
     useEffect(() => {
         if (user.isLogin === true && map.errorMsg !== null) {
@@ -44,17 +44,38 @@ function Foreground() {
     return (
         <NavigationContainer>
             <Stack.Navigator>
-                <Stack.Screen name="Home" component={MainPage} />
-                <Stack.Screen name="Auth" component={Auth} />
+                {
+                    user.isLogin ? (
+                        <>
+                            <Stack.Screen 
+                                name="Home" 
+                                component={MainPage} 
+                                options={{
+                                    headerShown: false,
+                                    animationTypeForReplace: (!user.isLogin) ? 'pop': 'push',
+                                }}
+                            />
+                            <Stack.Screen 
+                                name="Profile"
+                                component={UserPage} 
+                                options={{
+                                    headerShown: false
+                                }}
+                            />
+                        </>
+                    ) : (
+                        <>
+                            <Stack.Screen 
+                                name="Auth" 
+                                component={Auth} 
+                                options={{
+                                    headerShown: false
+                                }}
+                            />
+                        </>
+                    )
+                }
             </Stack.Navigator>
-            {
-                (user.isLogin === true) &&
-                <MainPage />
-            }
-            {
-                (user.isLogin === false) &&
-                <SignupUser />
-            }
         </NavigationContainer>
     );
 }

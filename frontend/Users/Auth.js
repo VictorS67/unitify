@@ -1,130 +1,79 @@
 import React, { useState } from "react";
 import { Text, Alert, Button, TextInput, View, StyleSheet, Linking } from 'react-native';
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { MaterialIcons, Ionicons } from '@expo/vector-icons';
 
+import LoginUser from "./LoginUser";
+import SignupUser from "./SignupUser";
 import Card from "../UI/Card";
 import { normalize } from "../Tool/FontSize";
 
 const Auth = props => {
-
-    const [email, setEmail] = useState('');
-    const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
-    const [passwordAgain, setPasswordAgain] = useState('');
-
-    const signupUserHandler = (event) => {
-        event.preventDefault();
-
-        Alert.alert('Credentials', `${username} + ${password}`);
-    }
-
-    const url="https://google.com";
+    
+    const Tab = createBottomTabNavigator();
 
     return (
-        <View style={styles.container}>
+        // <Stack.Navigator initialRouteName="Login">
+        //     <Stack.Screen 
+        //         name="Login"
+        //         component={LoginUser}
+        //         // options={{
+        //         //     headerShown: false
+        //         // }}
+        //     />
+        //     <Stack.Screen 
+        //         name="Signup"
+        //         component={SignupUser}
+        //         // options={{
+        //         //     headerShown: false
+        //         // }}
+        //     />
+        // </Stack.Navigator>
+        <Tab.Navigator 
+            initialRouteName="Login"
+            screenOptions={({ route }) => ({
+                tabBarIcon: ({ focused, color, size }) => {
+                    let iconName;
 
-            <Text style={styles.titleText}>
-                Sign Up
-            </Text>
+                    if (route.name === "Login") {
+                        iconName = focused
+                            ? "person-circle"
+                            : "person-circle-outline";
+                    } else if (route.name === "Signup") {
+                        iconName = focused
+                            ? "add-circle"
+                            : "add-circle-outline";
+                    }
 
-            <Text style={styles.subtitleText}>
-                Register an Account to start your journey!
-            </Text>
-
-            <View style={styles.signupBox}>
-                <Card>
-                    <TextInput
-                        value={email}
-                        onChangeText={(email) => setEmail(email)}
-                        placeholder={'Email'}
-                        style={styles.input}
-                    />
-                </Card>
-
-                <Card>
-                    <TextInput
-                        value={username}
-                        onChangeText={(username) => setUsername(username)}
-                        placeholder={'Username'}
-                        style={styles.input}
-                    />
-                </Card>
-
-                <Card>
-                    <TextInput
-                        value={password}
-                        onChangeText={(password) => setPassword(password)}
-                        placeholder={'Password'}
-                        secureTextEntry={true}
-                        style={styles.input}
-                    />
-                </Card>
-
-                <Card>
-                    <TextInput
-                        value={passwordAgain}
-                        onChangeText={(passwordAgain) => setPasswordAgain(passwordAgain)}
-                        placeholder={'Password Again'}
-                        secureTextEntry={true}
-                        style={styles.input}
-                    />
-                </Card>
-            </View>
-
-            <View style={styles.signupButton}>
-                <Button
-                    title={'Sign Up'}
-                    onPress={signupUserHandler}
-                />
-            </View>
-        </View>
+                    return <Ionicons name={iconName} size={size} color={color} />
+                },
+                tabBarActiveTintColor: 'tomato',
+                tabBarInactiveTintColor: 'gray'
+            })}
+        >
+            <Tab.Screen 
+                name="Login"
+                component={LoginUser}
+                options={{
+                    headerShown: false,
+                    title: "Login"
+                }}
+            />
+            <Tab.Screen 
+                name="Signup"
+                component={SignupUser}
+                options={{
+                    headerShown: false,
+                    title: "Sign Up"
+                }}
+            />
+        </Tab.Navigator>
     )
 };
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: '#ecf0f1'
-    },
-    input: {
-        width: normalize(250),
-        height: normalize(40),
-        padding: normalize(5)
-    },
-    signupButton: {
-        width: normalize(250),
-        height: normalize(40),
-        marginHorizontal: normalize(5),
-        marginVertical: normalize(5)
-    },
-    linkText: {
-        color: 'black',
-        textDecorationLine: "underline"
-    },
-    signupText: {
-        width: normalize(250),
-        textAlign: "center",
-        marginTop: normalize(20)
-    },
-    titleText: {
-        fontSize: normalize(30),
-        textAlign: "center",
-        marginBottom: normalize(14)
-    },
-    subtitleText: {
-        fontSize: normalize(18),
-        textAlign: "center",
-        marginVertical: normalize(8)
-    },
-    normalText: {
-        fontSize: normalize(12),
-        textAlign: "right",
-        marginEnd: normalize(10)
-    },
-    signupBox: {
-        marginVertical: normalize(20)
-    }
+
 });
 
 export default Auth;

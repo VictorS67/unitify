@@ -14,10 +14,10 @@ const SignupUser = props => {
     const signupUserHandler = (event) => {
         event.preventDefault();
 
-        Alert.alert('Credentials', `${username} + ${password}`);
-    }
+        // TODO: Register new user
 
-    const url="https://google.com";
+        props.navigation.navigate('Login');
+    }
 
     return (
         <View style={styles.container}>

@@ -1,10 +1,15 @@
 import React, { useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
 import { Text, Alert, Button, TextInput, View, StyleSheet, Linking } from 'react-native';
 
 import Card from "../UI/Card";
 import { normalize } from "../Tool/FontSize";
+import { userActions } from "../store/user-slice";
 
 const LoginUser = props => {
+
+    const dispatch = useDispatch();
+    const user = useSelector((state) => state.user);
 
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
@@ -12,10 +17,10 @@ const LoginUser = props => {
     const loginUserHandler = (event) => {
         event.preventDefault();
 
-        Alert.alert('Credentials', `${username} + ${password}`);
+        // TODO: login user
+        
+        dispatch(userActions.login());
     }
-
-    const url="https://google.com";
 
     return (
         <View style={styles.container}>
@@ -48,9 +53,9 @@ const LoginUser = props => {
                     />
                 </Card>
 
-                <Text style={[styles.linkText, styles.normalText]} onPress={() => Linking.openURL(url)}>
+                {/* <Text style={[styles.linkText, styles.normalText]} onPress={() => Linking.openURL(url)}>
                     Forgot your password?
-                </Text>
+                </Text> */}
             </View>
 
             <View style={styles.loginButton}>
@@ -64,7 +69,7 @@ const LoginUser = props => {
                 <Text>
                     Don't have account?&nbsp;
                 </Text>
-                <Text style={styles.linkText} onPress={() => Linking.openURL(url)}>
+                <Text style={styles.linkText} onPress={() => props.navigation.navigate('Signup')}>
                     Register one
                 </Text>
             </Text>
