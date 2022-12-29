@@ -20,6 +20,7 @@ import {
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import { NavigationContainer } from '@react-navigation/native';
 import MonthlyRankList from "./MonthlyRankList";
+import UserInfoCard from "./Userinfocard";
 const oddRowColor = "white";
 const evenRowColor = "#f2f5f7";
 function Sevenboard(){
@@ -80,11 +81,26 @@ function Leaderboard(props){
             </Tab.Navigator>
           {/* </NavigationContainer> */}
         {/* //   <RankList style = {styles.ranklist}></RankList> */}
+          <Pressable 
+              style={styles.userinfocontainer}
+              onPress={() => {props.navigation.navigate('Profile');}}
+          >
+            <UserInfoCard></UserInfoCard>
+          </Pressable>
         </SafeAreaView>)
 
         
 }
 const styles = StyleSheet.create({
+  userinfocontainer:{
+    width: '100%',
+    height: 70,
+    backgroundColor: '#EE5407',
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'absolute', //Here is the trick
+    bottom: 20, //Here is the trick
+  },
   background:{
     height:'100%',
     width:'100%',
