@@ -11,7 +11,10 @@ const MileCard = props => {
                 <Text style={styles.titleText}>
                     Miles
                 </Text>
-                <Pressable style={styles.button}>
+                <Pressable 
+                    style={styles.button}
+                    onPress={() => {props.navigation.navigate('Profile');}}
+                >
                     <MaterialIcons name="leaderboard" size={normalize(14)} color="black" />
                     <Text style={{ fontSize: normalize(12), textAlign: "center", textTransform: 'uppercase' }}>
                         &nbsp;Leaderboard
