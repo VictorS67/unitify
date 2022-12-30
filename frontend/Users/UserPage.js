@@ -14,19 +14,6 @@ const UserPage = props => {
 
     return (
         <View style={styles.container}>
-            <StatusBar style={styles.statusBar}/>
-
-            <TopBar style={styles.topBar}>
-                <Text style={styles.topBarLeft}>
-                    <FontAwesome5 name="angle-left" size={normalize(28)} color="black" />
-                </Text>
-                <Text style={[styles.topBarCenter, styles.topBarText]}>
-                    Profile
-                </Text>
-                <Text style={styles.topBarRight}>
-
-                </Text>
-            </TopBar>
 
             <UserAvatarWindow style={styles.userAvatarWindow} userName={"User Name"} />
 
@@ -34,7 +21,7 @@ const UserPage = props => {
 
             <UserMileWindow style={styles.userMileWindow} rank={3} month={8104} total={10024} />
 
-            <UserSettingWindow style={styles.userSettingWindow} />
+            <UserSettingWindow style={styles.userSettingWindow} navigation={props.navigation}/>
 
         </View>
     )

@@ -4,6 +4,7 @@ import { Provider, useSelector, useDispatch } from "react-redux";
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
+import Profile from "./Users/Profile";
 import Auth from "./Users/Auth";
 import SignupUser from "./Users/SignupUser";
 import LoginUser from "./Users/LoginUser";
@@ -57,7 +58,7 @@ function Foreground() {
                             />
                             <Stack.Screen 
                                 name="Profile"
-                                component={UserPage} 
+                                component={Profile} 
                                 options={{
                                     headerShown: false
                                 }}

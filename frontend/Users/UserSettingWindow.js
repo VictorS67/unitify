@@ -1,11 +1,13 @@
 import React, { useState } from "react";
-import { View, StyleSheet } from 'react-native';
+import { useDispatch, useSelector } from "react-redux";
+import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import { Divider } from 'react-native-paper';
 import { FontAwesome5, Ionicons, MaterialIcons } from '@expo/vector-icons';
 
 import Card from "../UI/Card";
 import ButtonRow from "../UI/ButtonRow";
 import { normalize } from "../Tool/FontSize";
+import { userActions } from "../store/user-slice";
 
 const SettingIcon = () => {
     return(
@@ -33,14 +35,29 @@ const InformationIcon = () => {
 
 const UserSettingWindow = props => {
 
+    const dispatch = useDispatch();
+    const user = useSelector((state) => state.user);
+
+    const onPressLogout = () => {
+        dispatch(userActions.logout());
+    }
+
     return (
         <View style={props.style}>
             <Card style={styles.userSettingCard} childrenStyle={styles.userSettingCardContent}>
-                <ButtonRow icon={SignatureIcon()} text={"Champion Signature"} />
-                <ButtonRow icon={SettingIcon()} text={"Setting"} />
-                <ButtonRow icon={InformationIcon()} text={"App Information"} />
+                <TouchableOpacity onPress={() => props.navigation.navigate("ChampionSignature")}>
+                    <ButtonRow icon={SignatureIcon()} text={"Champion Signature"} />
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => props.navigation.navigate("ChampionSignature")}>
+                    <ButtonRow icon={SettingIcon()} text={"Setting"} />
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => props.navigation.navigate("ChampionSignature")}>
+                    <ButtonRow icon={InformationIcon()} text={"App Information"} />
+                </TouchableOpacity>
                 <Divider style={{ width: "100%" }} />
-                <ButtonRow icon={LogoutIcon()} text={"Logout"} />
+                <TouchableOpacity onPress={() => {onPressLogout()}}>
+                    <ButtonRow icon={LogoutIcon()} text={"Logout"} />
+                </TouchableOpacity>
             </Card>
         </View>
     );
