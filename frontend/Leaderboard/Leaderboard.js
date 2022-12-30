@@ -30,6 +30,12 @@ function Sevenboard(){
       </ChampCard>
       {/* <Navibar>ygh9 5</Navibar> */}
       <RankList style = {styles.ranklist}></RankList>
+      <Pressable 
+              style={styles.userinfocontainer}
+              onPress={() => {props.navigation.navigate('Profile');}}
+          >
+            <UserInfoCard></UserInfoCard>
+      </Pressable>
     </View>)
 }
 
@@ -81,25 +87,21 @@ function Leaderboard(props){
             </Tab.Navigator>
           {/* </NavigationContainer> */}
         {/* //   <RankList style = {styles.ranklist}></RankList> */}
-          <Pressable 
-              style={styles.userinfocontainer}
-              onPress={() => {props.navigation.navigate('Profile');}}
-          >
-            <UserInfoCard></UserInfoCard>
-          </Pressable>
+          
         </SafeAreaView>)
 
         
 }
 const styles = StyleSheet.create({
   userinfocontainer:{
+    flex:0.2,
     width: '100%',
     height: 70,
     backgroundColor: '#EE5407',
     justifyContent: 'center',
     alignItems: 'center',
-    position: 'absolute', //Here is the trick
-    bottom: 20, //Here is the trick
+    // position: 'absolute', //Here is the trick
+    // bottom: 20, //Here is the trick
   },
   background:{
     height:'100%',
