@@ -1,11 +1,14 @@
 import React, { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { Text, Alert, Button, TextInput, View, StyleSheet, Linking } from 'react-native';
 
 import Card from "../UI/Card";
 import { normalize } from "../Tool/FontSize";
+import { signupUser } from "../store/user-actions";
 
 const SignupUser = props => {
 
+    const dispatch = useDispatch();
     const [email, setEmail] = useState('');
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
@@ -15,8 +18,12 @@ const SignupUser = props => {
         event.preventDefault();
 
         // TODO: Register new user
+        dispatch(signupUser(username, email, password, passwordAgain))
+        .then((result) => {
+            console.log(`result: ${result}`)
+        })
 
-        props.navigation.navigate('Login');
+        // props.navigation.navigate('Login');
     }
 
     return (

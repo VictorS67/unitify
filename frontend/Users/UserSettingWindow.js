@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { View, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { Divider } from 'react-native-paper';
 import { FontAwesome5, Ionicons, MaterialIcons } from '@expo/vector-icons';
 
@@ -8,6 +8,9 @@ import Card from "../UI/Card";
 import ButtonRow from "../UI/ButtonRow";
 import { normalize } from "../Tool/FontSize";
 import { userActions } from "../store/user-slice";
+import { tripnavActions } from "../store/tripnav-slice";
+import { mainActions } from "../store/main-slice";
+import { mapActions } from "../store/map-slice";
 import { logoutUser } from "../store/user-actions";
 
 const SettingIcon = () => {
@@ -38,10 +41,48 @@ const UserSettingWindow = props => {
 
     const dispatch = useDispatch();
     const user = useSelector((state) => state.user);
+    const main = useSelector((state) => state.main);
+
+    const onPressNoSaveQuit = () => {
+        dispatch(tripnavActions.resetTripNav());
+        dispatch(mainActions.resetNavStatusToInit());
+        dispatch(mapActions.resetMap());
+        dispatch(logoutUser());
+    }
+
+    const onPressSaveQuit = () => {
+        // TODO: Backend API to Save current trip
+
+        dispatch(tripnavActions.resetTripNav());
+        dispatch(mainActions.resetNavStatusToInit());
+        dispatch(mapActions.resetMap());
+        dispatch(logoutUser());
+    }
 
     const onPressLogout = () => {
         // dispatch(userActions.logout());
-        dispatch(logoutUser());
+        if (main.navStatus === "NAV") {
+            Alert.alert(
+                "Are You Sure?",
+                "Your trip is still running. Logging out will end your trip.",
+                [
+                    { 
+                        text: "Cancel", 
+                        onPress: () => console.log("Return back") 
+                    },
+                    { 
+                        text: "Don't Save", 
+                        onPress: () => onPressNoSaveQuit() 
+                    },
+                    { 
+                        text: "Save", 
+                        onPress: () => onPressSaveQuit()
+                    }
+                ]
+            );
+        } else {
+            onPressNoSaveQuit();
+        }
     }
 
     return (

@@ -31,7 +31,7 @@ function Foreground() {
             dispatch(mapActions.resetMap());
 
             Alert.alert(
-                "Alert Title",
+                "Error!",
                 map.errorMsg.message,
                 [
                     { 

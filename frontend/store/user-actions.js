@@ -71,3 +71,33 @@ export const logoutUser = () => {
         }
     }
 }
+
+export const signupUser = (username, email, password, confirmedPassword) => {
+    return async (dispatch) => {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const request = new Request(`${BACKEND_URL}/signup`, {
+                    method: "POST",
+                    body: JSON.stringify({
+                        username: username,
+                        email: email,
+                        password: password,
+                        confirmedPassword: confirmedPassword
+                    }),
+                    headers: {
+                        Accept: "application/json, text/plain, /",
+                        "Content-Type": "application/json"
+                    }
+                });
+    
+                const resp = await fetch(request);
+                let respJson = await resp.json();
+    
+                resolve(respJson);
+            } catch (error) {
+                console.log("signupUser: Something went wrong");
+                reject(error);
+            }
+        });
+    }
+}
