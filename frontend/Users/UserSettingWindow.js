@@ -8,6 +8,7 @@ import Card from "../UI/Card";
 import ButtonRow from "../UI/ButtonRow";
 import { normalize } from "../Tool/FontSize";
 import { userActions } from "../store/user-slice";
+import { logoutUser } from "../store/user-actions";
 
 const SettingIcon = () => {
     return(
@@ -39,7 +40,8 @@ const UserSettingWindow = props => {
     const user = useSelector((state) => state.user);
 
     const onPressLogout = () => {
-        dispatch(userActions.logout());
+        // dispatch(userActions.logout());
+        dispatch(logoutUser());
     }
 
     return (
@@ -48,7 +50,7 @@ const UserSettingWindow = props => {
                 <TouchableOpacity onPress={() => props.navigation.navigate("ChampionSignature")}>
                     <ButtonRow icon={SignatureIcon()} text={"Champion Signature"} />
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => props.navigation.navigate("ChampionSignature")}>
+                <TouchableOpacity onPress={() => props.navigation.navigate("SecureSetting")}>
                     <ButtonRow icon={SettingIcon()} text={"Setting"} />
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => props.navigation.navigate("ChampionSignature")}>

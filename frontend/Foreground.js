@@ -15,6 +15,7 @@ import Card from "./UI/Card";
 import { mapActions } from "./store/map-slice";
 import { mainActions } from "./store/main-slice";
 import { normalize } from "./Tool/FontSize";
+import { getUser } from "./store/user-actions";
 
 function Foreground() {
 
@@ -39,6 +40,10 @@ function Foreground() {
                     }
                 ]
             );
+        }
+
+        if (user.isLogin === false && user.checkutoLogin === false) {
+            dispatch(getUser());
         }
     }, [map.errorMsg, user.isLogin, dispatch]);
 

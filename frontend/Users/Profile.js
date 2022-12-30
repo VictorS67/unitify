@@ -5,6 +5,9 @@ import { MaterialIcons, Ionicons } from '@expo/vector-icons';
 
 import UserPage from "./UserPage";
 import UserChampionSignWindow from "./UserChampionSignWindow";
+import UserSecureSettingWindow from "./UserSecureSettingWindow";
+import UserChangePassWindow from "./UserChangePassWindow";
+import UserChangeEmailWindow from "./UserChangeEmailWindow";
 import Card from "../UI/Card";
 import { normalize } from "../Tool/FontSize";
 
@@ -30,6 +33,30 @@ const Profile = props => {
                 options={{
                     headerShown: true,
                     title: "Champion Signature",
+                }}
+            />
+            <Stack.Screen 
+                name="SecureSetting" 
+                component={UserSecureSettingWindow} 
+                options={{
+                    headerShown: true,
+                    title: "Settings",
+                }}
+            />
+            <Stack.Screen 
+                name="ChangeEmail" 
+                component={UserChangeEmailWindow} 
+                options={{
+                    headerShown: true,
+                    title: "Change Email",
+                }}
+            />
+            <Stack.Screen 
+                name="ChangePassword" 
+                component={UserChangePassWindow} 
+                options={{
+                    headerShown: true,
+                    title: "Change Password",
                 }}
             />
         </Stack.Navigator>
