@@ -26,7 +26,7 @@ const UserStatWindow = props => {
                     </Text>
                     <Text style={styles.normalText}>
                         <FontAwesome5 name="trophy" size={normalize(14)} color="black" />
-                        &nbsp;Champions
+                        &nbsp;Wins
                     </Text>
                 </View>
                 <View style={styles.statCard}>

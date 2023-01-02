@@ -5,6 +5,7 @@ import { Text, Alert, Button, TextInput, View, StyleSheet, Linking } from 'react
 import Card from "../UI/Card";
 import { normalize } from "../Tool/FontSize";
 import { userActions } from "../store/user-slice";
+import { loginUser } from "../store/user-actions";
 
 const LoginUser = props => {
 
@@ -17,9 +18,7 @@ const LoginUser = props => {
     const loginUserHandler = (event) => {
         event.preventDefault();
 
-        // TODO: login user
-        
-        dispatch(userActions.login());
+        dispatch(loginUser(username, password));
     }
 
     return (

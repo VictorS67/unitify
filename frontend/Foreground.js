@@ -4,21 +4,25 @@ import { Provider, useSelector, useDispatch } from "react-redux";
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
+import Profile from "./Users/Profile";
 import Auth from "./Users/Auth";
 import SignupUser from "./Users/SignupUser";
 import LoginUser from "./Users/LoginUser";
 import MainPage from "./Main/Main";
 import UserPage from "./Users/UserPage";
-import Map from "./Map/Map";
-import Card from "./UI/Card";
-import { mapActions } from "./store/map-slice";
-import { mainActions } from "./store/main-slice";
-import { normalize } from "./Tool/FontSize";
 import Leaderboard from "./Leaderboard/Leaderboard";
 // import RewardPage from "./Rewarding/Rewardpage";
 //import CircularProgress from "react-native-circular-progress-indicator";
 import CircularProgress from "./Rewarding/CircularProgress";
 import RewardPage from "./Rewarding/Rewardpage";
+import Map from "./Map/Map";
+import Card from "./UI/Card";
+import { mapActions } from "./store/map-slice";
+import { mainActions } from "./store/main-slice";
+import { normalize } from "./Tool/FontSize";
+
+import { getUser } from "./store/user-actions";
+
 function Foreground() {
 
     const dispatch = useDispatch();
@@ -33,7 +37,7 @@ function Foreground() {
             dispatch(mapActions.resetMap());
 
             Alert.alert(
-                "Alert Title",
+                "Error!",
                 map.errorMsg.message,
                 [
                     { 
@@ -42,6 +46,10 @@ function Foreground() {
                     }
                 ]
             );
+        }
+
+        if (user.isLogin === false && user.checkutoLogin === false) {
+            dispatch(getUser());
         }
     }, [map.errorMsg, user.isLogin, dispatch]);
 
@@ -61,7 +69,7 @@ function Foreground() {
                             />
                             <Stack.Screen 
                                 name="Profile"
-                                component={UserPage} 
+                                component={Profile} 
                                 options={{
                                     headerShown: false
                                 }}

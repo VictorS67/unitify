@@ -25,106 +25,120 @@ function Background() {
     const user = useSelector((state) => state.user);
 
     useEffect(() => {
-        if (user.isLogin === false) return;
 
-        if (map.position === null) {
-            // dispatch(mapActions.initUpdate());
-
-            (async () => {
-        
-                let { status } = await Location.requestForegroundPermissionsAsync();
-                if (status !== 'granted') {
-                    dispatch(mapActions.sErrorMsg(
-                        {
-                            message: 'Permission to access location was denied'
-                        }
-                    ));
-                    return;
-                }
+        if (user.isLogin) {
+            if (map.position === null) {
+                // dispatch(mapActions.initUpdate());
+    
+                (async () => {
             
-                let curr_location = await Location.getCurrentPositionAsync({});
-                // console.log("init position: ", curr_location);
-                dispatch(mapActions.sPosition(
-                    {
-                        ...curr_location.coords,
-                        timestamp: curr_location.timestamp
-                    }
-                ));
-            })();
-        } else {
-            // console.log("update: ", map.initUpdateTask);
-            TaskManager.defineTask(LOCATION_TASK_NAME, ({ data, error }) => {
-                if (error) {
-                    // Error occurred - check `error.message` for more details.
-                    return;
-                }
-                if (data) {
-                    const { locations } = data;
-                    // do something with the locations captured in the background
-                    console.log("Background: ", locations);
-                    console.log("map.position: ", map.position);
-                    console.log("main.navStatus: ", main.navStatus);
-        
-                    let curr_location = locations[locations.length - 1];
-        
-                    if (map.position === null || main.navStatus !== "NAV") {
-                        dispatch(mapActions.sPosition(
+                    let { status } = await Location.requestForegroundPermissionsAsync();
+                    if (status !== 'granted') {
+                        dispatch(mapActions.sErrorMsg(
                             {
-                                ...curr_location.coords,
-                                timestamp: curr_location.timestamp
+                                message: 'Permission to access location was denied'
                             }
                         ));
-                    } else if (main.navStatus === "NAV") {
-                        dispatch(updateNavInfo(map.position, {
+                        return;
+                    }
+                
+                    let curr_location = await Location.getCurrentPositionAsync({});
+                    // console.log("init position: ", curr_location);
+                    dispatch(mapActions.sPosition(
+                        {
                             ...curr_location.coords,
                             timestamp: curr_location.timestamp
-                        }))
-                        .then(() => {
+                        }
+                    ));
+                })();
+            } else {
+                // console.log("update: ", map.initUpdateTask);
+                TaskManager.defineTask(LOCATION_TASK_NAME, ({ data, error }) => {
+                    if (error) {
+                        // Error occurred - check `error.message` for more details.
+                        return;
+                    }
+                    if (data) {
+                        const { locations } = data;
+                        // do something with the locations captured in the background
+                        console.log("Background: ", locations);
+                        console.log("map.position: ", map.position);
+                        console.log("main.navStatus: ", main.navStatus);
+            
+                        let curr_location = locations[locations.length - 1];
+            
+                        if (map.position === null || main.navStatus !== "NAV") {
                             dispatch(mapActions.sPosition(
                                 {
                                     ...curr_location.coords,
                                     timestamp: curr_location.timestamp
                                 }
                             ));
-                        });
+                        } else if (main.navStatus === "NAV") {
+                            dispatch(updateNavInfo(map.position, {
+                                ...curr_location.coords,
+                                timestamp: curr_location.timestamp
+                            }))
+                            .then(() => {
+                                dispatch(mapActions.sPosition(
+                                    {
+                                        ...curr_location.coords,
+                                        timestamp: curr_location.timestamp
+                                    }
+                                ));
+                            });
+                        }
                     }
-                }
-            });
-
-            (async () => {
-                let { status: foregroundStatus  } = await Location.requestForegroundPermissionsAsync();
-                let { status: backgroundStatus } = await Location.requestBackgroundPermissionsAsync();
-    
-                if (foregroundStatus !== 'granted') {
-                    dispatch(mapActions.sErrorMsg(
-                        {
-                            message: 'Foreground: Permission to access location was denied'
-                        }
-                    ));
-                    return;
-                }
-    
-                if (backgroundStatus !== 'granted') {
-                    dispatch(mapActions.sErrorMsg(
-                        {
-                            message: 'Background: Permission to access location was denied'
-                        }
-                    ));
-                    return;
-                }
-    
-                await Location.startLocationUpdatesAsync(LOCATION_TASK_NAME, {
-                    accuracy: Location.Accuracy.BestForNavigation,
-                    timeInterval: 5000,
-                    distanceInterval: 0,
-                    showsBackgroundLocationIndicator: true,
-                    foregroundService: {
-                        notificationTitle: 'Location',
-                        notificationBody: 'Location tracking in background',
-                        notificationColor: '#fff',
-                    },
                 });
-            })();
+    
+                (async () => {
+                    let { status: foregroundStatus  } = await Location.requestForegroundPermissionsAsync();
+                    let { status: backgroundStatus } = await Location.requestBackgroundPermissionsAsync();
+        
+                    if (foregroundStatus !== 'granted') {
+                        dispatch(mapActions.sErrorMsg(
+                            {
+                                message: 'Foreground: Permission to access location was denied'
+                            }
+                        ));
+                        return;
+                    }
+        
+                    if (backgroundStatus !== 'granted') {
+                        dispatch(mapActions.sErrorMsg(
+                            {
+                                message: 'Background: Permission to access location was denied'
+                            }
+                        ));
+                        return;
+                    }
+        
+                    await Location.startLocationUpdatesAsync(LOCATION_TASK_NAME, {
+                        accuracy: Location.Accuracy.BestForNavigation,
+                        timeInterval: 5000,
+                        distanceInterval: 0,
+                        showsBackgroundLocationIndicator: true,
+                        foregroundService: {
+                            notificationTitle: 'Location',
+                            notificationBody: 'Location tracking in background',
+                            notificationColor: '#fff',
+                        },
+                    });
+                })();
+            }
+        } else {
+            TaskManager.isTaskRegisteredAsync(LOCATION_TASK_NAME)
+            .then((isRegistered) => {
+                console.log("isDefined: ", TaskManager.isTaskDefined(LOCATION_TASK_NAME));
+                console.log("isRegistered: ", isRegistered);
+                console.log("user not login: ", !user.isLogin);
+                if (!user.isLogin && isRegistered && TaskManager.isTaskDefined(LOCATION_TASK_NAME)) {
+                    (async () => {
+                        await TaskManager.unregisterTaskAsync(LOCATION_TASK_NAME);
+                    });
+                }
+                console.log();
+            });
         }
     }, [map.position, user.isLogin, dispatch]);
 
