@@ -15,6 +15,10 @@ import { mapActions } from "./store/map-slice";
 import { mainActions } from "./store/main-slice";
 import { normalize } from "./Tool/FontSize";
 import Leaderboard from "./Leaderboard/Leaderboard";
+// import RewardPage from "./Rewarding/Rewardpage";
+//import CircularProgress from "react-native-circular-progress-indicator";
+import CircularProgress from "./Rewarding/CircularProgress";
+import RewardPage from "./Rewarding/Rewardpage";
 function Foreground() {
 
     const dispatch = useDispatch();
@@ -84,6 +88,8 @@ function Foreground() {
                 }
             </Stack.Navigator>
         </NavigationContainer>
+        // <CircularProgress percent={30}></CircularProgress>
+        // <RewardPage></RewardPage> 
     );
 }
 

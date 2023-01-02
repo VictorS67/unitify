@@ -23,7 +23,7 @@ import MonthlyRankList from "./MonthlyRankList";
 import UserInfoCard from "./Userinfocard";
 const oddRowColor = "white";
 const evenRowColor = "#f2f5f7";
-function Sevenboard(){
+function Sevenboard(props){
   return (
     <View style={styles.background}>
       <ChampCard style = {styles.championcard}>
