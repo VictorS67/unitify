@@ -1,11 +1,14 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Text, View, StyleSheet } from 'react-native';
 import { Divider } from 'react-native-paper';
 import { FontAwesome5 } from '@expo/vector-icons';
+import { useDispatch, useSelector } from "react-redux";
 
 import { normalize } from "../Tool/FontSize";
 
 const UserStatWindow = props => {
+
+    const user = useSelector((state) => state.user);
 
     return (
         <View style={props.style}>
@@ -13,7 +16,11 @@ const UserStatWindow = props => {
             <View style={styles.userStatCollection}>
                 <View style={styles.statCard}>
                     <Text style={styles.statText}>
-                        {props.like}
+                        {
+                            (user.likeNumber !== null)
+                            ? user.likeNumber
+                            : 0
+                        }
                     </Text>
                     <Text style={styles.normalText}>
                         <FontAwesome5 name="thumbs-up" size={normalize(14)} color="black" />
@@ -22,7 +29,11 @@ const UserStatWindow = props => {
                 </View>
                 <View style={styles.statCard}>
                     <Text style={styles.statText}>
-                        {props.champion}
+                        {
+                            (user.likeNumber !== null)
+                            ? user.likeNumber
+                            : 0
+                        }
                     </Text>
                     <Text style={styles.normalText}>
                         <FontAwesome5 name="trophy" size={normalize(14)} color="black" />
@@ -31,7 +42,11 @@ const UserStatWindow = props => {
                 </View>
                 <View style={styles.statCard}>
                     <Text style={styles.statText}>
-                        {props.visit}
+                        {
+                            (user.likeNumber !== null)
+                            ? user.likeNumber
+                            : 0
+                        }
                     </Text>
                     <Text style={styles.normalText}>
                         <FontAwesome5 name="user-friends" size={normalize(14)} color="black" />

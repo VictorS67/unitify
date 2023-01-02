@@ -1,10 +1,14 @@
 import React from "react";
 import { Text, View, StyleSheet, useWindowDimensions, Pressable } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
+import { useDispatch, useSelector } from "react-redux";
 
 import { normalize } from "../Tool/FontSize";
 
 const MileCard = props => {
+
+    const user = useSelector((state) => state.user);
+
     return (
         <View style={styles.mileCard}>
             <View style={styles.mileCardTitle}>
@@ -24,7 +28,11 @@ const MileCard = props => {
             <View style={styles.mileCardContent}>
                 <View style={styles.statCard}>
                     <Text style={styles.mileText}>
-                        3
+                        {
+                            (user.currentRank !== null)
+                            ? user.currentRank
+                            : ''
+                        }
                     </Text>
                     <Text style={styles.normalText}>
                         Rank
@@ -33,7 +41,11 @@ const MileCard = props => {
 
                 <View style={styles.statCard}>
                     <Text style={styles.mileText}>
-                        8104
+                        {
+                            (user.monthlyMiles !== null)
+                            ? user.monthlyMiles
+                            : ''
+                        }
                     </Text>
                     <Text style={styles.normalText}>
                         Month
@@ -42,7 +54,11 @@ const MileCard = props => {
 
                 <View style={styles.statCard}>
                     <Text style={styles.mileText}>
-                        10024
+                    {
+                            (user.totalMiles !== null)
+                            ? user.totalMiles
+                            : ''
+                        }
                     </Text>
                     <Text style={styles.normalText}>
                         Total

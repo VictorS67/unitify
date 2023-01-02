@@ -1,17 +1,24 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Text, View, StyleSheet } from 'react-native';
+import { useDispatch, useSelector } from "react-redux";
 
 import Card from "../UI/Card";
 import { normalize } from "../Tool/FontSize";
 
 const UserMileWindow = props => {
 
+    const user = useSelector((state) => state.user);
+
     return (
         <View style={props.style}>
             <View style={styles.userMileCollection}>
                 <Card style={styles.mileCard} childrenStyle={styles.mileCardContent}>
                     <Text style={styles.mileText}>
-                        {props.rank}
+                        {
+                            (user.currentRank !== null)
+                            ? user.currentRank
+                            : ''
+                        }
                     </Text>
                     <Text style={styles.normalText}>
                         Rank
@@ -19,7 +26,11 @@ const UserMileWindow = props => {
                 </Card>
                 <Card style={styles.mileCard} childrenStyle={styles.mileCardContent}>
                     <Text style={styles.mileText}>
-                        {props.month}
+                        {
+                            (user.monthlyMiles !== null)
+                            ? user.monthlyMiles
+                            : ''
+                        }
                     </Text>
                     <Text style={styles.normalText}>
                         Month
@@ -27,7 +38,11 @@ const UserMileWindow = props => {
                 </Card>
                 <Card style={styles.mileCard} childrenStyle={styles.mileCardContent}>
                     <Text style={styles.mileText}>
-                        {props.total}
+                        {
+                            (user.totalMiles !== null)
+                            ? user.totalMiles
+                            : ''
+                        }
                     </Text>
                     <Text style={styles.normalText}>
                         Total

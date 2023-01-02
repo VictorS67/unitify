@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Text, View, StyleSheet, TextInput, Button, Pressable, TouchableOpacity } from 'react-native';
 import { Divider } from 'react-native-paper';
 import { FontAwesome5 } from '@expo/vector-icons';
+import { useDispatch, useSelector } from "react-redux";
 
 import Card from "../UI/Card";
 import { normalize } from "../Tool/FontSize";
@@ -63,10 +64,12 @@ const renderSettingColumn = (title, content, event, showNext) => {
 
 const UserSecureSettingWindow = props => {
 
+    const user = useSelector((state) => state.user);
+
     return (
         <View style={props.style}>
-            {renderSettingColumn('User Name', 'test', () => {}, false)}
-            {renderSettingColumn('Email', 'test@test.com', () => {props.navigation.navigate("ChangeEmail")}, true)}
+            {renderSettingColumn('User Name', user.userName, () => {}, false)}
+            {renderSettingColumn('Email', user.email, () => {props.navigation.navigate("ChangeEmail")}, true)}
             {renderSettingColumn('Password', null, () => {props.navigation.navigate("ChangePassword")}, true)}
         </View>
     );

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Text, Alert, Button, TextInput, View, StyleSheet, Linking } from 'react-native';
+import { Text, Alert, Button, TextInput, View, StyleSheet, Linking, FlatList, SafeAreaView } from 'react-native';
 
 import Card from "../UI/Card";
 import { normalize } from "../Tool/FontSize";
@@ -14,16 +14,54 @@ const SignupUser = props => {
     const [password, setPassword] = useState('');
     const [passwordAgain, setPasswordAgain] = useState('');
 
+    const resetSignup = () => {
+        setEmail('');
+        setUsername('');
+        setPassword('');
+        setPasswordAgain('');
+    }
+
+    const resetPassword = () => {
+        setPassword('');
+        setPasswordAgain('');
+    }
+
     const signupUserHandler = (event) => {
         event.preventDefault();
 
         // TODO: Register new user
         dispatch(signupUser(username, email, password, passwordAgain))
-        .then((result) => {
-            console.log(`result: ${result}`)
-        })
-
-        // props.navigation.navigate('Login');
+        .then(
+            (resolve) => {
+                const result = JSON.parse(resolve);
+                if (result.status === 200) {
+                    resetSignup();
+                    Alert.alert(
+                        "Awesome",
+                        "You have signed up your account.",
+                        [
+                            { 
+                                text: "OK", 
+                                onPress: () => props.navigation.navigate('Login')
+                            }
+                        ]
+                    );
+                } else {
+                    resetPassword();
+                    console.log("result message: ", result["message"])
+                    Alert.alert(
+                        "Ah no",
+                        result.message,
+                        [
+                            { 
+                                text: "Try Again", 
+                                onPress: () => console.log("Try Again")
+                            }
+                        ]
+                    );
+                }
+            }
+        )
     }
 
     return (
@@ -75,6 +113,17 @@ const SignupUser = props => {
                         style={styles.input}
                     />
                 </Card>
+
+                <Text style={styles.passwordHint}>
+                    Your Password Should...
+                </Text>
+                <View style={{ marginBottom: normalize(2) }}>
+                    <Text style={styles.normalText}>{`\u2022 Start with any character (e.g. a-z).`}</Text>
+                </View>
+                <View style={{ marginBottom: normalize(2) }}>
+                    <Text style={styles.normalText}>{`\u2022 Total length between 8 to 15.`}</Text>
+                </View>
+
             </View>
 
             <View style={styles.signupButton}>
@@ -126,8 +175,15 @@ const styles = StyleSheet.create({
     },
     normalText: {
         fontSize: normalize(12),
-        textAlign: "right",
-        marginEnd: normalize(10)
+        textAlign: "left",
+        marginStart: normalize(10)
+    },
+    passwordHint: {
+        fontSize: normalize(14),
+        textAlign: "left",
+        marginStart: normalize(10),
+        marginTop: normalize(5),
+        fontWeight: "bold"
     },
     signupBox: {
         marginVertical: normalize(20)

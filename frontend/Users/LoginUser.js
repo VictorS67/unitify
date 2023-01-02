@@ -5,7 +5,7 @@ import { Text, Alert, Button, TextInput, View, StyleSheet, Linking } from 'react
 import Card from "../UI/Card";
 import { normalize } from "../Tool/FontSize";
 import { userActions } from "../store/user-slice";
-import { loginUser } from "../store/user-actions";
+import { loginUser, getLikeNumber } from "../store/user-actions";
 
 const LoginUser = props => {
 
