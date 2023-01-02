@@ -1,11 +1,17 @@
 import React, { useState } from "react";
-import { View, StyleSheet } from 'react-native';
+import { useDispatch, useSelector } from "react-redux";
+import { View, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { Divider } from 'react-native-paper';
 import { FontAwesome5, Ionicons, MaterialIcons } from '@expo/vector-icons';
 
 import Card from "../UI/Card";
 import ButtonRow from "../UI/ButtonRow";
 import { normalize } from "../Tool/FontSize";
+import { userActions } from "../store/user-slice";
+import { tripnavActions } from "../store/tripnav-slice";
+import { mainActions } from "../store/main-slice";
+import { mapActions } from "../store/map-slice";
+import { logoutUser } from "../store/user-actions";
 
 const SettingIcon = () => {
     return(
@@ -33,14 +39,68 @@ const InformationIcon = () => {
 
 const UserSettingWindow = props => {
 
+    const dispatch = useDispatch();
+    const user = useSelector((state) => state.user);
+    const main = useSelector((state) => state.main);
+
+    const onPressNoSaveQuit = () => {
+        dispatch(tripnavActions.resetTripNav());
+        dispatch(mainActions.resetNavStatusToInit());
+        dispatch(mapActions.resetMap());
+        dispatch(logoutUser());
+    }
+
+    const onPressSaveQuit = () => {
+        // TODO: Backend API to Save current trip
+
+        dispatch(tripnavActions.resetTripNav());
+        dispatch(mainActions.resetNavStatusToInit());
+        dispatch(mapActions.resetMap());
+        dispatch(logoutUser());
+    }
+
+    const onPressLogout = () => {
+        // dispatch(userActions.logout());
+        if (main.navStatus === "NAV") {
+            Alert.alert(
+                "Are You Sure?",
+                "Your trip is still running. Logging out will end your trip.",
+                [
+                    { 
+                        text: "Cancel", 
+                        onPress: () => console.log("Return back") 
+                    },
+                    { 
+                        text: "Don't Save", 
+                        onPress: () => onPressNoSaveQuit() 
+                    },
+                    { 
+                        text: "Save", 
+                        onPress: () => onPressSaveQuit()
+                    }
+                ]
+            );
+        } else {
+            onPressNoSaveQuit();
+        }
+    }
+
     return (
         <View style={props.style}>
             <Card style={styles.userSettingCard} childrenStyle={styles.userSettingCardContent}>
-                <ButtonRow icon={SignatureIcon()} text={"Champion Signature"} />
-                <ButtonRow icon={SettingIcon()} text={"Setting"} />
-                <ButtonRow icon={InformationIcon()} text={"App Information"} />
+                <TouchableOpacity onPress={() => props.navigation.navigate("ChampionSignature")}>
+                    <ButtonRow icon={SignatureIcon()} text={"Champion Signature"} />
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => props.navigation.navigate("SecureSetting")}>
+                    <ButtonRow icon={SettingIcon()} text={"Setting"} />
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => props.navigation.navigate("ChampionSignature")}>
+                    <ButtonRow icon={InformationIcon()} text={"App Information"} />
+                </TouchableOpacity>
                 <Divider style={{ width: "100%" }} />
-                <ButtonRow icon={LogoutIcon()} text={"Logout"} />
+                <TouchableOpacity onPress={() => {onPressLogout()}}>
+                    <ButtonRow icon={LogoutIcon()} text={"Logout"} />
+                </TouchableOpacity>
             </Card>
         </View>
     );

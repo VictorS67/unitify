@@ -14,22 +14,6 @@ const Auth = props => {
     const Tab = createBottomTabNavigator();
 
     return (
-        // <Stack.Navigator initialRouteName="Login">
-        //     <Stack.Screen 
-        //         name="Login"
-        //         component={LoginUser}
-        //         // options={{
-        //         //     headerShown: false
-        //         // }}
-        //     />
-        //     <Stack.Screen 
-        //         name="Signup"
-        //         component={SignupUser}
-        //         // options={{
-        //         //     headerShown: false
-        //         // }}
-        //     />
-        // </Stack.Navigator>
         <Tab.Navigator 
             initialRouteName="Login"
             screenOptions={({ route }) => ({

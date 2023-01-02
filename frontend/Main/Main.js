@@ -79,7 +79,17 @@ const MainPage = props => {
                 <Map />
 
                 <Card style={styles.userCard} childrenStyle={styles.userCardContent}>
-                    <FontAwesome5 name="user" size={normalize(22)} color="black" />
+                    <TouchableOpacity 
+                        style={{
+                            justifyContent: "center",
+                            alignItems: "center"
+                        }}
+                        onPress={() => {
+                            props.navigation.navigate('Profile');
+                        }}
+                    >
+                        <FontAwesome5 name="user" size={normalize(22)} color="black" />
+                    </TouchableOpacity>
                 </Card>
 
                 <Card style={styles.mapToolCard} childrenStyle={styles.mapToolCardContent}>
@@ -112,7 +122,7 @@ const MainPage = props => {
                     {
                         (main.navStatus !== "PLAN") && 
                         <View style={[styles.container, styles.mileCard]}>
-                            <MileCard />
+                            <MileCard navigation={props.navigation} />
                         </View>
                     }
                     {/* {
