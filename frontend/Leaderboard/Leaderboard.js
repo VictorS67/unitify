@@ -14,22 +14,28 @@ import {
   Text,
   TouchableOpacity,
   View,
-  ViewPropTypes,
-  Button,
+  Pressable,
   SafeAreaView
 } from "react-native";
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import { NavigationContainer } from '@react-navigation/native';
 import MonthlyRankList from "./MonthlyRankList";
+import UserInfoCard from "./Userinfocard";
 const oddRowColor = "white";
 const evenRowColor = "#f2f5f7";
-function Sevenboard(){
+function Sevenboard(props){
   return (
     <View style={styles.background}>
       <ChampCard style = {styles.championcard}>
       </ChampCard>
       {/* <Navibar>ygh9 5</Navibar> */}
       <RankList style = {styles.ranklist}></RankList>
+      <Pressable 
+              style={styles.userinfocontainer}
+              onPress={() => {props.navigation.navigate('Profile');}}
+          >
+            <UserInfoCard></UserInfoCard>
+      </Pressable>
     </View>)
 }
 
@@ -64,25 +70,39 @@ function Navibar() {
 //     }
 // });
 
-function Leaderboard(){
+function Leaderboard(props){
  
     return (
         <SafeAreaView style={styles.background}>
         {/* //   <ChampCard style = {styles.championcard}>
         //   </ChampCard> */}
-
-          <NavigationContainer style={styles.container}>
+          <Pressable 
+              style={styles.button}
+              onPress={() => {props.navigation.navigate('Home');}}
+          ></Pressable>
+          {/* <NavigationContainer style={styles.container}> */}
             <Tab.Navigator>
             <Tab.Screen name="7DAYS" component={Sevenboard}/>
             <Tab.Screen name="1MONTH" component={Monthboard} />
             </Tab.Navigator>
-          </NavigationContainer>
+          {/* </NavigationContainer> */}
         {/* //   <RankList style = {styles.ranklist}></RankList> */}
+          
         </SafeAreaView>)
 
         
 }
 const styles = StyleSheet.create({
+  userinfocontainer:{
+    flex:0.2,
+    width: '100%',
+    height: 70,
+    backgroundColor: '#EE5407',
+    justifyContent: 'center',
+    alignItems: 'center',
+    // position: 'absolute', //Here is the trick
+    // bottom: 20, //Here is the trick
+  },
   background:{
     height:'100%',
     width:'100%',
@@ -130,6 +150,7 @@ const styles = StyleSheet.create({
         // marginVertical: normalize(20),
         paddingTop:0,
   },
+  
   left: {
     flexDirection: "row",
     alignItems: "center"

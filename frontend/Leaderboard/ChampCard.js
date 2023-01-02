@@ -9,12 +9,14 @@ import {
     SafeAreaView
   } from "react-native"; 
 import Homebutton from "./Homebutton";
+import { normalize } from "../Tool/FontSize";
 const newData = {
-    rank:"1000",
-    name: "John",
+    rank:"10th",
+    name: "John 12312313123123131",
     score: Math.floor(Math.random() * 100).toString(),
     iconUrl:
-      "https://www.shareicon.net/data/128x128/2016/09/15/829473_man_512x512.png"
+      "https://www.shareicon.net/data/128x128/2016/09/15/829473_man_512x512.png",
+    signature:"I am king of the world!"
 };
 function ChampCard() {
     return (
@@ -22,9 +24,26 @@ function ChampCard() {
             {/* <Homebutton style={styles.homeButton}></Homebutton> */}
             <SafeAreaView style={styles.infocontainer}>
                 {/* <Homebutton style = {styles.homeButton}></Homebutton> */}
-                <Text style={styles.rank}>{newData.rank}</Text>
-                <Image source={{uri:"https://www.shareicon.net/data/128x128/2016/09/15/829473_man_512x512.png"}} style = {styles.avatar}></Image>
-                <Text style={styles.score}>{newData.score}</Text>
+                <View style = {styles.topChoiceTransInfoRow}>
+                    <Text style={styles.rank}>{newData.rank}</Text>
+                </View>
+
+                <View style = {styles.topChoiceTransInfoRow}
+                      >
+                    {/* <Image source={{uri:"https://www.shareicon.net/data/128x128/2016/09/15/829473_man_512x512.png"}} style = {styles.avatar}></Image> */}
+                    {/* <Text >{newData.signature}</Text> */}
+                    <Text style={styles.score} numberOfLines = {1}>{newData.name}</Text>
+                </View>
+
+                <View style={styles.topChoiceTransInfoRow}>
+                    <Text style={styles.score}>{newData.score}</Text>
+                </View>
+                {/* <View style = {styles.topChoiceTransInfoRow}>
+                    <Text >{newData.signature}</Text>
+                </View> */} 
+            </SafeAreaView>
+            <SafeAreaView style = {styles.sigcontainer}>
+              <Text style= {styles.signature} numberOfLines = {2}>{newData.signature}</Text>
             </SafeAreaView>
             
         </SafeAreaView>
@@ -34,23 +53,29 @@ function ChampCard() {
 const styles = StyleSheet.create({
     container: {
         flex: 0.3,
-        flexDirection:'row'
+        flexDirection:'column'
     },
     infocontainer:{
       width:'100%',
       marginTop:'5%',
-    height:'100%',
-    marginRight:'80%',
+      // height:'100%',
+      marginRight:'80%',
       flexDirection:  'row',
     //   alignContent:'center',
-      justifyContent:'space-around'
+      justifyContent:'space-evenly'
     },
-    homeButton:{
-    //   marginTop:'15%',
-    //   fontSize: 40,
-    //   marginLeft: '30%',
-      fontWeight: "bold",
-    //   position: "absolute",
+    topChoiceTransInfoRow: {
+      paddingHorizontal: normalize(5),
+      flex: 1,
+      flexDirection: "row",
+      // alignItems: "center",
+      justifyContent: "center",
+      width: "100%"
+    },
+    avatarcontainer:{
+      flex:1,
+      flexDirection:'column',
+      alignItems: "center",
     },
     rank: {
       marginTop:'10%',
@@ -72,13 +97,28 @@ const styles = StyleSheet.create({
     },
     avatar: {
       marginTop:'10%',
-      height: '40%',
-      width: '20%',
+      height: 60,
+      width: 60,
     //   borderRadius: 30 / 2,
     //   marginRight: 10,
     //   flex: 0.33,
     //   position: "absolute",
     // marginLeft:'5%'
+    },
+    sigcontainer:{
+      width:'90%',
+      marginTop:'5%',
+      // height:'100%',
+      marginRight:'80%',
+      flexDirection:  'row',
+    //   alignContent:'center',
+      justifyContent:'space-evenly'
+    },
+    signature:{
+      // marginTop:'10%',
+      
+      fontSize: 20,
+      // fontWeight: "bold",
     }
   });
 

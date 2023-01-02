@@ -10,11 +10,17 @@ import SignupUser from "./Users/SignupUser";
 import LoginUser from "./Users/LoginUser";
 import MainPage from "./Main/Main";
 import UserPage from "./Users/UserPage";
+import Leaderboard from "./Leaderboard/Leaderboard";
+// import RewardPage from "./Rewarding/Rewardpage";
+//import CircularProgress from "react-native-circular-progress-indicator";
+import CircularProgress from "./Rewarding/CircularProgress";
+import RewardPage from "./Rewarding/Rewardpage";
 import Map from "./Map/Map";
 import Card from "./UI/Card";
 import { mapActions } from "./store/map-slice";
 import { mainActions } from "./store/main-slice";
 import { normalize } from "./Tool/FontSize";
+
 import { getUser } from "./store/user-actions";
 
 function Foreground() {
@@ -68,6 +74,13 @@ function Foreground() {
                                     headerShown: false
                                 }}
                             />
+                            <Stack.Screen 
+                                name="Leaderboard"
+                                component={Leaderboard} 
+                                options={{
+                                    headerShown: true
+                                }}
+                            />
                         </>
                     ) : (
                         <>
@@ -83,6 +96,8 @@ function Foreground() {
                 }
             </Stack.Navigator>
         </NavigationContainer>
+        // <CircularProgress percent={30}></CircularProgress>
+        // <RewardPage></RewardPage> 
     );
 }
 

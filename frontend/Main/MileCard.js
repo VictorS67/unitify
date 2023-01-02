@@ -13,7 +13,7 @@ const MileCard = props => {
                 </Text>
                 <Pressable 
                     style={styles.button}
-                    onPress={() => {props.navigation.navigate('Profile');}}
+                    onPress={() => {props.navigation.navigate('Leaderboard');}}
                 >
                     <MaterialIcons name="leaderboard" size={normalize(14)} color="black" />
                     <Text style={{ fontSize: normalize(12), textAlign: "center", textTransform: 'uppercase' }}>
