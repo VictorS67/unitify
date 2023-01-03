@@ -17,12 +17,13 @@ import {
   Pressable,
   SafeAreaView
 } from "react-native";
+import { useSelector, useDispatch } from "react-redux";
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import { NavigationContainer } from '@react-navigation/native';
 import MonthlyRankList from "./MonthlyRankList";
 import UserInfoCard from "./Userinfocard";
-const oddRowColor = "white";
-const evenRowColor = "#f2f5f7";
+import { getMonthlyLeaderboard } from "../store/leader-actions";
+
 function Sevenboard(props){
   return (
     <View style={styles.background}>
@@ -39,30 +40,33 @@ function Sevenboard(props){
     </View>)
 }
 
-function Monthboard(){
+function Monthboard(props){
+  const dispatch = useDispatch();
+  React.useEffect(() => {
+    const unsubscribe = props.navigation.addListener('focus', () => {
+      // do something
+      dispatch(getMonthlyLeaderboard());
+      
+    });
+
+    return unsubscribe;
+  }, [props.navigation, dispatch]);
   return (
     <View style={styles.background}>
       <ChampCard style = {styles.championcard}>
       </ChampCard>
       {/* <Navibar>ygh9 5</Navibar> */}
-      <MonthlyRankList style = {styles.ranklist}></MonthlyRankList>
+      <RankList style = {styles.ranklist}></RankList>
+      <Pressable 
+              style={styles.userinfocontainer}
+              onPress={() => {props.navigation.navigate('Profile');}}
+          >
+            <UserInfoCard></UserInfoCard>
+      </Pressable>
     </View>)
 }
 const Tab = createMaterialTopTabNavigator();
 
-function Navibar() {
-  return (
-    <SafeAreaView style={styles.container}>
-        <NavigationContainer>
-          <Tab.Navigator>
-          <Tab.Screen name="7DAYS" component={Sevenboard}/>
-          <Tab.Screen name="1MONTH" component={Monthboard} />
-          </Tab.Navigator>
-        </NavigationContainer>
-      </SafeAreaView>
-    
-  );
-}
 
 // const styles = StyleSheet.create({
 //     container:{
@@ -82,6 +86,7 @@ function Leaderboard(props){
           ></Pressable>
           {/* <NavigationContainer style={styles.container}> */}
             <Tab.Navigator>
+
             <Tab.Screen name="7DAYS" component={Sevenboard}/>
             <Tab.Screen name="1MONTH" component={Monthboard} />
             </Tab.Navigator>
