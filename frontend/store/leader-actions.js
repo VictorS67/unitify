@@ -12,6 +12,28 @@ export const getMonthlyLeaderboard = () =>{
                     dispatch(leaderActions.sChampSig(userJson.data[0]));
                 }
                 if(userJson.data.length > 1){
+                    console.log("1");
+                    dispatch(leaderActions.sMonthlyBoard(userJson.data.slice(1)));
+                    
+                }
+                
+            }
+        } catch(error){
+
+        }
+    }
+}
+
+export const getWeeklyLeaderboard = () =>{
+    return async(dipatch) =>{
+        try{
+            const users = await fetch(`${BACKEND_URL}/leaderboard?startIndex=0&endIndex=20`);
+            let userJson = await users.json();
+            if (userJson.status === 200){
+                if(userJson.data.length > 0){
+                    dispatch(leaderActions.sChampSig(userJson.data[0]));
+                }
+                if(userJson.data.length > 1){
                     dispatch(leaderActions.sMonthlyBoard(userJson.data.slice(1)));
                 }
                 

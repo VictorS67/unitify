@@ -20,7 +20,7 @@ import {
 import { useSelector, useDispatch } from "react-redux";
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import { NavigationContainer } from '@react-navigation/native';
-import MonthlyRankList from "./MonthlyRankList";
+import WeeklyRankList from "./WeeklyRankList";
 import UserInfoCard from "./Userinfocard";
 import { getMonthlyLeaderboard } from "../store/leader-actions";
 
@@ -30,7 +30,7 @@ function Sevenboard(props){
       <ChampCard style = {styles.championcard}>
       </ChampCard>
       {/* <Navibar>ygh9 5</Navibar> */}
-      <RankList style = {styles.ranklist}></RankList>
+      <WeeklyRankList style = {styles.ranklist}></WeeklyRankList>
       <Pressable 
               style={styles.userinfocontainer}
               onPress={() => {props.navigation.navigate('Profile');}}
@@ -46,7 +46,7 @@ function Monthboard(props){
     const unsubscribe = props.navigation.addListener('focus', () => {
       // do something
       dispatch(getMonthlyLeaderboard());
-      
+      // console.log(`${}`)
     });
 
     return unsubscribe;

@@ -29,6 +29,8 @@ const leaderSlice = createSlice({
         users: trialData,
         ismonthly: true,
         // champsig:'',
+        weekchampion: newData,
+        weeklyusers:trialData,
     },
     reducers:{
         sChampSig(state, action){
@@ -38,6 +40,10 @@ const leaderSlice = createSlice({
         sMonthlyBoard(state, action){
             const users = action.payload;
             state.users = users;
+        },
+        sWeeklyboard(state, action){
+            const weeklyusers = action.payload;
+            state.weeklyusers = weeklyusers;
         }
     }
 })

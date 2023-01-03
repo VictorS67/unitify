@@ -21,7 +21,7 @@ function ChampCard() {
     const dispatch = useDispatch();
     const leaderboard = useSelector((state) => state.leaderboard);
     // dispatch(getMonthlyLeaderboard);
-    console.log(leaderboard.champion);
+    // console.log(leaderboard.users);
     return (
         <SafeAreaView style={styles.container}>
             {/* <Homebutton style={styles.homeButton}></Homebutton> */}

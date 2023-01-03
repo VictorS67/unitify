@@ -8,7 +8,7 @@ import {
     SafeAreaView,
     TouchableOpacity
   } from "react-native"; 
-
+import { useSelector, useDispatch } from "react-redux";
 // import { AutoSizeText, ResizeTextMode } from 'react-native-auto-size-text';
 import LikeButton from "./Likeheart";
 import { normalize } from "../Tool/FontSize";
@@ -34,24 +34,26 @@ const Item = ({ title }) => (
 
 function RankList(props){
 
-  const [data, setdat] = useState(trialData);
+  // const [data, setdata] = useState(trialData);
+  const dispatch = useDispatch();
+  const leaderboard = useSelector((state) => state.leaderboard);
   const renderItem = ({ item, index }) => (
     <SafeAreaView>
       <TouchableOpacity style={styles.listcontainer}>
         <SafeAreaView style={styles.left}>
           <View style = {styles.rankcontainer}>
-            <Text style={styles.rank}>{item.rank}</Text>
+            <Text style={styles.rank}>{index + 2}</Text>
           </View>
           {/* <Image style={styles.avatar} source={{uri: item.iconUrl}}></Image> */}
           <View style = {styles.topChoiceTransInfoRow}>
             <Text style={styles.name} numberOfLines ={1}>
-              {item.name}
+              {item.userName}
             </Text>
           </View>
           
           {/* <Item title={item.name}></Item> */}
           <View style= {styles.scorecontainer}>
-            <Text style = {styles.score}>{item.score}</Text>
+            <Text style = {styles.score}>{item.monthlyMiles}</Text>
           </View>
           <View style = {styles.likecontainer}>
             <LikeButton></LikeButton>
@@ -62,13 +64,13 @@ function RankList(props){
     </SafeAreaView>
     
   );
-
+  // console.log(leaderboard.users);
   return (
     <SafeAreaView style={styles.container}>
       <FlatList
-        data={trialData}
+        data={leaderboard.users}
         renderItem={renderItem}
-        keyExtractor={item => item.name}
+        keyExtractor={item => item.userId}
       />
     </SafeAreaView>)
 };
