@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
     FlatList,
     Image,
@@ -27,8 +27,9 @@ function MonthlyRankList(props){
   const dispatch = useDispatch();
   // const leaderboard = useSelector((state) => state.leaderboard);
   const leaderboard = useSelector((state) => state.leaderboard);
-  console.log(leaderboard.weeklyusers);
+  // console.log(leaderboard.weeklyusers);
   const renderItem = ({ item, index }) => (
+    
     <SafeAreaView>
       <TouchableOpacity style={styles.listcontainer}>
         <SafeAreaView style={styles.left}>
@@ -47,7 +48,7 @@ function MonthlyRankList(props){
             <Text style = {styles.score}>{item.monthlyMiles}</Text>
           </View>
           <View style = {styles.likecontainer}>
-            <LikeButton></LikeButton>
+            <LikeButton userid = {props.userId} likeduserid = {item.userId}></LikeButton>
           </View>
         </SafeAreaView>
       {/* <Item title={item.name} /> */}

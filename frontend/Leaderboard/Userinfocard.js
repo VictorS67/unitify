@@ -6,7 +6,7 @@ import {
     View,
     SafeAreaView
   } from "react-native";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { userActions } from "../store/user-slice";
 import { normalize } from "../Tool/FontSize";
 // const userData = {
@@ -19,6 +19,9 @@ import { normalize } from "../Tool/FontSize";
 // };
 function UserInfoCard(){
     const userData = useSelector((state) => state.user);
+    const dispatch = useDispatch();
+    // dispatch(userActions.getUser());
+    console.log(userData);
     return (
         <SafeAreaView>
             <SafeAreaView style={styles.infocontainer}>

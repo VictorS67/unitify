@@ -26,6 +26,7 @@ import { getMonthlyLeaderboard, getWeeklyLeaderboard } from "../store/leader-act
 
 function Sevenboard(props){
   const dispatch = useDispatch();
+  const user = useSelector((state) => state.user);
   React.useEffect(() => {
     const unsubscribe = props.navigation.addListener('focus', () => {
       // do something
@@ -40,7 +41,7 @@ function Sevenboard(props){
       <ChampCard style = {styles.championcard}>
       </ChampCard>
       {/* <Navibar>ygh9 5</Navibar> */}
-      <WeeklyRankList style = {styles.ranklist}></WeeklyRankList>
+      <WeeklyRankList style = {styles.ranklist} userid = {user.id}></WeeklyRankList>
       <Pressable 
               style={styles.userinfocontainer}
               onPress={() => {props.navigation.navigate('Profile');}}
@@ -52,6 +53,7 @@ function Sevenboard(props){
 
 function Monthboard(props){
   const dispatch = useDispatch();
+  const user = useSelector((state) => state.user);
   React.useEffect(() => {
     const unsubscribe = props.navigation.addListener('focus', () => {
       // do something
@@ -66,7 +68,7 @@ function Monthboard(props){
       <ChampCard style = {styles.championcard}>
       </ChampCard>
       {/* <Navibar>ygh9 5</Navibar> */}
-      <RankList style = {styles.ranklist}></RankList>
+      <RankList style = {styles.ranklist} userid = {user.id}></RankList>
       <Pressable 
               style={styles.userinfocontainer}
               onPress={() => {props.navigation.navigate('Profile');}}

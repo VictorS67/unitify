@@ -13,7 +13,9 @@ const userSlice = createSlice({
         championTimes: null,
         likeNumber: null,
         monthlyMiles: null,
-        totalMiles: null
+        totalMiles: null,
+        whoIliked:[],
+        whoLikedMe:[],
     },
     reducers: {
         login(state, action) {
@@ -51,6 +53,9 @@ const userSlice = createSlice({
             state.likeNumber = user.likeNumber;
             state.monthlyMiles = user.monthlyMiles;
             state.totalMiles = user.totalMiles;
+            //I added these two
+            state.whoIliked = user.whoIliked;
+            state.whoLikedMe = user.whoLikedMe;
 
             console.log("state.totalMiles: ", state.totalMiles)
         },
@@ -62,6 +67,11 @@ const userSlice = createSlice({
             const email = action.payload;
             state.email = email;
         },
+        sLikeNumber(state, action){
+            const likenumber = action.payload;
+            state.likeNumber = likenumber;
+            console.log(state,likenumber);
+        }
     },
 });
 
