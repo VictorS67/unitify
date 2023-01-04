@@ -16,7 +16,10 @@ import { createMaterialTopTabNavigator } from '@react-navigation/material-top-ta
 import { NavigationContainer } from '@react-navigation/native';
 import CircularProgress from "./CircularProgress";
 import { LineChart} from 'react-native-chart-kit'
+import { useSelector } from "react-redux";
 function RewardPage(props){
+    const user = useSelector((state) => state.user);
+    const percent = Math.floor(user.monthlyMiles / 3000);
     return(
         
         <SafeAreaView style={styes.container}>
@@ -29,7 +32,7 @@ function RewardPage(props){
             </SafeAreaView>
             
             <SafeAreaView style = {styes.circlecontainer}>
-                <CircularProgress percent={70}></CircularProgress>
+                <CircularProgress percent={percent}></CircularProgress>
                 {/* <Text>{"Goal of this month is caculated by 1.1 * average miles"}</Text> */}
             </SafeAreaView>
             

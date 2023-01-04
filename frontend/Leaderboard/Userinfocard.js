@@ -6,35 +6,36 @@ import {
     View,
     SafeAreaView
   } from "react-native";
+import { useSelector } from "react-redux";
 import { userActions } from "../store/user-slice";
 import { normalize } from "../Tool/FontSize";
-const userData = {
-    rank:"1st",
-    name: "Leo Messi",
-    score: Math.floor(Math.random() * 100).toString(),
-    iconUrl:
-      "https://www.shareicon.net/data/128x128/2016/09/15/829473_man_512x512.png",
-    signature:"The GOAT!"
-};
+// const userData = {
+//     rank:"1st",
+//     name: "Leo Messi",
+//     score: Math.floor(Math.random() * 100).toString(),
+//     iconUrl:
+//       "https://www.shareicon.net/data/128x128/2016/09/15/829473_man_512x512.png",
+//     signature:"The GOAT!"
+// };
 function UserInfoCard(){
-    
+    const userData = useSelector((state) => state.user);
     return (
         <SafeAreaView>
             <SafeAreaView style={styles.infocontainer}>
                 {/* <Homebutton style = {styles.homeButton}></Homebutton> */}
                 <View style = {styles.topChoiceTransInfoRow}>
-                    <Text style={styles.rank}>{userData.rank}</Text>
+                    <Text style={styles.rank}>{userData.currentRank}</Text>
                 </View>
 
                 <View style = {styles.topChoiceTransInfoRow}
                       >
                     {/* <Image source={{uri:"https://www.shareicon.net/data/128x128/2016/09/15/829473_man_512x512.png"}} style = {styles.avatar}></Image> */}
                     {/* <Text >{newData.signature}</Text> */}
-                    <Text style={styles.score} numberOfLines = {1}>{userData.name}</Text>
+                    <Text style={styles.score} numberOfLines = {1}>{userData.userName}</Text>
                 </View>
 
                 <View style={styles.topChoiceTransInfoRow}>
-                    <Text style={styles.score}>{userData.score}</Text>
+                    <Text style={styles.score}>{userData.monthlyMiles}</Text>
                 </View>
                 {/* <View style = {styles.topChoiceTransInfoRow}>
                     <Text >{newData.signature}</Text>

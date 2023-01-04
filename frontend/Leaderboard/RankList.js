@@ -56,7 +56,7 @@ function RankList(props){
             <Text style = {styles.score}>{item.monthlyMiles}</Text>
           </View>
           <View style = {styles.likecontainer}>
-            <LikeButton></LikeButton>
+            <LikeButton ></LikeButton>
           </View>
         </SafeAreaView>
       {/* <Item title={item.name} /> */}
