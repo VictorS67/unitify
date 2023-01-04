@@ -149,7 +149,7 @@ function Notification() {
     // useEffect(() => {
     //     const interval = setInterval(() => {
     //         triggerNotifications().then(result => console.log("result: ", result));
-    //     }, 6000);
+    //     }, 5 * 6000);
 
     //     return () => clearInterval(interval);
     // }, [])

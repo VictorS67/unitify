@@ -10,6 +10,7 @@ const userSlice = createSlice({
         userName: '',
         championSignature: '',
         currentRank: null,
+        championTimes: null,
         likeNumber: null,
         monthlyMiles: null,
         totalMiles: null
@@ -29,6 +30,7 @@ const userSlice = createSlice({
             state.userName = '';
             state.championSignature = '';
             state.currentRank = null;
+            state.championTimes = null;
             state.likeNumber = null;
             state.monthlyMiles = null;
             state.totalMiles = null;
