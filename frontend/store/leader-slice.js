@@ -44,6 +44,10 @@ const leaderSlice = createSlice({
         sWeeklyboard(state, action){
             const weeklyusers = action.payload;
             state.weeklyusers = weeklyusers;
+        },
+        sWeekChampSig(state, action){
+            const weeklychamp = action.payload;
+            state.weekchampion = weeklychamp;
         }
     }
 })

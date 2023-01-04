@@ -22,9 +22,19 @@ import { createMaterialTopTabNavigator } from '@react-navigation/material-top-ta
 import { NavigationContainer } from '@react-navigation/native';
 import WeeklyRankList from "./WeeklyRankList";
 import UserInfoCard from "./Userinfocard";
-import { getMonthlyLeaderboard } from "../store/leader-actions";
+import { getMonthlyLeaderboard, getWeeklyLeaderboard } from "../store/leader-actions";
 
 function Sevenboard(props){
+  const dispatch = useDispatch();
+  React.useEffect(() => {
+    const unsubscribe = props.navigation.addListener('focus', () => {
+      // do something
+      dispatch(getWeeklyLeaderboard());
+      // console.log(`${}`)
+    });
+
+    return unsubscribe;
+  }, [props.navigation, dispatch]);
   return (
     <View style={styles.background}>
       <ChampCard style = {styles.championcard}>
