@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Text, View, StyleSheet } from 'react-native';
 import { FontAwesome5 } from '@expo/vector-icons';
+import { useDispatch, useSelector } from "react-redux";
 
 import StatusBar from "../UI/StatusBar";
 import TopBar from "../UI/TopBar";
@@ -9,8 +10,22 @@ import UserStatWindow from "./UserStatWindow";
 import UserMileWindow from "./UserMileWindow";
 import UserSettingWindow from "./UserSettingWindow";
 import { normalize } from "../Tool/FontSize";
+import { getLikeNumber, getLatestUserStatus } from "../store/user-actions";
 
 const UserPage = props => {
+
+    const dispatch = useDispatch();
+    const user = useSelector((state) => state.user);
+
+    useEffect(() => {
+        const updateInterval = setInterval(() => {
+            console.log("====== ======")
+            // dispatch(getLikeNumber());
+            dispatch(getLatestUserStatus(user.id));
+        }, 5 * 6000);
+
+        return () => clearInterval(updateInterval);
+    }, [dispatch]);
 
     return (
         <View style={styles.container}>

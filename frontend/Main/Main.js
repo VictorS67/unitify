@@ -15,12 +15,14 @@ import UsageCard from "./UsageCard";
 import MileCard from "./MileCard";
 import { normalize } from "../Tool/FontSize";
 import { mainActions } from "../store/main-slice";
+import { getLatestUserStatus } from "../store/user-actions";
 
 
 const MainPage = props => {
 
     const dispatch = useDispatch();
     const main = useSelector((state) => state.main);
+    const user = useSelector((state) => state.user);
     
     const [scrollHeight, sScrollHeight] = useState(30);
     const [pageY, sPageY] = useState(null);
@@ -39,6 +41,16 @@ const MainPage = props => {
             showSubscription.remove();
             hideSubscription.remove();
         };
+    }, [dispatch]);
+
+    useEffect(() => {
+        const updateInterval = setInterval(() => {
+            console.log("====== ======")
+            // dispatch(getLikeNumber());
+            dispatch(getLatestUserStatus(user.id));
+        }, 5 * 6000);
+
+        return () => clearInterval(updateInterval);
     }, [dispatch]);
 
     useEffect(() => {

@@ -1,10 +1,12 @@
 import React, { useState } from "react";
-import { Text, View, StyleSheet, TextInput, Button, Pressable, TouchableOpacity } from 'react-native';
+import { Text, View, StyleSheet, TextInput, Button, Pressable, TouchableOpacity, Alert } from 'react-native';
 import { Divider } from 'react-native-paper';
 import { FontAwesome5 } from '@expo/vector-icons';
+import { useDispatch, useSelector } from "react-redux";
 
 import Card from "../UI/Card";
 import { normalize } from "../Tool/FontSize";
+import { changeEmail } from "../store/user-actions";
 
 const renderChangeColumn = (title, content, event) => {
 
@@ -41,7 +43,46 @@ const renderChangeColumn = (title, content, event) => {
 
 const UserChangeEmailWindow = props => {
 
-    const [newEmail, sNewEmail] = useState('');
+    const dispatch = useDispatch();
+    const user = useSelector((state) => state.user);
+    const [newEmail, sNewEmail] = useState(user.email);
+
+    const changeEmailHandler = (event) => {
+        event.preventDefault();
+
+        if (newEmail !== "") {
+            dispatch(changeEmail(user.id, newEmail))
+            .then(
+                (resolve) => {
+                    const result = JSON.parse(resolve);
+                    if (result.status === 200) {
+                        Alert.alert(
+                            "Success",
+                            "You have changed your email.",
+                            [
+                                { 
+                                    text: "OK", 
+                                    onPress: () => console.log("OK")
+                                }
+                            ]
+                        );
+                    } else {
+                        console.log("result message: ", result["message"])
+                        Alert.alert(
+                            "Ah no",
+                            result.message,
+                            [
+                                { 
+                                    text: "Try Again", 
+                                    onPress: () => console.log("Try Again")
+                                }
+                            ]
+                        );
+                    }
+                }
+            )
+        }
+    }
 
     return (
         <View style={props.style}>
@@ -59,7 +100,9 @@ const UserChangeEmailWindow = props => {
                 shadowColor: '#333',
                 shadowOpacity: 0.3,
                 shadowRadius: normalize(2),
-            }}>
+            }}
+            onPress={changeEmailHandler}
+            >
                 <Text
                     style={{
                         fontSize: normalize(18),
