@@ -1,13 +1,12 @@
 import React from "react";
 import {
-    FlatList,
-    Image,
+   
     StyleSheet,
     Text,
     View,
     SafeAreaView
-  } from "react-native"; 
-import Homebutton from "./Homebutton";
+  } from "react-native";
+import { userActions } from "../store/user-slice";
 import { normalize } from "../Tool/FontSize";
 const userData = {
     rank:"1st",

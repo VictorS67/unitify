@@ -1,15 +1,14 @@
 
 import React from "react";
 import {
-    FlatList,
-    Image,
     StyleSheet,
     Text,
     View,
     SafeAreaView
   } from "react-native"; 
-import Homebutton from "./Homebutton";
 import { normalize } from "../Tool/FontSize";
+import { useSelector, useDispatch } from "react-redux";
+import { getMonthlyLeaderboard } from "../store/leader-actions";
 const newData = {
     rank:"10th",
     name: "John 12312313123123131",
@@ -19,31 +18,35 @@ const newData = {
     signature:"I am king of the world!"
 };
 function ChampCard() {
+    const dispatch = useDispatch();
+    const leaderboard = useSelector((state) => state.leaderboard);
+    // dispatch(getMonthlyLeaderboard);
+    // console.log(leaderboard.users);
     return (
         <SafeAreaView style={styles.container}>
             {/* <Homebutton style={styles.homeButton}></Homebutton> */}
             <SafeAreaView style={styles.infocontainer}>
                 {/* <Homebutton style = {styles.homeButton}></Homebutton> */}
                 <View style = {styles.topChoiceTransInfoRow}>
-                    <Text style={styles.rank}>{newData.rank}</Text>
+                    <Text style={styles.rank}>{leaderboard.champion.rankNumber}</Text>
                 </View>
 
                 <View style = {styles.topChoiceTransInfoRow}
                       >
                     {/* <Image source={{uri:"https://www.shareicon.net/data/128x128/2016/09/15/829473_man_512x512.png"}} style = {styles.avatar}></Image> */}
                     {/* <Text >{newData.signature}</Text> */}
-                    <Text style={styles.score} numberOfLines = {1}>{newData.name}</Text>
+                    <Text style={styles.score} numberOfLines = {1}>{leaderboard.champion.userName}</Text>
                 </View>
 
                 <View style={styles.topChoiceTransInfoRow}>
-                    <Text style={styles.score}>{newData.score}</Text>
+                    <Text style={styles.score} numberOfLines = {1}>{leaderboard.champion.monthlyMiles}</Text>
                 </View>
                 {/* <View style = {styles.topChoiceTransInfoRow}>
                     <Text >{newData.signature}</Text>
                 </View> */} 
             </SafeAreaView>
             <SafeAreaView style = {styles.sigcontainer}>
-              <Text style= {styles.signature} numberOfLines = {2}>{newData.signature}</Text>
+              <Text style= {styles.signature} numberOfLines = {2}>{leaderboard.champion.championSignature}</Text>
             </SafeAreaView>
             
         </SafeAreaView>
