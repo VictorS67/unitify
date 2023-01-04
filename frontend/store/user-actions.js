@@ -51,8 +51,10 @@ export const getUser = () => {
                 dispatch(userActions.login(respJson.user));
                 
                 const latestUserStatusResp = await fetch(`${BACKEND_URL}/getLastestUserStatus/${respJson.user._id}`);
+               
                 let latestUserStatusRespJson = await latestUserStatusResp.json();
                 console.log("GET getLastestUserStatus", latestUserStatusRespJson);
+               
 
                 if (latestUserStatusRespJson.status === 200) {
                     dispatch(userActions.updateLatestUser(latestUserStatusRespJson.data));
@@ -239,6 +241,7 @@ export const getLikeNumber = (userID) => {
             if (respJson.status === 200) {
                 console.log("SUCCESS", respJson);
                 // dispatch(userActions.login(respJson.user));
+                // dispatch(userActions,sLikeNumber());
             }
         } catch (error) {
             console.log("likeNumber: Something went wrong");

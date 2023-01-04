@@ -1,5 +1,5 @@
 import React from "react";
-import { Text, View, StyleSheet, useWindowDimensions, Pressable } from 'react-native';
+import { Text, View, StyleSheet, useWindowDimensions, Pressable, TouchableOpacity } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useDispatch, useSelector } from "react-redux";
 
@@ -10,7 +10,7 @@ const MileCard = props => {
     const user = useSelector((state) => state.user);
 
     return (
-        <View style={styles.mileCard}>
+        <TouchableOpacity style={styles.mileCard} onPress={() => {props.navigation.navigate('Reward');}}>
             <View style={styles.mileCardTitle}>
                 <Text style={styles.titleText}>
                     Miles
@@ -65,7 +65,7 @@ const MileCard = props => {
                     </Text>
                 </View>
             </View>
-        </View>
+        </TouchableOpacity>
     );
 };
 

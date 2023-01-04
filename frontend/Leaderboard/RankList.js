@@ -37,6 +37,7 @@ function RankList(props){
   // const [data, setdata] = useState(trialData);
   const dispatch = useDispatch();
   const leaderboard = useSelector((state) => state.leaderboard);
+  const user = useSelector((state) => state.user);
   const renderItem = ({ item, index }) => (
     <SafeAreaView>
       <TouchableOpacity style={styles.listcontainer}>
@@ -56,7 +57,12 @@ function RankList(props){
             <Text style = {styles.score}>{item.monthlyMiles}</Text>
           </View>
           <View style = {styles.likecontainer}>
-            <LikeButton></LikeButton>
+            <LikeButton 
+            userid = {props.userid} 
+            likeduserid = {item.userId}
+            liked = {(!user.whoILiked === undefined) && user.whoILiked.includes(item.userId)}>
+
+            </LikeButton>
           </View>
         </SafeAreaView>
       {/* <Item title={item.name} /> */}

@@ -22,7 +22,7 @@ import { mainActions } from "./store/main-slice";
 import { normalize } from "./Tool/FontSize";
 
 import { getUser } from "./store/user-actions";
-
+// import RewardPage from "./Rewarding/Rewardpage";
 function Foreground() {
 
     const dispatch = useDispatch();
@@ -81,6 +81,10 @@ function Foreground() {
                                     headerShown: true
                                 }}
                             />
+                            <Stack.Screen 
+                                name="Reward"
+                                component={RewardPage}
+                                options={{headerShown: true}}></Stack.Screen>
                         </>
                     ) : (
                         <>
