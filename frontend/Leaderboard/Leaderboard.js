@@ -46,7 +46,7 @@ function Sevenboard(props){
               style={styles.userinfocontainer}
               onPress={() => {props.navigation.navigate('Profile');}}
           >
-            <UserInfoCard></UserInfoCard>
+            <UserInfoCard userid = {user.id}></UserInfoCard>
       </Pressable>
     </View>)
 }
@@ -73,7 +73,7 @@ function Monthboard(props){
               style={styles.userinfocontainer}
               onPress={() => {props.navigation.navigate('Profile');}}
           >
-            <UserInfoCard></UserInfoCard>
+            <UserInfoCard userid = {user.id}></UserInfoCard>
       </Pressable>
     </View>)
 }

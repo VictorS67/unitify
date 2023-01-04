@@ -9,6 +9,7 @@ import {
 import { useSelector, useDispatch } from "react-redux";
 import { userActions } from "../store/user-slice";
 import { normalize } from "../Tool/FontSize";
+import { getLatestUserStatus } from "../store/user-actions";
 // const userData = {
 //     rank:"1st",
 //     name: "Leo Messi",
@@ -17,9 +18,12 @@ import { normalize } from "../Tool/FontSize";
 //       "https://www.shareicon.net/data/128x128/2016/09/15/829473_man_512x512.png",
 //     signature:"The GOAT!"
 // };
-function UserInfoCard(){
+function UserInfoCard(props){
+  
     const userData = useSelector((state) => state.user);
     const dispatch = useDispatch();
+    // const userData = dispatch(getLatestUserStatus(props.userid));
+    console.log('called infocard');
     // dispatch(userActions.getUser());
     console.log(userData);
     return (

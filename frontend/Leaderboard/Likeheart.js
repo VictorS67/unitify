@@ -4,15 +4,23 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useDispatch, useSelector } from "react-redux";
 // import { userActions } from "../store/user-slice";
 import { getLatestUserStatus } from "../store/user-actions";
+
+
 const LikeButton = (props) => {
     const dispatch = useDispatch()
 
-    const user = useSelector((state) =>state.user);
-    dispatch(getLatestUserStatus(props.likeduserid));
+    // const likeduser = dispatch(getLatestUserStatus(props.likeduserid));
 
-    const likenumber = user.whoLikedMe.length;
+    // const user = useSelector((state) =>state.user);
+    // console.log('called Likebutton');
+    // console.log(likeduser.userId === props.likeduserid);
 
-    const [liked, setLiked] = useState(false);
+    const likenumber = 0;
+    // if(!(likeduser.whoLikedMe === undefined)){
+    //     likenumber = likeduser.whoLikedMe.length;
+    // }
+    
+    const [liked, setLiked] = useState(props.liked);
     const [counter, setCounter] = useState(likenumber);
     
     const pressHandler = () =>{
