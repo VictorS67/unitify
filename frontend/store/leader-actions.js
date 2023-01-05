@@ -2,44 +2,80 @@ import { leaderActions } from "./leader-slice";
 
 const BACKEND_URL = "https://unitify-api.chenpan.ca";
 
-export const getMonthlyLeaderboard = () =>{
-    return async(dispatch) =>{
-        try{
-            const users = await fetch(`${BACKEND_URL}/monthlyLeaderboard?startIndex=0&endIndex=20`);
-            let userJson = await users.json();
-            if (userJson.status === 200){
-                if(userJson.data.length > 0){
-                    dispatch(leaderActions.sChampSig(userJson.data[0]));
-                }
-                if(userJson.data.length > 1){
-                    console.log("1");
-                    dispatch(leaderActions.sMonthlyBoard(userJson.data.slice(1)));
-                    
-                }
-                
+export const getMonthlyLeaderboard = (user) => {
+  return async (dispatch) => {
+    try {
+      const leaderboard = await fetch(
+        `${BACKEND_URL}/monthlyLeaderboard?startIndex=0&endIndex=20`
+      );
+      let leaderboardJson = await leaderboard.json();
+      if (leaderboardJson.status === 200) {
+        dispatch(leaderActions.sIsMonth(true));
+        if (leaderboardJson.data.length > 0) {
+          dispatch(leaderActions.sChampSig(leaderboardJson.data[0]));
+
+          const leaderboardList = [];
+          for (let index = 0; index < leaderboardJson.data.length; index++) {
+            let leader = leaderboardJson.data[index];
+            const resp = await fetch(
+              `${BACKEND_URL}/getLastestUserStatus/${leader.userId}`
+            );
+            let respJson = await resp.json();
+
+            if (respJson.status === 200) {
+              leader["likeNumber"] = respJson.data.likeNumber;
+              leader["isLiked"] = user.whoILiked.includes(leader.userId);
             }
-        } catch(error){
-
+            leaderboardList.push(leader);
+          }
+          dispatch(leaderActions.sBoard(leaderboardList));
+        } else {
+          dispatch(leaderActions.sChampSig(null));
+          dispatch(leaderActions.sBoard([]));
         }
+      }
+    } catch (error) {
+      console.log("getMonthlyLeaderboard: something is wrong.");
     }
-}
+  };
+};
 
-export const getWeeklyLeaderboard = () =>{
-    return async(dispatch) =>{
-        try{
-            const users = await fetch(`${BACKEND_URL}/leaderboard?startIndex=0&endIndex=20`);
-            let userJson = await users.json();
-            if (userJson.status === 200){
-                if(userJson.data.length > 0){
-                    dispatch(leaderActions.sWeekChampSig(userJson.data[0]));
-                }
-                if(userJson.data.length > 1){
-                    dispatch(leaderActions.sWeeklyboard(userJson.data.slice(1)));
-                }
-                
+export const getWeeklyLeaderboard = (user) => {
+  return async (dispatch) => {
+    try {
+      const leaderboard = await fetch(
+        `${BACKEND_URL}/leaderboard?startIndex=0&endIndex=20`
+      );
+      let leaderboardJson = await leaderboard.json();
+      console.log("WEEK LEADERBORD: ", leaderboardJson);
+
+      if (leaderboardJson.status === 200) {
+        dispatch(leaderActions.sIsMonth(false));
+        if (leaderboardJson.data.length > 0) {
+          dispatch(leaderActions.sChampSig(leaderboardJson.data[0]));
+
+          const leaderboardList = [];
+          for (let index = 0; index < leaderboardJson.data.length; index++) {
+            let leader = leaderboardJson.data[index];
+            const resp = await fetch(
+              `${BACKEND_URL}/getLastestUserStatus/${leader.userId}`
+            );
+            let respJson = await resp.json();
+
+            if (respJson.status === 200) {
+              leader["likeNumber"] = respJson.data.likeNumber;
+              leader["isLiked"] = user.whoILiked.includes(leader.userId);
             }
-        } catch(error){
-
+            leaderboardList.push(leader);
+          }
+          dispatch(leaderActions.sBoard(leaderboardList));
+        } else {
+          dispatch(leaderActions.sChampSig(null));
+          dispatch(leaderActions.sBoard([]));
         }
+      }
+    } catch (error) {
+      console.log("getWeeklyLeaderboard: something is wrong.");
     }
-}
+  };
+};
