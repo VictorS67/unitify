@@ -1,22 +1,19 @@
 
-import React, { Component } from "react";
-import PropTypes from "prop-types";
+import React, { Component, useEffect, useState } from "react";
 import { normalize } from "../Tool/FontSize";
 import {
-  FlatList,
-  Image,
   StyleSheet,
   Text,
-  TouchableOpacity,
-  View,
   Pressable,
   SafeAreaView
 } from "react-native";
-import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
-import { NavigationContainer } from '@react-navigation/native';
 import CircularProgress from "./CircularProgress";
-import { LineChart} from 'react-native-chart-kit'
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+// import {BottomChart} from "./BottomChart";
+import BottomChart from "./BottomChart";
+const BACKEND_URL = "https://unitify-api.chenpan.ca";
+
+
 function RewardPage(props){
     const user = useSelector((state) => state.user);
     const percent = Math.floor(user.monthlyMiles / 3000);
@@ -27,6 +24,7 @@ function RewardPage(props){
               style={styes.button}
               onPress={() => {props.navigation.navigate('Home');}}
           ></Pressable>
+
             <SafeAreaView style={styes.titlecontainer}>
                 <Text style={styes.title}>{"Goal of this month"}</Text>
             </SafeAreaView>
@@ -40,6 +38,11 @@ function RewardPage(props){
                 <Text>{"Goal of this month is caculated by 1.1 * average miles"}</Text>
             </SafeAreaView>
             {/* <Text>{"Happy"}</Text> */}
+          
+            <SafeAreaView style ={styes.diagramcontainer}>
+                <BottomChart></BottomChart>
+            </SafeAreaView>
+
         </SafeAreaView>
     
         
@@ -75,6 +78,15 @@ const styes = StyleSheet.create({
     notecntainer:{
         flex:1,
         // justifyContent: "center",
+    }, 
+    diagramcontainer:{
+        margiinTop:'5%',
+        flex: 0.8,
+        justifyContent: "center",
+    },
+    diagram:{
+        width: '100%',
+        height:220
     }
 
 })

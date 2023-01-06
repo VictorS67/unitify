@@ -66,6 +66,7 @@ export const getUser = () => {
     }
 }
 
+
 export const logoutUser = () => {
     return async (dispatch) => {
         try {
@@ -262,6 +263,25 @@ export const getLatestUserStatus = (userID) => {
                 // dispatch(userActions.login(respJson.user));
                 dispatch(userActions.updateLatestUser(respJson.data));
             }
+        } catch (error) {
+            console.log("lastestUserStatus: Something went wrong");
+        }
+    }
+}
+
+export const getHistoryMiles =(userId) => {
+    return async (dispatch) => {
+        try {
+            const resp = await fetch(`${BACKEND_URL}/historyMiles/${userId}`);
+            let respJson = await resp.json();
+
+            console.log("GET History Miles", respJson);
+
+            // if (respJson.status === 200) {
+            //     console.log("SUCCESS", respJson);
+            //     // dispatch(userActions.login(respJson.user));
+            //     dispatch(userActions.updateLatestUser(respJson.data));
+            // }
         } catch (error) {
             console.log("lastestUserStatus: Something went wrong");
         }
