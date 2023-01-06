@@ -1,208 +1,178 @@
-// import React from "react";
-// import { View } from "react-native-web";
-// import Navibar from "./Navibar";
+import React, { Component, useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { StyleSheet, View, Pressable, SafeAreaView } from "react-native";
+import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
+
 import ChampCard from "./ChampCard";
 import RankList from "./RankList";
-import Homebutton from "./Homebutton";
-import React, { Component } from "react";
-import PropTypes from "prop-types";
+import UserInfoCard from "./Userinfocard";
 import { normalize } from "../Tool/FontSize";
 import {
-  FlatList,
-  Image,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-  Pressable,
-  SafeAreaView
-} from "react-native";
-import { useSelector, useDispatch } from "react-redux";
-import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
-import { NavigationContainer } from '@react-navigation/native';
-import WeeklyRankList from "./WeeklyRankList";
-import UserInfoCard from "./Userinfocard";
-import { getMonthlyLeaderboard, getWeeklyLeaderboard } from "../store/leader-actions";
+  getMonthlyLeaderboard,
+  getWeeklyLeaderboard,
+} from "../store/leader-actions";
 
-function Sevenboard(props){
-  const dispatch = useDispatch();
-  const user = useSelector((state) => state.user);
-  React.useEffect(() => {
-    const unsubscribe = props.navigation.addListener('focus', () => {
-      // do something
-      dispatch(getWeeklyLeaderboard());
-      // console.log(`${}`)
-    });
-
-    return unsubscribe;
-  }, [props.navigation, dispatch]);
-  return (
-    <View style={styles.background}>
-      <ChampCard style = {styles.championcard}>
-      </ChampCard>
-      {/* <Navibar>ygh9 5</Navibar> */}
-      <WeeklyRankList style = {styles.ranklist} userid = {user.id}></WeeklyRankList>
-      <Pressable 
-              style={styles.userinfocontainer}
-              onPress={() => {props.navigation.navigate('Profile');}}
-          >
-            <UserInfoCard userid = {user.id}></UserInfoCard>
-      </Pressable>
-    </View>)
-}
-
-function Monthboard(props){
-  const dispatch = useDispatch();
-  const user = useSelector((state) => state.user);
-  React.useEffect(() => {
-    const unsubscribe = props.navigation.addListener('focus', () => {
-      // do something
-      dispatch(getMonthlyLeaderboard());
-      // console.log(`${}`)
-    });
-
-    return unsubscribe;
-  }, [props.navigation, dispatch]);
-  return (
-    <View style={styles.background}>
-      <ChampCard style = {styles.championcard}>
-      </ChampCard>
-      {/* <Navibar>ygh9 5</Navibar> */}
-      <RankList style = {styles.ranklist} userid = {user.id}></RankList>
-      <Pressable 
-              style={styles.userinfocontainer}
-              onPress={() => {props.navigation.navigate('Profile');}}
-          >
-            <UserInfoCard userid = {user.id}></UserInfoCard>
-      </Pressable>
-    </View>)
-}
 const Tab = createMaterialTopTabNavigator();
 
+const Sevenboard = (props) => {
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state.user);
 
-// const styles = StyleSheet.create({
-//     container:{
-//         flex:0.1
-//     }
-// });
+  useEffect(() => {
+    const unsubscribe = props.navigation.addListener("focus", () => {
+      dispatch(getWeeklyLeaderboard(user));
+    });
+    return unsubscribe;
+  }, [props.navigation, dispatch]);
 
-function Leaderboard(props){
- 
-    return (
-        <SafeAreaView style={styles.background}>
-        {/* //   <ChampCard style = {styles.championcard}>
-        //   </ChampCard> */}
-          <Pressable 
-              style={styles.button}
-              onPress={() => {props.navigation.navigate('Home');}}
-          ></Pressable>
-          {/* <NavigationContainer style={styles.container}> */}
-            <Tab.Navigator>
+  return (
+    <View style={styles.background}>
+      <ChampCard style={styles.championcard} />
+      <RankList style={styles.ranklist} userid={user.id} />
+      <Pressable
+        style={styles.userinfocontainer}
+        onPress={() => {
+          props.navigation.navigate("Profile");
+        }}
+      >
+        <UserInfoCard userid={user.id} />
+      </Pressable>
+    </View>
+  );
+};
 
-            <Tab.Screen name="7DAYS" component={Sevenboard}/>
-            <Tab.Screen name="1MONTH" component={Monthboard} />
-            </Tab.Navigator>
-          {/* </NavigationContainer> */}
-        {/* //   <RankList style = {styles.ranklist}></RankList> */}
-          
-        </SafeAreaView>)
+const Monthboard = (props) => {
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state.user);
 
-        
-}
+  useEffect(() => {
+    const unsubscribe = props.navigation.addListener("focus", () => {
+      dispatch(getMonthlyLeaderboard(user));
+    });
+    return unsubscribe;
+  }, [props.navigation, dispatch]);
+
+  return (
+    <View style={styles.background}>
+      <ChampCard style={styles.championcard} />
+      <RankList style={styles.ranklist} userId={user.id} />
+      <Pressable
+        style={styles.userinfocontainer}
+        onPress={() => props.navigation.navigate("Profile")}
+      >
+        <UserInfoCard userid={user.id}></UserInfoCard>
+      </Pressable>
+    </View>
+  );
+};
+
+const Leaderboard = (props) => {
+  const leaderboard = useSelector((state) => state.leaderboard);
+
+  return (
+    <SafeAreaView style={styles.background}>
+      <Pressable
+        style={styles.button}
+        onPress={() => {
+          props.navigation.navigate("Home");
+        }}
+      ></Pressable>
+      <Tab.Navigator
+        initialRouteName={leaderboard.ismonthly ? "MONTH" : "WEEK"}
+      >
+        <Tab.Screen name="WEEK" component={Sevenboard} />
+        <Tab.Screen name="MONTH" component={Monthboard} />
+      </Tab.Navigator>
+    </SafeAreaView>
+  );
+};
+
 const styles = StyleSheet.create({
-  userinfocontainer:{
-    flex:0.2,
-    width: '100%',
-    height: 70,
-    backgroundColor: '#EE5407',
-    justifyContent: 'center',
-    alignItems: 'center',
-    // position: 'absolute', //Here is the trick
-    // bottom: 20, //Here is the trick
+  userinfocontainer: {
+    position: "absolute",
+    bottom: 0,
+    height: 100,
+    backgroundColor: "transparent",
+    padding: normalize(5),
   },
-  background:{
-    height:'100%',
-    width:'100%',
-    flexDirection:'column',
+  background: {
+    height: "100%",
+    width: "100%",
+    flexDirection: "column",
   },
-  container:{
-    flex:0.1,
-    marginTop:10
+  container: {
+    flex: 0.1,
+    marginTop: 10,
   },
-  championcard:{
-    flex:0.4,
-    flexDirection:'row',
-    backgroundColor:'green'
+  championcard: {
+    flex: 0.4,
+    flexDirection: "row",
+    backgroundColor: "green",
   },
-  ranklist:{
-    flex:3,
-    backgroundColor:'red'
+  ranklist: {
+    flex: 3,
+    backgroundColor: "red",
   },
   rankcontainer: {
     paddingTop: 300,
-    // paddingBottom: 15,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     borderWidth: 0.5,
     borderRadius: 5,
     borderColor: "green",
-    backgroundColor: "red"
+    backgroundColor: "red",
   },
   boardcard: {
     paddingTop: 15,
-    // paddingBottom: 15,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     borderWidth: 1.0,
     borderRadius: 5,
     borderColor: "#d6d7da",
-    backgroundColor: "yellow"
+    backgroundColor: "yellow",
   },
   homebutton: {
-        width: normalize(500),
-        height: normalize(40),
-        // marginHorizontal: normalize(200),
-        // marginVertical: normalize(20),
-        paddingTop:0,
+    width: normalize(500),
+    height: normalize(40),
+    paddingTop: 0,
   },
-  
   left: {
     flexDirection: "row",
-    alignItems: "center"
+    alignItems: "center",
   },
   rank: {
     fontSize: 17,
     fontWeight: "bold",
-    marginRight: 5
+    marginRight: 5,
   },
   singleDidget: {
     paddingLeft: 16,
-    paddingRight: 6
+    paddingRight: 6,
   },
   doubleDidget: {
     paddingLeft: 10,
-    paddingRight: 2
+    paddingRight: 2,
   },
   label: {
     fontSize: 17,
     flex: 1,
-    paddingRight: 80
+    paddingRight: 80,
   },
   score: {
     fontSize: 20,
     fontWeight: "bold",
     position: "absolute",
     right: 15,
-    paddingLeft: 15
+    paddingLeft: 15,
   },
   avatar: {
     height: 30,
     width: 30,
     borderRadius: 30 / 2,
-    marginRight: 10
-  }
+    marginRight: 10,
+  },
 });
 
 export default Leaderboard;

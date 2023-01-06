@@ -1,49 +1,55 @@
-import React, { useState } from "react";
-import { Pressable, SafeAreaView, TouchableOpacity, Text} from "react-native";
+import React, { useEffect, useState } from "react";
+import { Pressable, SafeAreaView, TouchableOpacity, Text } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useDispatch, useSelector } from "react-redux";
-// import { userActions } from "../store/user-slice";
-import { getLatestUserStatus } from "../store/user-actions";
 
+import { getLatestUserStatus } from "../store/user-actions";
+import { normalize } from "../Tool/FontSize";
 
 const LikeButton = (props) => {
-    const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
-    // const likeduser = dispatch(getLatestUserStatus(props.likeduserid));
+  const [liked, sLiked] = useState(false);
+  const [likeNumber, sLikeNumber] = useState(0);
 
-    // const user = useSelector((state) =>state.user);
-    // console.log('called Likebutton');
-    // console.log(likeduser.userId === props.likeduserid);
+  useEffect(() => {
+    sLiked(props.isLiked);
+    sLikeNumber(props.likeNumber);
+  }, [props.isLiked, props.likeNumber]);
 
-    const likenumber = 0;
-    // if(!(likeduser.whoLikedMe === undefined)){
-    //     likenumber = likeduser.whoLikedMe.length;
-    // }
-    
-    const [liked, setLiked] = useState(props.liked);
-    const [counter, setCounter] = useState(likenumber);
-    
-    const pressHandler = () =>{
-        setLiked((isLiked) => !isLiked);
-        if(liked){
-            setCounter((counter) => counter-1);
-        }else{
-            setCounter((counter) => counter+1);
-        }
-    console.log(counter);
+  const pressHandler = () => {
+    sLiked((isLiked) => !isLiked);
+    if (liked) {
+      sLikeNumber((counter) => counter - 1);
+    } else {
+      sLikeNumber((counter) => counter + 1);
     }
-    return (
-        <SafeAreaView>
-            <Pressable onPress={pressHandler}>
-                <MaterialCommunityIcons
-                    name={liked ? "heart" : "heart-outline"}
-                    size={32}
-                    color={liked ? "red" : "black"}
-                />
-            </Pressable>
-            <Text>{counter.toString()}</Text>
-        </SafeAreaView>
-        
-    );
+    console.log(likeNumber);
+  };
+
+  return (
+    <SafeAreaView
+      style={{
+        width: "100%",
+        alignItems: "center",
+      }}
+    >
+      <Pressable onPress={pressHandler}>
+        <MaterialCommunityIcons
+          name={liked ? "heart" : "heart-outline"}
+          size={normalize(20)}
+          color={liked ? "red" : "black"}
+        />
+      </Pressable>
+      <Text
+        style={{
+          fontSize: normalize(12),
+        }}
+      >
+        {likeNumber}
+      </Text>
+    </SafeAreaView>
+  );
 };
+
 export default LikeButton;
