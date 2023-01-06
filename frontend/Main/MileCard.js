@@ -9,6 +9,7 @@ import {
 import { MaterialIcons } from "@expo/vector-icons";
 import { useDispatch, useSelector } from "react-redux";
 
+import { theme } from "../UI/Theme";
 import { normalize } from "../Tool/FontSize";
 import {
   getWeeklyLeaderboard,
@@ -17,12 +18,16 @@ import {
 
 const MileCard = (props) => {
   const dispatch = useDispatch();
+  const main = useSelector((state) => state.main);
   const user = useSelector((state) => state.user);
   const leaderboard = useSelector((state) => state.leaderboard);
 
   return (
     <TouchableOpacity
-      style={styles.mileCard}
+      style={[
+        styles.mileCard,
+        main.navStatus === "NAV" ? { backgroundColor: theme.colors.third } : {},
+      ]}
       onPress={() => {
         if (leaderboard.ismonthly) {
           dispatch(getMonthlyLeaderboard(user));
@@ -43,7 +48,7 @@ const MileCard = (props) => {
           <MaterialIcons
             name="leaderboard"
             size={normalize(14)}
-            color="black"
+            color={theme.colors.text}
           />
           <Text
             style={{
@@ -85,10 +90,11 @@ const MileCard = (props) => {
 const styles = StyleSheet.create({
   mileCard: {
     flex: 1,
-    backgroundColor: "orange",
+    backgroundColor: theme.colors.secondary,
     padding: normalize(10),
   },
   mileCardTitle: {
+    color: theme.colors.text,
     flexDirection: "row",
     justifyContent: "space-between",
     paddingBottom: normalize(5),
@@ -100,16 +106,19 @@ const styles = StyleSheet.create({
     flexGrow: 1,
   },
   titleText: {
+    color: theme.colors.text,
     fontSize: normalize(18),
     textAlign: "left",
     textTransform: "uppercase",
   },
   mileText: {
+    color: theme.colors.text,
     fontSize: normalize(30),
     textAlign: "left",
     textTransform: "uppercase",
   },
   normalText: {
+    color: theme.colors.text,
     fontSize: normalize(14),
     textAlign: "left",
     textTransform: "uppercase",
@@ -121,6 +130,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: normalize(5),
   },
   button: {
+    color: theme.colors.text,
+    backgroundColor: theme.colors.primary,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
@@ -128,7 +139,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: normalize(10),
     borderRadius: normalize(4),
     elevation: normalize(3),
-    backgroundColor: "green",
   },
 });
 
