@@ -7,14 +7,13 @@ import Background from "./Background";
 import Notification from "./Notification";
 
 function App() {
-
-    return (
-        <Provider store={store}>
-            <Foreground />
-            <Background />
-            {/* <Notification /> */}
-        </Provider>
-    );
+  return (
+    <Provider store={store}>
+      <Foreground />
+      <Background />
+      <Notification />
+    </Provider>
+  );
 }
 
 export default App;

@@ -73,7 +73,11 @@ const RankList = (props) => {
               flex: 1,
             }}
           >
-            <LikeButton likeNumber={item.likeNumber} isLiked={item.isLiked} />
+            <LikeButton
+              userId={item.userId}
+              likeNumber={item.likeNumber}
+              isLiked={item.isLiked}
+            />
           </View>
         </SafeAreaView>
         <Divider style={{ width: "100%" }} />

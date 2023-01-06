@@ -7,6 +7,9 @@ import {
   Keyboard,
   TouchableOpacity,
   KeyboardAvoidingView,
+  Animated,
+  PanResponder,
+  useWindowDimensions,
 } from "react-native";
 import { FontAwesome5, Ionicons } from "@expo/vector-icons";
 import { useDispatch, useSelector } from "react-redux";
@@ -18,6 +21,7 @@ import MapNav from "../Map/MapNav";
 import TripCard from "./TripCard";
 import UsageCard from "./UsageCard";
 import MileCard from "./MileCard";
+import { theme } from "../UI/Theme";
 import { normalize } from "../Tool/FontSize";
 import { mainActions } from "../store/main-slice";
 import { getLatestUserStatus } from "../store/user-actions";
@@ -27,9 +31,8 @@ const MainPage = (props) => {
   const main = useSelector((state) => state.main);
   const user = useSelector((state) => state.user);
 
-  const [scrollHeight, sScrollHeight] = useState(30);
-  const [pageY, sPageY] = useState(null);
-  const [pageYOffest, sPageYOffset] = useState(0);
+  const [toTop, sToTop] = useState(false);
+  const position = useRef(new Animated.Value(150)).current;
 
   useEffect(() => {
     const showSubscription = Keyboard.addListener("keyboardDidShow", () => {
@@ -56,13 +59,70 @@ const MainPage = (props) => {
 
   useEffect(() => {
     if (main.navStatus === "INIT") {
-      sScrollHeight(17);
+      snapToHeight(150);
     } else if (main.navStatus === "PLAN") {
-      sScrollHeight(50);
+      snapToHeight(400);
     } else if (main.navStatus === "NAV") {
-      sScrollHeight(40);
+      snapToHeight(350);
     }
   }, [main.navStatus]);
+
+  const parentResponder = PanResponder.create({
+    onMoveShouldSetPanResponderCapture: (e, gestureState) => {
+      return false;
+    },
+    onStartShouldSetPanResponder: () => false,
+    onMoveShouldSetPanResponder: (e, gestureState) => {
+      if (toTop) {
+        return gestureState.dy > 6;
+      } else {
+        return gestureState.dy < -6;
+      }
+    },
+    onPanResponderTerminationRequest: () => false,
+    onPanResponderMove: (evt, gestureState) => {},
+    onPanResponderRelease: (evt, gestureState) => {
+      if (toTop) {
+        if (gestureState.dy > 50) {
+          snapToBottom();
+        } else {
+          snapToTop();
+        }
+      } else {
+        if (gestureState.dy < -90) {
+          snapToTop();
+        } else {
+          snapToBottom();
+        }
+      }
+    },
+  });
+
+  const snapToTop = () => {
+    Animated.timing(position, {
+      toValue: 1000,
+      duration: 300,
+      useNativeDriver: false,
+    }).start(() => {});
+    sToTop(true);
+  };
+
+  const snapToBottom = () => {
+    Animated.timing(position, {
+      toValue: 200,
+      duration: 150,
+      useNativeDriver: false,
+    }).start(() => {});
+    sToTop(false);
+  };
+
+  const snapToHeight = (height) => {
+    Animated.timing(position, {
+      toValue: height,
+      duration: 300,
+      useNativeDriver: false,
+    }).start(() => {});
+  };
 
   return (
     <View style={styles.container}>
@@ -82,7 +142,11 @@ const MainPage = (props) => {
               props.navigation.navigate("Profile");
             }}
           >
-            <FontAwesome5 name="user" size={normalize(22)} color="black" />
+            <FontAwesome5
+              name="user"
+              size={normalize(22)}
+              color={theme.colors.text}
+            />
           </TouchableOpacity>
         </Card>
 
@@ -97,29 +161,34 @@ const MainPage = (props) => {
         </Card>
       </KeyboardAvoidingView>
       {main.keyboardStatus === false && (
-        <ScrollView
-          style={{ maxHeight: `${scrollHeight}%`, width: "100%" }}
-          scrollEnabled={false}
-          contentContainerStyle={{ flexGrow: 1 }}
+        <Animated.View
+          style={{ maxHeight: position }}
+          {...parentResponder.panHandlers}
         >
-          {main.navStatus !== "INIT" && (
-            <View style={[styles.container]}>
-              <TripCard />
-            </View>
-          )}
+          <ScrollView
+            style={{ maxHeight: `100%`, width: "100%" }}
+            scrollEnabled={false}
+            contentContainerStyle={{ flexGrow: 1 }}
+          >
+            {main.navStatus !== "INIT" && (
+              <View style={[styles.container]}>
+                <TripCard />
+              </View>
+            )}
 
-          {main.navStatus !== "PLAN" && (
-            <View style={[styles.container, styles.mileCard]}>
-              <MileCard navigation={props.navigation} />
-            </View>
-          )}
-          {/* {
+            {main.navStatus !== "PLAN" && (
+              <View style={[styles.container, styles.mileCard]}>
+                <MileCard navigation={props.navigation} />
+              </View>
+            )}
+            {/* {
               (main.navStatus === "NAV") &&
               <View style={[styles.container, styles.usageCard]}>
                   <UsageCard />
               </View>
           } */}
-        </ScrollView>
+          </ScrollView>
+        </Animated.View>
       )}
     </View>
   );
@@ -145,6 +214,7 @@ const styles = StyleSheet.create({
     width: normalize(50),
     height: normalize(50),
     borderRadius: normalize(50 / 2),
+    backgroundColor: theme.colors.background,
   },
   mapToolCard: {
     position: "absolute",
@@ -153,7 +223,7 @@ const styles = StyleSheet.create({
     width: "95%",
     borderRadius: normalize(10),
     flexDirection: "row",
-    backgroundColor: "green",
+    backgroundColor: theme.colors.primary,
     paddingVertical: normalize(7),
     maxHeight: "100%",
   },

@@ -73,6 +73,10 @@ const userSlice = createSlice({
       state.likeNumber = likenumber;
       console.log(state, likenumber);
     },
+    addWhoILike(state, action) {
+      const userId = action.payload;
+      state.whoILiked.push(userId);
+    },
   },
 });
 
