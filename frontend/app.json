@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "frontend",
-    "slug": "frontend",
-    "version": "1.0.0",
+    "name": "Unitify",
+    "slug": "unitify",
+    "version": "0.1.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -14,39 +14,32 @@
     "updates": {
       "fallbackToCacheTimeout": 0
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
-      "bundleIdentifier": "com.company.frontend",
+      "bundleIdentifier": "com.company.unitify",
       "supportsTablet": true,
-      "config":{
+      "config": {
         "googleMapsApiKey": "AIzaSyAtc6gbQfdI-YdE7SoIeBXJMPmSV_LuOCk"
       },
       "infoPlist": {
         "NSLocationAlwaysUsageDescription": "App requires user location.",
         "NSLocationWhenInUseUsageDescription": "App requires user location.",
         "NSLocationAlwaysAndWhenInUseUsageDescription": "App requires location even when the App is backgrounded.",
-        "UIBackgroundModes": [
-          "location",
-          "fetch"
-        ]
+        "UIBackgroundModes": ["remote-notification", "location", "fetch"]
       }
     },
     "android": {
-      "package": "com.company.frontend",
+      "package": "com.company.unitify",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
       },
-      "config":{
-        "googleMaps":{
+      "config": {
+        "googleMaps": {
           "apiKey": "AIzaSyAtc6gbQfdI-YdE7SoIeBXJMPmSV_LuOCk"
         }
       },
-      "permissions": [
-        "ACCESS_BACKGROUND_LOCATION"
-      ],
+      "permissions": ["ACCESS_BACKGROUND_LOCATION"],
       "useNextNotificationsApi": true
     },
     "web": {

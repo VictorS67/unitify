@@ -475,7 +475,7 @@ const styles = StyleSheet.create({
   topChoiceTransTagText: {
     color: theme.colors.text,
     flexDirection: "row",
-    alignItems: "center",
+    alignItems: "flex-end",
     flex: 1,
     height: "100%",
   },

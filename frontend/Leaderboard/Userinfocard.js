@@ -4,9 +4,9 @@ import { useSelector, useDispatch } from "react-redux";
 
 import Card from "../UI/Card";
 import LikeButton from "./Likeheart";
+import { theme } from "../UI/Theme";
 import { normalize } from "../Tool/FontSize";
 import { userActions } from "../store/user-slice";
-import { getLatestUserStatus } from "../store/user-actions";
 
 const UserInfoCard = (props) => {
   const dispatch = useDispatch();
@@ -16,7 +16,11 @@ const UserInfoCard = (props) => {
 
   return (
     <Card
-      style={{ margin: 0, padding: 0 }}
+      style={{
+        backgroundColor: theme.colors.boardUserBack,
+        margin: 0,
+        padding: 0,
+      }}
       childrenStyle={{ margin: 0, padding: 0 }}
     >
       <SafeAreaView
@@ -37,6 +41,7 @@ const UserInfoCard = (props) => {
         >
           <Text
             style={{
+              color: theme.colors.boardUserText,
               fontSize: normalize(24),
               fontWeight: "bold",
               textAlign: "center",
@@ -55,6 +60,7 @@ const UserInfoCard = (props) => {
         >
           <Text
             style={{
+              color: theme.colors.boardUserText,
               fontSize: normalize(18),
               fontWeight: "bold",
             }}
@@ -65,6 +71,7 @@ const UserInfoCard = (props) => {
 
           <Text
             style={{
+              color: theme.colors.boardUserText,
               fontSize: normalize(18),
               fontWeight: "bold",
             }}
@@ -81,6 +88,9 @@ const UserInfoCard = (props) => {
           <LikeButton
             likeNumber={userData.likeNumber}
             isLiked={userData.whoILiked.includes(userData.id)}
+            textColor={theme.colors.boardUserText}
+            isSelf={true}
+            userId={userData.id}
           />
         </View>
       </SafeAreaView>

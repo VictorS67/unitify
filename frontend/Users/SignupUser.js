@@ -1,6 +1,14 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Text, Alert, Button, TextInput, View, StyleSheet } from "react-native";
+import {
+  Text,
+  Alert,
+  Button,
+  TextInput,
+  View,
+  StyleSheet,
+  TouchableOpacity,
+} from "react-native";
 
 import Card from "../UI/Card";
 import { normalize } from "../Tool/FontSize";
@@ -114,9 +122,35 @@ const SignupUser = (props) => {
         </View>
       </View>
 
-      <View style={styles.signupButton}>
+      <TouchableOpacity
+        style={{
+          paddingHorizontal: normalize(20),
+          justifyContent: "center",
+          alignItems: "center",
+          backgroundColor: "dodgerblue",
+          paddingVertical: normalize(10),
+          borderRadius: normalize(5),
+          elevation: 3,
+          shadowOffset: { width: 1, height: 1 },
+          shadowColor: "#333",
+          shadowOpacity: 0.3,
+          shadowRadius: normalize(2),
+        }}
+        onPress={signupUserHandler}
+      >
+        <Text
+          style={{
+            fontSize: normalize(18),
+            color: "white",
+          }}
+        >
+          SIGN UP
+        </Text>
+      </TouchableOpacity>
+
+      {/* <View style={styles.signupButton}>
         <Button title={"Sign Up"} onPress={signupUserHandler} />
-      </View>
+      </View> */}
     </View>
   );
 };
@@ -154,7 +188,7 @@ const styles = StyleSheet.create({
     marginBottom: normalize(14),
   },
   subtitleText: {
-    fontSize: normalize(18),
+    fontSize: normalize(16),
     textAlign: "center",
     marginVertical: normalize(8),
   },

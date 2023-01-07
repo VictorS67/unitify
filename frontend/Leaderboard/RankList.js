@@ -4,6 +4,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { Divider } from "react-native-paper";
 
 import LikeButton from "./Likeheart";
+import { theme } from "../UI/Theme";
 import { normalize } from "../Tool/FontSize";
 
 const RankList = (props) => {
@@ -18,6 +19,7 @@ const RankList = (props) => {
       <React.Fragment>
         <SafeAreaView
           style={{
+            backgroundColor: theme.colors.boardBack,
             flexDirection: "row",
             alignItems: "center",
             height: normalize(50),
@@ -32,6 +34,7 @@ const RankList = (props) => {
           >
             <Text
               style={{
+                color: theme.colors.boardText,
                 fontSize: normalize(24),
                 fontWeight: "bold",
                 textAlign: "center",
@@ -50,6 +53,7 @@ const RankList = (props) => {
           >
             <Text
               style={{
+                color: theme.colors.boardText,
                 fontSize: normalize(18),
                 fontWeight: "bold",
               }}
@@ -60,6 +64,7 @@ const RankList = (props) => {
 
             <Text
               style={{
+                color: theme.colors.boardText,
                 fontSize: normalize(18),
                 fontWeight: "bold",
               }}
@@ -75,8 +80,9 @@ const RankList = (props) => {
           >
             <LikeButton
               userId={item.userId}
-              likeNumber={item.likeNumber}
+              likeNumber={item.likeNumber ? item.likeNumber : 0}
               isLiked={item.isLiked}
+              isSelf={false}
             />
           </View>
         </SafeAreaView>
@@ -94,6 +100,7 @@ const RankList = (props) => {
           return item.userId;
         }}
         contentContainerStyle={{
+          backgroundColor: theme.colors.boardBack,
           paddingBottom: normalize(100),
         }}
       />

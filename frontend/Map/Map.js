@@ -1,22 +1,11 @@
-import React, { useState, useEffect, useRef } from "react";
-import {
-  Text,
-  View,
-  SafeAreaView,
-  StyleSheet,
-  Button,
-  TouchableOpacity,
-} from "react-native";
+import React, { useEffect, useRef } from "react";
+import { View, SafeAreaView, StyleSheet } from "react-native";
 import { useSelector, useDispatch } from "react-redux";
-import { Ionicons, FontAwesome5 } from "@expo/vector-icons";
-import * as Location from "expo-location";
 import MapView, { Marker, Polyline, Geojson } from "react-native-maps";
-import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
 import { decode } from "@mapbox/polyline";
 
 import TalkBubble from "../UI/TalkBubble";
 import PolylineInfo from "../UI/PolylineInfo";
-import MapTool from "./MapTool";
 import { normalize } from "../Tool/FontSize";
 import { updateDirection, updateAllDirection } from "../store/map-actions";
 import { mapActions } from "../store/map-slice";

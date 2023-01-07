@@ -1,14 +1,22 @@
 import React, { useEffect, useState } from "react";
-import { Pressable, SafeAreaView, TouchableOpacity, Text } from "react-native";
+import {
+  Pressable,
+  SafeAreaView,
+  TouchableOpacity,
+  Text,
+  Alert,
+} from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useDispatch, useSelector } from "react-redux";
 
-import { getLatestUserStatus } from "../store/user-actions";
+import { likeUser, unlikeUser } from "../store/user-actions";
 import { normalize } from "../Tool/FontSize";
+import { leaderActions } from "../store/leader-slice";
+import { userActions } from "../store/user-slice";
 
 const LikeButton = (props) => {
   const dispatch = useDispatch();
-
+  const user = useSelector((state) => state.user);
   const [liked, sLiked] = useState(false);
   const [likeNumber, sLikeNumber] = useState(0);
 
@@ -18,13 +26,51 @@ const LikeButton = (props) => {
   }, [props.isLiked, props.likeNumber]);
 
   const pressHandler = () => {
-    sLiked((isLiked) => !isLiked);
     if (liked) {
-      sLikeNumber((counter) => counter - 1);
+      dispatch(unlikeUser(user.id, props.userId)).then((resolve) => {
+        const result = JSON.parse(resolve);
+        if (result.status === 200) {
+          if (!props.isSelf) {
+            dispatch(leaderActions.unlikeUserInLeaderBoard(props.userId));
+          } else {
+            dispatch(userActions.unlikeSelf());
+          }
+
+          sLikeNumber((counter) => counter - 1);
+          sLiked((isLiked) => false);
+        } else {
+          console.log("result message: ", result["message"]);
+          Alert.alert("Ah no", result.message, [
+            {
+              text: "Try Again",
+              onPress: () => console.log("Try Again"),
+            },
+          ]);
+        }
+      });
     } else {
-      sLikeNumber((counter) => counter + 1);
+      dispatch(likeUser(user.id, props.userId)).then((resolve) => {
+        const result = JSON.parse(resolve);
+        if (result.status === 200) {
+          if (!props.isSelf) {
+            dispatch(leaderActions.likeUserInLeaderBoard(props.userId));
+          } else {
+            dispatch(userActions.likeSelf());
+          }
+
+          sLikeNumber((counter) => counter + 1);
+          sLiked((isLiked) => true);
+        } else {
+          console.log("result message: ", result["message"]);
+          Alert.alert("Ah no", result.message, [
+            {
+              text: "Try Again",
+              onPress: () => console.log("Try Again"),
+            },
+          ]);
+        }
+      });
     }
-    console.log(likeNumber);
   };
 
   return (
@@ -38,12 +84,13 @@ const LikeButton = (props) => {
         <MaterialCommunityIcons
           name={liked ? "heart" : "heart-outline"}
           size={normalize(20)}
-          color={liked ? "red" : "black"}
+          color={liked ? "red" : props.textColor}
         />
       </Pressable>
       <Text
         style={{
           fontSize: normalize(12),
+          color: props.textColor,
         }}
       >
         {likeNumber}
