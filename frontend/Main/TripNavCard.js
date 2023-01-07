@@ -6,6 +6,7 @@ import {
   Pressable,
   useWindowDimensions,
   Modal,
+  TouchableOpacity,
 } from "react-native";
 import { useSelector, useDispatch } from "react-redux";
 import {
@@ -18,6 +19,8 @@ import Card from "../UI/Card";
 import { theme } from "../UI/Theme";
 import { normalize } from "../Tool/FontSize";
 import { tripnavActions } from "../store/tripnav-slice";
+import { addMiles } from "../store/user-actions";
+import { computeMiles } from "../Utils/ComputeMiles";
 
 function secondsToHms(d) {
   d = Number(d);
@@ -32,6 +35,7 @@ function secondsToHms(d) {
 const TripNavCard = (props) => {
   const dispatch = useDispatch();
   const tripnav = useSelector((state) => state.tripnav);
+  const user = useSelector((state) => state.user);
 
   const [hour, minute] = secondsToHms(tripnav.duration);
   const { height, width, scale, fontScale } = useWindowDimensions();
@@ -113,17 +117,36 @@ const TripNavCard = (props) => {
         <View style={styles.flexColumn}>
           <Text style={styles.cardText}>Pause</Text>
           <Card
-            style={{
-              width: normalize(0.1 * width),
-              height: normalize(0.1 * width),
-            }}
+            style={[
+              {
+                width: normalize(0.1 * width),
+                height: normalize(0.1 * width),
+              },
+              tripnav.isPaused
+                ? { backgroundColor: theme.colors.error }
+                : { backgroundColor: theme.colors.background },
+            ]}
             childrenStyle={styles.navItemCardContent}
           >
-            <FontAwesome5
-              name="hand-paper"
-              size={normalize(24)}
-              color={theme.colors.text}
-            />
+            <TouchableOpacity
+              style={{
+                height: "100%",
+                width: "100%",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+              onPress={() => {
+                dispatch(tripnavActions.togglePause());
+              }}
+            >
+              <FontAwesome5
+                name="hand-paper"
+                size={normalize(24)}
+                color={
+                  tripnav.isPaused ? theme.colors.errorText : theme.colors.text
+                }
+              />
+            </TouchableOpacity>
           </Card>
           <Text style={styles.cardText}>
             <Text style={styles.statText}>{tripnav.pause}</Text>
@@ -290,6 +313,10 @@ const TripNavCard = (props) => {
                 ]}
                 onPress={() => {
                   sShowFinishTrip(false);
+                  dispatch(
+                    user.id,
+                    addMiles(computeMiles(tripnav.travalDurations))
+                  );
                   dispatch(tripnavActions.terminate());
                 }}
               >

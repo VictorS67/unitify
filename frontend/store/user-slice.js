@@ -3,6 +3,7 @@ import { createSlice } from "@reduxjs/toolkit";
 const userSlice = createSlice({
   name: "user",
   initialState: {
+    sendNotificationToken: false,
     checkutoLogin: false,
     isLogin: false,
     id: "",
@@ -12,6 +13,7 @@ const userSlice = createSlice({
     currentRank: null,
     championTimes: null,
     likeNumber: null,
+    dailyMiles: null,
     monthlyMiles: null,
     totalMiles: null,
     whoILiked: [],
@@ -25,6 +27,7 @@ const userSlice = createSlice({
       state.isLogin = true;
     },
     logout(state) {
+      state.sendNotificationToken = false;
       state.checkutoLogin = false;
       state.isLogin = false;
       state.id = "";
@@ -34,6 +37,7 @@ const userSlice = createSlice({
       state.currentRank = null;
       state.championTimes = null;
       state.likeNumber = null;
+      state.dailyMiles = null;
       state.monthlyMiles = null;
       state.totalMiles = null;
       state.whoILiked = [];
@@ -44,21 +48,17 @@ const userSlice = createSlice({
     },
     updateLatestUser(state, action) {
       const user = action.payload;
-
-      console.log("update latest user: ", user);
-
       state.id = user._id;
       state.email = user.email;
       state.userName = user.userName;
       state.championSignature = user.championSignature;
       state.currentRank = user.currentRank;
       state.likeNumber = user.likeNumber;
+      state.dailyMiles = user.dailyMiles;
       state.monthlyMiles = user.monthlyMiles;
       state.totalMiles = user.totalMiles;
       state.whoILiked = user.whoILiked;
       state.whoLikedMe = user.whoLikedMe;
-
-      console.log("state.whoILiked: ", state.whoILiked);
     },
     changeChampionSignature(state, action) {
       const championSignature = action.payload;
@@ -76,6 +76,32 @@ const userSlice = createSlice({
     addWhoILike(state, action) {
       const userId = action.payload;
       state.whoILiked.push(userId);
+    },
+    sendToken(state) {
+      state.sendNotificationToken = true;
+    },
+    addMiles(state, payload) {
+      const miles = action.payload;
+      state.dailyMiles =
+        state.dailyMiles === null ? miles : state.dailyMiles + miles;
+      state.monthlyMiles =
+        state.monthlyMiles === null ? miles : state.monthlyMiles + miles;
+      state.totalMiles =
+        state.totalMiles === null ? miles : state.totalMiles + miles;
+    },
+    likeSelf(state) {
+      state.likeNumber = state.likeNumber === null ? 1 : state.likeNumber + 1;
+      if (state.id !== "") {
+        state.whoLikedMe.push(state.id);
+        state.whoILiked.push(state.id);
+      }
+    },
+    unlikeSelf(state) {
+      state.likeNumber = state.likeNumber === null ? 0 : state.likeNumber - 1;
+      if (state.id !== "") {
+        state.whoLikedMe = state.whoLikedMe.filter((who) => who === state.id);
+        state.whoILiked = state.whoILiked.filter((who) => who === state.id);
+      }
     },
   },
 });

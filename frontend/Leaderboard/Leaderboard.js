@@ -9,18 +9,18 @@ import UserInfoCard from "./Userinfocard";
 import { normalize } from "../Tool/FontSize";
 import {
   getMonthlyLeaderboard,
-  getWeeklyLeaderboard,
+  getDailyLeaderboard,
 } from "../store/leader-actions";
 
 const Tab = createMaterialTopTabNavigator();
 
-const Sevenboard = (props) => {
+const Dayboard = (props) => {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user);
 
   useEffect(() => {
     const unsubscribe = props.navigation.addListener("focus", () => {
-      dispatch(getWeeklyLeaderboard(user));
+      dispatch(getDailyLeaderboard(user));
     });
     return unsubscribe;
   }, [props.navigation, dispatch]);
@@ -71,16 +71,8 @@ const Leaderboard = (props) => {
 
   return (
     <SafeAreaView style={styles.background}>
-      <Pressable
-        style={styles.button}
-        onPress={() => {
-          props.navigation.navigate("Home");
-        }}
-      ></Pressable>
-      <Tab.Navigator
-        initialRouteName={leaderboard.ismonthly ? "MONTH" : "WEEK"}
-      >
-        <Tab.Screen name="WEEK" component={Sevenboard} />
+      <Tab.Navigator initialRouteName={leaderboard.ismonthly ? "MONTH" : "DAY"}>
+        <Tab.Screen name="DAY" component={Dayboard} />
         <Tab.Screen name="MONTH" component={Monthboard} />
       </Tab.Navigator>
     </SafeAreaView>
@@ -107,7 +99,6 @@ const styles = StyleSheet.create({
   championcard: {
     flex: 0.4,
     flexDirection: "row",
-    backgroundColor: "green",
   },
   ranklist: {
     flex: 3,

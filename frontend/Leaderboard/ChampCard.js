@@ -2,6 +2,7 @@ import React from "react";
 import { StyleSheet, Text, View, SafeAreaView } from "react-native";
 import { useSelector, useDispatch } from "react-redux";
 
+import { theme } from "../UI/Theme";
 import { normalize } from "../Tool/FontSize";
 import { getMonthlyLeaderboard } from "../store/leader-actions";
 
@@ -12,48 +13,58 @@ const ChampCard = (props) => {
   return (
     <SafeAreaView
       style={{
+        backgroundColor: theme.colors.champBack,
         height: normalize(100),
-        paddingTop: normalize(5),
+        paddingVertical: normalize(10),
+        justifyContent: "space-between",
       }}
     >
       <Text
         style={{
+          color: theme.colors.boardText,
           fontSize: normalize(15),
           textAlign: "center",
           width: "100%",
+          // fontFamily: "monospace",
         }}
         numberOfLines={1}
       >
-        {leaderboard.champion !== null ? leaderboard.champion.userName : ""}
+        {leaderboard.champion !== null
+          ? leaderboard.champion.userName
+          : "No one"}
         &nbsp;owns the champion now!
       </Text>
       <View
         style={{
-          height: normalize(60),
+          height: normalize(50),
           alignItems: "center",
           justifyContent: "center",
         }}
       >
         <Text
           style={{
-            fontSize: normalize(25),
+            color: theme.colors.boardText,
+            fontSize: normalize(20),
             textAlign: "center",
             width: "100%",
+            // fontFamily: "monospace",
+            fontWeight: "bold",
           }}
           numberOfLines={2}
         >
           {leaderboard.champion !== null
             ? leaderboard.champion.championSignature
             : ""}
-          {/* Winner is me :D */}
         </Text>
       </View>
 
       <Text
         style={{
+          color: theme.colors.boardText,
           fontSize: normalize(15),
           textAlign: "center",
           width: "100%",
+          // fontFamily: "monospace",
         }}
         numberOfLines={1}
       >

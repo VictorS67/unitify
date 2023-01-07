@@ -40,11 +40,11 @@ export const getMonthlyLeaderboard = (user) => {
   };
 };
 
-export const getWeeklyLeaderboard = (user) => {
+export const getDailyLeaderboard = (user) => {
   return async (dispatch) => {
     try {
       const leaderboard = await fetch(
-        `${BACKEND_URL}/leaderboard?startIndex=0&endIndex=20`
+        `${BACKEND_URL}/dailyLeaderboard?startIndex=0&endIndex=20`
       );
       let leaderboardJson = await leaderboard.json();
       console.log("WEEK LEADERBORD: ", leaderboardJson);
@@ -75,7 +75,7 @@ export const getWeeklyLeaderboard = (user) => {
         }
       }
     } catch (error) {
-      console.log("getWeeklyLeaderboard: something is wrong.");
+      console.log("getDailyLeaderboard: something is wrong.");
     }
   };
 };

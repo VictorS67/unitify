@@ -622,7 +622,14 @@ const MapNav = (props) => {
               color={theme.colors.text}
               style={{ flexGrow: 1 }}
             />
-            <View style={{ flexDirection: "row", flex: 1 }}>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "flex-end",
+                flex: 1,
+                height: "100%",
+              }}
+            >
               {getEmissionTrendIconByNumber(emission)}
               <Text
                 style={{
@@ -649,7 +656,14 @@ const MapNav = (props) => {
               color={theme.colors.text}
               style={{ flexGrow: 1 }}
             />
-            <View style={{ flexDirection: "row", flex: 1 }}>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "flex-end",
+                flex: 1,
+                height: "100%",
+              }}
+            >
               <Text
                 style={{
                   textAlign: "center",

@@ -24,7 +24,7 @@ import MileCard from "./MileCard";
 import { theme } from "../UI/Theme";
 import { normalize } from "../Tool/FontSize";
 import { mainActions } from "../store/main-slice";
-import { getLatestUserStatus } from "../store/user-actions";
+import { getMyStatus } from "../store/user-actions";
 
 const MainPage = (props) => {
   const dispatch = useDispatch();
@@ -36,7 +36,9 @@ const MainPage = (props) => {
 
   useEffect(() => {
     const showSubscription = Keyboard.addListener("keyboardDidShow", () => {
-      dispatch(mainActions.sKeyboardStatus(true));
+      if (Platform.OS === "andriod") {
+        dispatch(mainActions.sKeyboardStatus(true));
+      }
     });
 
     const hideSubscription = Keyboard.addListener("keyboardDidHide", () => {
@@ -51,7 +53,7 @@ const MainPage = (props) => {
 
   useEffect(() => {
     const updateInterval = setInterval(() => {
-      dispatch(getLatestUserStatus(user.id));
+      dispatch(getMyStatus(user.id));
     }, 5 * 6000);
 
     return () => clearInterval(updateInterval);

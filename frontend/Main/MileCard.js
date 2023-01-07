@@ -12,7 +12,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { theme } from "../UI/Theme";
 import { normalize } from "../Tool/FontSize";
 import {
-  getWeeklyLeaderboard,
+  getDailyLeaderboard,
   getMonthlyLeaderboard,
 } from "../store/leader-actions";
 
@@ -32,9 +32,9 @@ const MileCard = (props) => {
         if (leaderboard.ismonthly) {
           dispatch(getMonthlyLeaderboard(user));
         } else {
-          dispatch(getWeeklyLeaderboard(user));
+          dispatch(getDailyLeaderboard(user));
         }
-        props.navigation.navigate("Reward");
+        props.navigation.navigate("Miles");
       }}
     >
       <View style={styles.mileCardTitle}>
