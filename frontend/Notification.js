@@ -27,30 +27,30 @@ import { normalize } from "./Tool/FontSize";
 
 const NOTIFICATION_TASK_NAME = "BACKGROUND-NOTIFICATION-TASK";
 
-const handleNewNotification = async (notificationObject) => {
-  try {
-    // const newNotification = {
-    //     id: notificationObject.messageId,
-    //     date: notificationObject.sentTime,
-    //     title: notificationObject.data.title,
-    //     body: notificationObject.data.message,
-    //     data: JSON.parse(notificationObject.data.body),
-    // }
-    // add the code to do what you need with the received notification  and, e.g., set badge number on app icon
-    console.log("new notification: ", notificationObject);
-    await Notifications.setBadgeCountAsync(1);
-  } catch (error) {
-    console.error(error);
-  }
-};
+// const handleNewNotification = async (notificationObject) => {
+//   try {
+//     // const newNotification = {
+//     //     id: notificationObject.messageId,
+//     //     date: notificationObject.sentTime,
+//     //     title: notificationObject.data.title,
+//     //     body: notificationObject.data.message,
+//     //     data: JSON.parse(notificationObject.data.body),
+//     // }
+//     // add the code to do what you need with the received notification  and, e.g., set badge number on app icon
+//     // console.log("new notification: ", notificationObject);
+//     await Notifications.setBadgeCountAsync(1);
+//   } catch (error) {
+//     console.error(error);
+//   }
+// };
 
-TaskManager.defineTask(
-  NOTIFICATION_TASK_NAME,
-  ({ data, error, executionInfo }) => {
-    console.log("define task...");
-    handleNewNotification(data);
-  }
-);
+// TaskManager.defineTask(
+//   NOTIFICATION_TASK_NAME,
+//   ({ data, error, executionInfo }) => {
+//     console.log("define task...");
+//     handleNewNotification(data);
+//   }
+// );
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -150,10 +150,9 @@ function Notification() {
 
     responseListener.current =
       Notifications.addNotificationResponseReceivedListener((response) => {
-        console.log("response: ", response);
-        console.log("response trigger: ", response.trigger);
-
-        handleNewNotification(response, () => {});
+        // console.log("response: ", response);
+        // console.log("response trigger: ", response.trigger);
+        // handleNewNotification(response, () => {});
       });
 
     return () => {
@@ -183,9 +182,9 @@ function Notification() {
   //     return () => clearInterval(interval);
   // }, [])
 
-  useEffect(() => {
-    handleNewNotification(notification);
-  }, [notification]);
+  // useEffect(() => {
+  //   handleNewNotification(notification);
+  // }, [notification]);
 
   return null;
 }

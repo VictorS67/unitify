@@ -24,7 +24,6 @@ function Background() {
   const user = useSelector((state) => state.user);
 
   useEffect(() => {
-    console.log("BACKGROUND START");
     if (user.isLogin) {
       if (map.position === null) {
         // dispatch(mapActions.initUpdate());
@@ -59,9 +58,9 @@ function Background() {
           if (data) {
             const { locations } = data;
             // do something with the locations captured in the background
-            console.log("Background: ", locations);
-            console.log("map.position: ", map.position);
-            console.log("main.navStatus: ", main.navStatus);
+            // console.log("Background: ", locations);
+            // console.log("map.position: ", map.position);
+            // console.log("main.navStatus: ", main.navStatus);
 
             let curr_location = locations[locations.length - 1];
 
@@ -130,12 +129,6 @@ function Background() {
     } else {
       TaskManager.isTaskRegisteredAsync(LOCATION_TASK_NAME).then(
         (isRegistered) => {
-          console.log(
-            "isDefined: ",
-            TaskManager.isTaskDefined(LOCATION_TASK_NAME)
-          );
-          console.log("isRegistered: ", isRegistered);
-          console.log("user not login: ", !user.isLogin);
           if (
             !user.isLogin &&
             isRegistered &&

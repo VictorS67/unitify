@@ -34,7 +34,7 @@ const mapSlice = createSlice({
         longitudeDelta: zoom,
       };
 
-      console.log("POSITION: ", state.position);
+      // console.log("POSITION: ", state.position);
     },
     sTravalMode(state, action) {
       const travalMode = action.payload;

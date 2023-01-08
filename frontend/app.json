@@ -2,7 +2,7 @@
   "expo": {
     "name": "Unitify",
     "slug": "unitify",
-    "version": "0.1.0",
+    "version": "0.1.2",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -48,6 +48,11 @@
     "packagerOpts": {
       "config": "metro.config.js",
       "sourceExts": ["js", "jsx", "css"]
+    },
+    "extra": {
+      "eas": {
+        "projectId": "469edaec-e6b7-4c56-b2e3-c1cfc6e602b9"
+      }
     }
   }
 }

@@ -314,8 +314,7 @@ const TripNavCard = (props) => {
                 onPress={() => {
                   sShowFinishTrip(false);
                   dispatch(
-                    user.id,
-                    addMiles(computeMiles(tripnav.travalDurations))
+                    addMiles(user.id, computeMiles(tripnav.travalDurations))
                   );
                   dispatch(tripnavActions.terminate());
                 }}
