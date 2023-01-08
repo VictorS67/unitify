@@ -15,6 +15,7 @@ import {
   getDailyLeaderboard,
   getMonthlyLeaderboard,
 } from "../store/leader-actions";
+import { getLatestUserStatus } from "../store/user-actions";
 
 const MileCard = (props) => {
   const dispatch = useDispatch();
@@ -29,11 +30,12 @@ const MileCard = (props) => {
         main.navStatus === "NAV" ? { backgroundColor: theme.colors.third } : {},
       ]}
       onPress={() => {
-        if (leaderboard.ismonthly) {
-          dispatch(getMonthlyLeaderboard(user));
-        } else {
-          dispatch(getDailyLeaderboard(user));
-        }
+        dispatch(getLatestUserStatus(user.id));
+        // if (leaderboard.ismonthly) {
+        //   dispatch(getMonthlyLeaderboard(user));
+        // } else {
+        //   dispatch(getDailyLeaderboard(user));
+        // }
         props.navigation.navigate("Miles");
       }}
     >

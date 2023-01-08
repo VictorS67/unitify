@@ -75,10 +75,7 @@ const UserSettingWindow = (props) => {
   const onPressSaveQuit = () => {
     // TODO: Backend API to Save current trip
 
-    dispatch(
-      user.id,
-      addMiles(computeMiles(tripnav.travalDurations))
-    );
+    addMiles(user.id, computeMiles(tripnav.travalDurations));
     dispatch(tripnavActions.resetTripNav());
     dispatch(mainActions.resetNavStatusToInit());
     dispatch(mapActions.resetMap());

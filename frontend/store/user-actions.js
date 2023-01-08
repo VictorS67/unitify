@@ -23,14 +23,14 @@ export const loginUser = (username, password) => {
         let respJson = await resp.json();
 
         if (respJson.status === 200) {
-          console.log(respJson);
+          // console.log(respJson);
           dispatch(userActions.login(respJson.user));
 
           const latestUserStatusResp = await fetch(
             `${BACKEND_URL}/getLastestUserStatus/${respJson.user._id}`
           );
           let latestUserStatusRespJson = await latestUserStatusResp.json();
-          console.log("GET getLastestUserStatus", latestUserStatusRespJson);
+          // console.log("GET getLastestUserStatus", latestUserStatusRespJson);
 
           if (latestUserStatusRespJson.status === 200) {
             dispatch(
@@ -61,7 +61,7 @@ export const getUser = () => {
       let respJson = await resp.json();
 
       if (respJson.status === 200) {
-        console.log("GET USER", respJson);
+        // console.log("GET USER", respJson);
         dispatch(userActions.login(respJson.user));
 
         const latestUserStatusResp = await fetch(
@@ -69,7 +69,7 @@ export const getUser = () => {
         );
 
         let latestUserStatusRespJson = await latestUserStatusResp.json();
-        console.log("GET getLastestUserStatus", latestUserStatusRespJson);
+        // console.log("GET getLastestUserStatus", latestUserStatusRespJson);
 
         if (latestUserStatusRespJson.status === 200) {
           dispatch(userActions.updateLatestUser(latestUserStatusRespJson.data));
@@ -96,7 +96,7 @@ export const logoutUser = () => {
       let respJson = await resp.json();
 
       if (respJson.status === 200) {
-        console.log(respJson);
+        // console.log(respJson);
         dispatch(userActions.logout());
       }
     } catch (error) {
@@ -126,7 +126,7 @@ export const signupUser = (username, email, password, confirmedPassword) => {
         const resp = await fetch(request);
         let respJson = await resp.json();
 
-        console.log("result: ", respJson);
+        // console.log("result: ", respJson);
         resolve(
           JSON.stringify({
             message: respJson.message,
@@ -160,11 +160,11 @@ export const changeEmail = (userID, newEmail) => {
         const resp = await fetch(request);
         let respJson = await resp.json();
 
-        console.log(respJson);
+        // console.log(respJson);
         if (respJson.status === 200) {
           dispatch(userActions.changeEmail(newEmail));
         }
-        console.log(respJson);
+        // console.log(respJson);
         resolve(
           JSON.stringify({
             message: respJson.message,
@@ -198,7 +198,7 @@ export const changeChampionSignature = (userID, championSignature) => {
         const resp = await fetch(request);
         let respJson = await resp.json();
 
-        console.log(respJson);
+        // console.log(respJson);
         if (respJson.status === 200) {
           dispatch(userActions.changeChampionSignature(championSignature));
         }
@@ -243,7 +243,7 @@ export const changePassword = (
         const resp = await fetch(request);
         let respJson = await resp.json();
 
-        console.log(respJson);
+        // console.log(respJson);
         resolve(
           JSON.stringify({
             message: respJson.message,
@@ -264,10 +264,10 @@ export const getLikeNumber = (userID) => {
       const resp = await fetch(`${BACKEND_URL}/likeNumber/${userID}`);
       let respJson = await resp.json();
 
-      console.log("GET LIKE NUMBER", respJson);
+      // console.log("GET LIKE NUMBER", respJson);
 
       if (respJson.status === 200) {
-        console.log("SUCCESS", respJson);
+        // console.log("SUCCESS", respJson);
         // dispatch(userActions.login(respJson.user));
         // dispatch(userActions,sLikeNumber());
       }
@@ -283,10 +283,10 @@ export const getLatestUserStatus = (userID) => {
       const resp = await fetch(`${BACKEND_URL}/getLastestUserStatus/${userID}`);
       let respJson = await resp.json();
 
-      console.log("GET LATEST USER STATUS", respJson);
+      // console.log("GET LATEST USER STATUS", respJson);
 
       if (respJson.status === 200) {
-        console.log("SUCCESS", respJson);
+        // console.log("SUCCESS", respJson);
         // dispatch(userActions.login(respJson.user));
         dispatch(userActions.updateLatestUser(respJson.data));
       }
@@ -302,7 +302,7 @@ export const getHistoryMiles = (userId) => {
       const resp = await fetch(`${BACKEND_URL}/historyMiles/${userId}`);
       let respJson = await resp.json();
 
-      console.log("GET History Miles", respJson);
+      // console.log("GET History Miles", respJson);
 
       // if (respJson.status === 200) {
       //     console.log("SUCCESS", respJson);
@@ -334,7 +334,7 @@ export const likeUser = (userId, likedUserId) => {
         const resp = await fetch(request);
         let respJson = await resp.json();
 
-        console.log(respJson);
+        // console.log(respJson);
         resolve(
           JSON.stringify({
             message: respJson.message,
@@ -368,7 +368,7 @@ export const unlikeUser = (userId, unlikedUserId) => {
         const resp = await fetch(request);
         let respJson = await resp.json();
 
-        console.log(respJson);
+        // console.log(respJson);
         resolve(
           JSON.stringify({
             message: respJson.message,
@@ -389,10 +389,10 @@ export const getMyStatus = (userID) => {
       const resp = await fetch(`${BACKEND_URL}/getMyStatus/${userID}`);
       let respJson = await resp.json();
 
-      console.log("GET MY STATUS", respJson);
+      // console.log("GET MY STATUS", respJson);
 
       if (respJson.status === 200) {
-        console.log("SUCCESS", respJson);
+        // console.log("SUCCESS", respJson);
         // dispatch(userActions.login(respJson.user));
         dispatch(userActions.updateLatestUser(respJson.data));
       }
@@ -420,7 +420,7 @@ export const updateNotificationToken = (userId, notificationToken) => {
       const resp = await fetch(request);
       let respJson = await resp.json();
 
-      console.log(respJson);
+      // console.log(respJson);
       if (respJson.status === 200) {
         dispatch(userActions.sendToken());
       }
@@ -433,6 +433,7 @@ export const updateNotificationToken = (userId, notificationToken) => {
 export const addMiles = (userId, miles) => {
   return async (dispatch) => {
     try {
+      // console.log("ADD MILES: ", userId, miles);
       const request = new Request(`${BACKEND_URL}/miles`, {
         method: "PUT",
         body: JSON.stringify({
@@ -448,7 +449,7 @@ export const addMiles = (userId, miles) => {
       const resp = await fetch(request);
       let respJson = await resp.json();
 
-      console.log(respJson);
+      // console.log(respJson);
       if (respJson.status === 200) {
         dispatch(userActions.addMiles(miles));
       }

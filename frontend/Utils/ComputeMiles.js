@@ -1,8 +1,6 @@
 export function computeMiles(travalModes) {
-  console.log("COMPUTE MILES: ", travalModes);
-
   let miles = 0;
-  travalModes.forEach(travalMode => {
+  travalModes.forEach((travalMode) => {
     if (travalMode.travalMode === "WALKING") {
       miles += 6 * travalMode.distance * 1000;
     } else if (travalMode.travalMode === "DRIVING") {
@@ -12,7 +10,9 @@ export function computeMiles(travalModes) {
     } else {
       miles += travalMode.distance * 1000;
     }
-  })
+  });
+
+  console.log("COMPUTE MILES: ", miles);
 
   return miles;
 }

@@ -13,6 +13,7 @@ import { likeUser, unlikeUser } from "../store/user-actions";
 import { normalize } from "../Tool/FontSize";
 import { leaderActions } from "../store/leader-slice";
 import { userActions } from "../store/user-slice";
+import { getLatestUserStatus } from "../store/user-actions";
 
 const LikeButton = (props) => {
   const dispatch = useDispatch();
@@ -26,18 +27,16 @@ const LikeButton = (props) => {
   }, [props.isLiked, props.likeNumber]);
 
   const pressHandler = () => {
+    console.log("LIKE PRESSED! ", props.userId);
+
     if (liked) {
       dispatch(unlikeUser(user.id, props.userId)).then((resolve) => {
         const result = JSON.parse(resolve);
         if (result.status === 200) {
-          if (!props.isSelf) {
-            dispatch(leaderActions.unlikeUserInLeaderBoard(props.userId));
-          } else {
-            dispatch(userActions.unlikeSelf());
-          }
-
+          dispatch(leaderActions.unlikeUserInLeaderBoard(props.userId));
+          dispatch(getLatestUserStatus(user.id));
           sLikeNumber((counter) => counter - 1);
-          sLiked((isLiked) => false);
+          sLiked(false);
         } else {
           console.log("result message: ", result["message"]);
           Alert.alert("Ah no", result.message, [
@@ -52,14 +51,10 @@ const LikeButton = (props) => {
       dispatch(likeUser(user.id, props.userId)).then((resolve) => {
         const result = JSON.parse(resolve);
         if (result.status === 200) {
-          if (!props.isSelf) {
-            dispatch(leaderActions.likeUserInLeaderBoard(props.userId));
-          } else {
-            dispatch(userActions.likeSelf());
-          }
-
+          dispatch(leaderActions.likeUserInLeaderBoard(props.userId));
+          dispatch(getLatestUserStatus(user.id));
           sLikeNumber((counter) => counter + 1);
-          sLiked((isLiked) => true);
+          sLiked(true);
         } else {
           console.log("result message: ", result["message"]);
           Alert.alert("Ah no", result.message, [

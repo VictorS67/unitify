@@ -13,8 +13,6 @@ const RankList = (props) => {
   const user = useSelector((state) => state.user);
 
   const renderItem = ({ item, index }) => {
-    console.log("RANK LIST ITEM: ", item);
-
     return (
       <React.Fragment>
         <SafeAreaView
@@ -79,9 +77,9 @@ const RankList = (props) => {
             }}
           >
             <LikeButton
-              userId={item.userId}
+              userId={item._id}
               likeNumber={item.likeNumber ? item.likeNumber : 0}
-              isLiked={item.isLiked}
+              isLiked={user.whoILiked.includes(item._id)}
               isSelf={false}
             />
           </View>
@@ -97,7 +95,7 @@ const RankList = (props) => {
         data={leaderboard.leaderBoard}
         renderItem={renderItem}
         keyExtractor={(item, index) => {
-          return item.userId;
+          return item._id;
         }}
         contentContainerStyle={{
           backgroundColor: theme.colors.boardBack,

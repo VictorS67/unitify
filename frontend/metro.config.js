@@ -1,15 +1,6 @@
-const { getDefaultConfig } = require("metro-config");
+// Learn more https://docs.expo.io/guides/customizing-metro
+const { getDefaultConfig } = require("expo/metro-config");
 
-module.exports = (async () => {
-  const {
-    resolver: { sourceExts }
-  } = await getDefaultConfig();
-  return {
-    transformer: {
-      babelTransformerPath: require.resolve("react-native-css-transformer")
-    },
-    resolver: {
-      sourceExts: [...sourceExts, "css"]
-    }
-  };
-})();
+const config = getDefaultConfig(__dirname);
+
+module.exports = config;

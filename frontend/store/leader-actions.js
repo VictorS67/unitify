@@ -14,21 +14,31 @@ export const getMonthlyLeaderboard = (user) => {
         if (leaderboardJson.data.length > 0) {
           dispatch(leaderActions.sChampSig(leaderboardJson.data[0]));
 
-          const leaderboardList = [];
-          for (let index = 0; index < leaderboardJson.data.length; index++) {
-            let leader = leaderboardJson.data[index];
-            const resp = await fetch(
-              `${BACKEND_URL}/getLastestUserStatus/${leader.userId}`
-            );
-            let respJson = await resp.json();
+          const leaderboardList = leaderboardJson.data.map((lead) => {
+            return lead.userId;
+          });
 
-            if (respJson.status === 200) {
-              leader["likeNumber"] = respJson.data.likeNumber;
-              leader["isLiked"] = user.whoILiked.includes(leader.userId);
+          const request = new Request(`${BACKEND_URL}/getLatestUsersStatus`, {
+            method: "POST",
+            body: JSON.stringify({
+              userIds: leaderboardList,
+            }),
+            headers: {
+              Accept: "application/json, text/plain, /",
+              "Content-Type": "application/json",
+            },
+          });
+
+          const resp = await fetch(request);
+          let respJson = await resp.json();
+
+          if (respJson.status === 200) {
+            for (let i = 0; i < leaderboardJson.data.length; i++) {
+              respJson.data[i].monthlyMiles =
+                leaderboardJson.data[i].monthlyMiles;
             }
-            leaderboardList.push(leader);
+            dispatch(leaderActions.sBoard(respJson.data));
           }
-          dispatch(leaderActions.sBoard(leaderboardList));
         } else {
           dispatch(leaderActions.sChampSig(null));
           dispatch(leaderActions.sBoard([]));
@@ -54,21 +64,30 @@ export const getDailyLeaderboard = (user) => {
         if (leaderboardJson.data.length > 0) {
           dispatch(leaderActions.sChampSig(leaderboardJson.data[0]));
 
-          const leaderboardList = [];
-          for (let index = 0; index < leaderboardJson.data.length; index++) {
-            let leader = leaderboardJson.data[index];
-            const resp = await fetch(
-              `${BACKEND_URL}/getLastestUserStatus/${leader.userId}`
-            );
-            let respJson = await resp.json();
+          const leaderboardList = leaderboardJson.data.map((lead) => {
+            return lead.userId;
+          });
 
-            if (respJson.status === 200) {
-              leader["likeNumber"] = respJson.data.likeNumber;
-              leader["isLiked"] = user.whoILiked.includes(leader.userId);
+          const request = new Request(`${BACKEND_URL}/getLatestUsersStatus`, {
+            method: "POST",
+            body: JSON.stringify({
+              userIds: leaderboardList,
+            }),
+            headers: {
+              Accept: "application/json, text/plain, /",
+              "Content-Type": "application/json",
+            },
+          });
+
+          const resp = await fetch(request);
+          let respJson = await resp.json();
+
+          if (respJson.status === 200) {
+            dispatch(leaderActions.sBoard(respJson.data));
+            for (let i = 0; i < leaderboardJson.data.length; i++) {
+              respJson.data[i].dailyMiles = leaderboardJson.data[i].dailyMiles;
             }
-            leaderboardList.push(leader);
           }
-          dispatch(leaderActions.sBoard(leaderboardList));
         } else {
           dispatch(leaderActions.sChampSig(null));
           dispatch(leaderActions.sBoard([]));
@@ -76,6 +95,7 @@ export const getDailyLeaderboard = (user) => {
       }
     } catch (error) {
       console.log("getDailyLeaderboard: something is wrong.");
+      console.log(error);
     }
   };
 };
