@@ -23,6 +23,24 @@ function LocationUpdate() {
   const map = useSelector((state) => state.map);
   const main = useSelector((state) => state.main);
   const user = useSelector((state) => state.user);
+  const [position, sPosition] = useState(null);
+
+  TaskManager.defineTask(LOCATION_TASK_NAME, ({ data, error }) => {
+    if (error) {
+      // Error occurred - check `error.message` for more details.
+      sPosition(null);
+      return;
+    }
+    if (data) {
+      const { locations } = data;
+      const curr_location = locations[0];
+
+      if (curr_location) {
+        console.log("Location in background", curr_location);
+        sPosition(curr_location);
+      }
+    }
+  });
 
   useEffect(() => {
     (async () => {
@@ -30,6 +48,7 @@ function LocationUpdate() {
       const { granted } = await Location.getForegroundPermissionsAsync();
       if (!granted) {
         console.log("Foreground: location tracking denied");
+        sPosition(null);
         return;
       }
 
@@ -49,31 +68,12 @@ function LocationUpdate() {
         {
           // For better logs, we set the accuracy to the most sensitive option
           accuracy: Location.Accuracy.BestForNavigation,
+          timeInterval: 5000,
+          distanceInterval: 0,
         },
         (curr_location) => {
-          console.log("Foreground: location update");
-          if (main.navStatus !== "NAV") {
-            dispatch(
-              mapActions.sPosition({
-                ...curr_location.coords,
-                timestamp: curr_location.timestamp,
-              })
-            );
-          } else if (main.navStatus === "NAV") {
-            dispatch(
-              updateNavInfo(map.position, {
-                ...curr_location.coords,
-                timestamp: curr_location.timestamp,
-              })
-            ).then(() => {
-              dispatch(
-                mapActions.sPosition({
-                  ...curr_location.coords,
-                  timestamp: curr_location.timestamp,
-                })
-              );
-            });
-          }
+          console.log("Foreground: location update", curr_location);
+          sPosition(curr_location);
         }
       );
     })();
@@ -83,6 +83,7 @@ function LocationUpdate() {
       const { granted } = await Location.getBackgroundPermissionsAsync();
       if (!granted) {
         console.log("Background: location tracking denied");
+        sPosition(null);
         return;
       }
 
@@ -90,46 +91,9 @@ function LocationUpdate() {
       const isTaskDefined = await TaskManager.isTaskDefined(LOCATION_TASK_NAME);
       if (!isTaskDefined) {
         console.log("Background: Task is not defined");
-
-        TaskManager.defineTask(LOCATION_TASK_NAME, ({ data, error }) => {
-          if (error) {
-            // Error occurred - check `error.message` for more details.
-            return;
-          }
-          if (data) {
-            const { locations } = data;
-            const curr_location = locations[0];
-            if (curr_location) {
-              console.log("Location in background", curr_location);
-              if (main.navStatus !== "NAV") {
-                dispatch(
-                  mapActions.sPosition({
-                    ...curr_location.coords,
-                    timestamp: curr_location.timestamp,
-                  })
-                );
-              } else if (main.navStatus === "NAV") {
-                dispatch(
-                  updateNavInfo(map.position, {
-                    ...curr_location.coords,
-                    timestamp: curr_location.timestamp,
-                  })
-                ).then(() => {
-                  dispatch(
-                    mapActions.sPosition({
-                      ...curr_location.coords,
-                      timestamp: curr_location.timestamp,
-                    })
-                  );
-                });
-              }
-            }
-          }
-        });
+        sPosition(null);
         return;
       }
-
-      foregroundSubscription?.remove();
 
       // Don't track if it is already running in background
       const hasStarted = await Location.hasStartedLocationUpdatesAsync(
@@ -137,8 +101,11 @@ function LocationUpdate() {
       );
       if (hasStarted) {
         console.log("Background: Already started");
+        sPosition(null);
         return;
       }
+
+      foregroundSubscription?.remove();
 
       await Location.startLocationUpdatesAsync(LOCATION_TASK_NAME, {
         accuracy: Location.Accuracy.BestForNavigation,
@@ -153,6 +120,34 @@ function LocationUpdate() {
       });
     })();
   }, [dispatch]);
+
+  useEffect(() => {
+    if (position !== null) {
+      console.log("Update Position to server: ", position);
+      if (main.navStatus !== "NAV") {
+        dispatch(
+          mapActions.sPosition({
+            ...position.coords,
+            timestamp: position.timestamp,
+          })
+        );
+      } else if (main.navStatus === "NAV") {
+        dispatch(
+          updateNavInfo(map.position, {
+            ...position.coords,
+            timestamp: position.timestamp,
+          })
+        ).then(() => {
+          dispatch(
+            mapActions.sPosition({
+              ...position.coords,
+              timestamp: position.timestamp,
+            })
+          );
+        });
+      }
+    }
+  }, [position, dispatch]);
 
   return null;
 }
