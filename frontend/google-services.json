@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "124377645904",
+    "project_id": "unitify-cbb71",
+    "storage_bucket": "unitify-cbb71.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:124377645904:android:9c1f4b51f1a8396867a255",
+        "android_client_info": {
+          "package_name": "com.company.unitify"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "124377645904-rdcnrsjpud4mtb0hj2apft2pmce21eep.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCCf6E3K-8BTXf39sIZSNDPl7EzBhQGL5g"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "124377645904-rdcnrsjpud4mtb0hj2apft2pmce21eep.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

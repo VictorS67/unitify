@@ -82,7 +82,7 @@ export const updateNavInfo = (oldPosition, newPosition) => {
         console.log("duration: ", duration);
         console.log("speed: ", speed);
 
-        if (distance >= 30) {
+        if (distance >= 3) {
           dispatch(tripnavActions.addDistance(distance / 1000));
           dispatch(tripnavActions.addDuration(duration));
           dispatch(tripnavActions.sSpeed(speed));
