@@ -5,19 +5,20 @@ import { normalize } from "../Tool/FontSize";
 
 const ProgressBar = ({ step, steps, height, style, progressChildren }) => {
   const [width, sWidth] = React.useState(0);
-  const animatedValue = useRef(new Animated.Value(-1000)).current;
-  const reactive = useRef(new Animated.Value(-1000)).current;
+  const animatedValue = useRef(new Animated.Value(-10)).current;
+  const reactive = useRef(new Animated.Value(-10)).current;
 
   useEffect(() => {
     Animated.timing(animatedValue, {
       toValue: reactive,
       duration: 300,
-      useNativeDriver: true,
+      useNativeDriver: false,
     }).start();
   }, []);
 
   useEffect(() => {
-    reactive.setValue(-width + (width * step) / steps);
+    const val = -width + (width * step) / steps;
+    reactive.setValue(val);
   }, [step, width]);
 
   let progress = [];
