@@ -13,7 +13,7 @@ const SkeletonView = (props) => {
         Animated.timing(circleAnimatedValue, {
           toValue: 1,
           duration: 750,
-          useNativeDriver: true, // Add this line
+          useNativeDriver: false, // Add this line
         }),
       ]),
       {

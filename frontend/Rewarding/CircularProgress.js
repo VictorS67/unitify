@@ -32,7 +32,7 @@ export default function CircularProgress({
       toValue,
       duration,
       delay: 1000,
-      useNativeDriver: true,
+      useNativeDriver: false,
       easing: Easing.out(Easing.ease),
     }).start(() => {
       // animation(toValue === 0 ? percentage : 0);
