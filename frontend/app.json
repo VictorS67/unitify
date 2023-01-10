@@ -2,7 +2,7 @@
   "expo": {
     "name": "Unitify",
     "slug": "unitify",
-    "version": "0.1.32",
+    "version": "0.1.4",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
