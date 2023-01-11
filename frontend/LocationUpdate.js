@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
+import { AppState } from "react-native";
 import { useSelector, useDispatch } from "react-redux";
 import * as TaskManager from "expo-task-manager";
 import * as Location from "expo-location";
@@ -14,8 +15,8 @@ function LocationUpdate() {
   const map = useSelector((state) => state.map);
   const main = useSelector((state) => state.main);
 
-  const [isBackRunning, sIsBackRunning] = useState(true);
-  const [isFrontRunning, sIsFrontRunning] = useState(true);
+  const appState = useRef(AppState.currentState);
+  const [appStateVisible, setAppStateVisible] = useState(appState.current);
   const [position, sPosition] = useState(null);
 
   TaskManager.defineTask(LOCATION_TASK_NAME, ({ data, error }) => {
@@ -39,8 +40,6 @@ function LocationUpdate() {
     const { granted } = await Location.getForegroundPermissionsAsync();
     if (!granted) {
       console.log("Foreground: location tracking denied");
-      sIsFrontRunning(false);
-      sIsBackRunning(true);
       return;
     }
 
@@ -50,12 +49,10 @@ function LocationUpdate() {
     if (hasStarted) {
       await Location.stopLocationUpdatesAsync(LOCATION_TASK_NAME);
       console.log("Foreground: Background Location tacking stopped");
-      sIsBackRunning(false);
     }
 
     // Make sure that foreground location tracking is not running
     foregroundSubscription?.remove();
-    sIsFrontRunning(false);
 
     // Start watching position in real-time
     foregroundSubscription = await Location.watchPositionAsync(
@@ -77,8 +74,6 @@ function LocationUpdate() {
     const { granted } = await Location.getBackgroundPermissionsAsync();
     if (!granted) {
       console.log("Background: location tracking denied");
-      sIsBackRunning(false);
-      sIsFrontRunning(true);
       return;
     }
 
@@ -86,12 +81,10 @@ function LocationUpdate() {
     const isTaskDefined = await TaskManager.isTaskDefined(LOCATION_TASK_NAME);
     if (!isTaskDefined) {
       console.log("Background: Task is not defined");
-      sIsBackRunning(false);
       return;
     }
 
     foregroundSubscription?.remove();
-    sIsFrontRunning(false);
 
     // Don't track if it is already running in background
     const hasStarted = await Location.hasStartedLocationUpdatesAsync(
@@ -99,11 +92,9 @@ function LocationUpdate() {
     );
     if (hasStarted) {
       console.log("Background: Already started");
-      sIsBackRunning(false);
       return;
     }
 
-    sIsBackRunning(true);
     await Location.startLocationUpdatesAsync(LOCATION_TASK_NAME, {
       accuracy: Location.Accuracy.BestForNavigation,
       timeInterval: 5000,
@@ -118,12 +109,31 @@ function LocationUpdate() {
   };
 
   useEffect(() => {
-    if (isBackRunning) {
+    const subscription = AppState.addEventListener("change", (nextAppState) => {
+      if (
+        appState.current.match(/inactive|background/) &&
+        nextAppState === "active"
+      ) {
+        console.log("App has come to the foreground!");
+      }
+
+      appState.current = nextAppState;
+      setAppStateVisible(appState.current);
+      console.log("AppState", appState.current);
+    });
+
+    return () => {
+      subscription.remove();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (appStateVisible.match(/inactive|background/)) {
       updateLocationBackground();
-    } else if (isFrontRunning) {
+    } else {
       updateLocationForeground();
     }
-  }, []);
+  }, [appStateVisible]);
 
   useEffect(() => {
     if (position !== null) {
