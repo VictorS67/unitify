@@ -17,6 +17,8 @@ function LocationUpdate() {
 
   const appState = useRef(AppState.currentState);
   const [appStateVisible, setAppStateVisible] = useState(appState.current);
+  const [isBackRunning, sIsBackRunning] = useState(true);
+  const [isFrontRunning, sIsFrontRunning] = useState(true);
   const [position, sPosition] = useState(null);
 
   TaskManager.defineTask(LOCATION_TASK_NAME, ({ data, error }) => {
@@ -40,6 +42,8 @@ function LocationUpdate() {
     const { granted } = await Location.getForegroundPermissionsAsync();
     if (!granted) {
       console.log("Foreground: location tracking denied");
+      sIsFrontRunning(false);
+      sIsBackRunning(true);
       return;
     }
 
@@ -49,10 +53,12 @@ function LocationUpdate() {
     if (hasStarted) {
       await Location.stopLocationUpdatesAsync(LOCATION_TASK_NAME);
       console.log("Foreground: Background Location tacking stopped");
+      sIsBackRunning(false);
     }
 
     // Make sure that foreground location tracking is not running
     foregroundSubscription?.remove();
+    sIsFrontRunning(false);
 
     // Start watching position in real-time
     foregroundSubscription = await Location.watchPositionAsync(
@@ -74,6 +80,8 @@ function LocationUpdate() {
     const { granted } = await Location.getBackgroundPermissionsAsync();
     if (!granted) {
       console.log("Background: location tracking denied");
+      sIsBackRunning(false);
+      sIsFrontRunning(true);
       return;
     }
 
@@ -81,10 +89,12 @@ function LocationUpdate() {
     const isTaskDefined = await TaskManager.isTaskDefined(LOCATION_TASK_NAME);
     if (!isTaskDefined) {
       console.log("Background: Task is not defined");
+      sIsBackRunning(false);
       return;
     }
 
     foregroundSubscription?.remove();
+    sIsFrontRunning(false);
 
     // Don't track if it is already running in background
     const hasStarted = await Location.hasStartedLocationUpdatesAsync(
@@ -92,9 +102,11 @@ function LocationUpdate() {
     );
     if (hasStarted) {
       console.log("Background: Already started");
+      sIsBackRunning(false);
       return;
     }
 
+    sIsBackRunning(true);
     await Location.startLocationUpdatesAsync(LOCATION_TASK_NAME, {
       accuracy: Location.Accuracy.BestForNavigation,
       timeInterval: 5000,
@@ -115,6 +127,8 @@ function LocationUpdate() {
         nextAppState === "active"
       ) {
         console.log("App has come to the foreground!");
+        sIsBackRunning(false);
+        sIsFrontRunning(true);
       }
 
       appState.current = nextAppState;
@@ -129,9 +143,15 @@ function LocationUpdate() {
 
   useEffect(() => {
     if (appStateVisible.match(/inactive|background/)) {
-      updateLocationBackground();
+      if (isBackRunning) {
+        updateLocationBackground();
+      }
     } else {
-      updateLocationForeground();
+      if (isFrontRunning) {
+        updateLocationForeground();
+      } else if (isBackRunning) {
+        updateLocationBackground();
+      }
     }
   }, [appStateVisible]);
 
