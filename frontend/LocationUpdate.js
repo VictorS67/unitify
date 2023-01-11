@@ -57,9 +57,13 @@ function LocationUpdate() {
     }
 
     // Make sure that foreground location tracking is not running
-    foregroundSubscription?.remove();
-    sIsFrontRunning(false);
+    if (foregroundSubscription) {
+      console.log("Forground: Already started");
+      sIsFrontRunning(false);
+      return;
+    }
 
+    sIsFrontRunning(true);
     // Start watching position in real-time
     foregroundSubscription = await Location.watchPositionAsync(
       {
