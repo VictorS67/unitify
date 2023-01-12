@@ -1,3 +1,4 @@
+
 <!-- Banner Image -->
 
 <p align="center">
@@ -112,3 +113,4 @@ Here are our team members!
 
 The Unitify source code is made available under the [MIT license](LICENSE). Some of the dependencies are licensed differently, please check them on [Expo](https://github.com/expo/expo), [react-native-maps](https://github.com/react-native-maps/react-native-maps), [
 react-native-google-places-autocomplete](https://github.com/FaridSafi/react-native-google-places-autocomplete), [react-native-paper](https://callstack.github.io/react-native-paper/), [react-navigation](https://reactnavigation.org/).
+
