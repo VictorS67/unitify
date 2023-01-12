@@ -1,7 +1,7 @@
-import { async } from "q";
 import { userActions } from "./user-slice";
+import configData from "../config.json";
 
-const BACKEND_URL = "https://unitify-api.chenpan.ca";
+const BACKEND_URL = configData.BACKEND_URL;
 
 export const loginUser = (username, password) => {
   return async (dispatch) => {

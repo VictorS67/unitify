@@ -1,6 +1,7 @@
 import { leaderActions } from "./leader-slice";
+import configData from "../config.json";
 
-const BACKEND_URL = "https://unitify-api.chenpan.ca";
+const BACKEND_URL = configData.BACKEND_URL;
 
 export const getMonthlyLeaderboard = (user) => {
   return async (dispatch) => {
