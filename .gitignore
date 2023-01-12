@@ -119,3 +119,7 @@ frontend/.env.local
 
 # macOS
 frontend/.DS_Store
+
+#Cofiguration
+frontend/app-local.json
+frontend/config-local.json

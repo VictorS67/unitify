@@ -19,7 +19,7 @@
       "bundleIdentifier": "com.company.unitify",
       "supportsTablet": true,
       "config": {
-        "googleMapsApiKey": "AIzaSyAtc6gbQfdI-YdE7SoIeBXJMPmSV_LuOCk"
+        "googleMapsApiKey": "this-is-an-dummy-api-key"
       },
       "infoPlist": {
         "NSLocationAlwaysUsageDescription": "App requires user location.",
@@ -37,7 +37,7 @@
       },
       "config": {
         "googleMaps": {
-          "apiKey": "AIzaSyAtc6gbQfdI-YdE7SoIeBXJMPmSV_LuOCk"
+          "apiKey": "this-is-an-dummy-api-key"
         }
       },
       "permissions": ["ACCESS_BACKGROUND_LOCATION"],
