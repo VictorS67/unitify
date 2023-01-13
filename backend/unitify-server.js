@@ -8,7 +8,9 @@ const bodyParser = require('body-parser')
 const cors = require('cors');
 const schedule = require('node-schedule');
 const ObjectId = require('mongodb').ObjectID;
+const Bcrypt = require("bcryptjs")
 
+var axios = require('axios');
 const connectionString = process.env.MONGODB_URI;
 const SIGNATURE_CHAR_LIMIT = parseInt(process.env.SIGNATURE_CHAR_LIMIT);
 let mongoDB = connectionString;
@@ -26,9 +28,18 @@ const Rank = mongoose.model('ranks', schemas.rankSchema, 'ranks');
 const Mile = mongoose.model('miles', schemas.mileSchema, 'miles');
 const Transportation = mongoose.model('transportations', schemas.transportationSchema, 'transportations');
 const Questionnnaire = mongoose.model('questionnaires', schemas.questionnaireSchema, 'questionnaires');
+const fs = require('fs');
 
 
 let leaderboard = [];
+
+fs.readFile('./leaderboard.json', 'utf8', (error, data) => {
+    if(error){
+       console.log(error);
+       return;
+    }
+    leaderboard = JSON.parse(data);
+})
 
 let monthlyLeaderboard = [];
 
@@ -51,11 +62,28 @@ backend.use(bodyParser.urlencoded({
 
 backend.use(bodyParser.json())
 
-backend.use(session({
-    secret: 'secret',
-    resave: true,
-    saveUninitialized: true
-}))
+// backend.use(session({
+//     secret: 'secret',
+//     resave: true,
+//     saveUninitialized: true
+// }))
+
+
+let RedisStore = require("connect-redis")(session)
+
+// redis@v4
+const { createClient } = require("redis")
+let redisClient = createClient({ legacyMode: true })
+redisClient.connect().catch(console.error)
+
+backend.use(
+  session({
+    store: new RedisStore({ client: redisClient }),
+    saveUninitialized: false,
+    secret: "keyboard cat",
+    resave: false,
+  })
+)
 
 //backend.use(cors());
 backend.use(cors({ credentials: true, origin: "*" }));
@@ -157,7 +185,7 @@ backend.post("/signup", async (req, res) => {
         else {
             let response = await User.create({
                 "userName": req.body.username,
-                "pass": req.body.password,
+                "pass": Bcrypt.hashSync(req.body.password, 10),
                 "email": req.body.email
             });
             return res.status(200).json({ "status": 200, "message": "Sign up successfully." })
@@ -188,7 +216,7 @@ backend.post('/auth', async (req, res) => {
             return res.status(404).json({ 'status': 404, 'message': `The user doesn't exist.` });
         }
         else {
-            if (password !== user.pass) {
+            if (!Bcrypt.compareSync(password, user.pass)) {
                 return res.status(400).json({ 'status': 400, 'message': `The credentials don't match.` });
             }
             else {
@@ -251,9 +279,10 @@ backend.post('/location', getAuth, async (req, res) => {
             res.status(400).json({ 'status': 400, 'message': "Please give the location and make sure it is in the right format." });
         }
         else {
+            const location = { type: 'Point', coordinates: req.body.location };
             let response = await Location.create({
                 "userId": req.body.userId,
-                "location": location
+                "location":location
             });
             return res.status(200).json({ 'status': 200, 'data': response });
         }
@@ -331,7 +360,7 @@ backend.get('/likeNumber/:userId', getAuth, async (req, res) => {
 backend.get('/getLastestUserStatus/:userId', async (req, res) => {
     try {
         let response = await User.findOne({ _id: req.params.userId }).select(["-pass"]);
-        response.likeNumber = response.whoLikedMe ? response.whoLikedMe.length: 0;
+        response.likeNumber = response.whoLikedMe ? response.whoLikedMe.length : 0;
         return res.status(200).json({ 'status': 200, data: response })
     }
     catch (error) {
@@ -343,11 +372,17 @@ backend.get('/getLastestUserStatus/:userId', async (req, res) => {
 
 backend.post('/getLatestUsersStatus', async (req, res) => {
     try {
-        let response = await User.find({ _id: {$in: req.body.userIds} }).select(["-pass"]);
-        response.forEach(function(obj){
-            obj.likeNumber = obj.whoLikedMe ? obj.whoLikedMe.length: 0;
-           });
-        return res.status(200).json({ 'status': 200, data: response })
+        let response = await User.find({ _id: { $in: req.body.userIds } }).select(["-pass"]);
+        response.forEach(function (obj) {
+            obj.likeNumber = obj.whoLikedMe ? obj.whoLikedMe.length : 0;
+        });
+
+        let result = []
+        for(let userId of req.body.userIds) {
+            let object = response.find(user => user._id == userId);
+            result.push(object);
+        }
+        return res.status(200).json({ 'status': 200, data: result })
     }
     catch (error) {
         console.log(error)
@@ -358,7 +393,7 @@ backend.post('/getLatestUsersStatus', async (req, res) => {
 
 backend.get('/getMyStatus/:userId', getAuth, async (req, res) => {
     try {
-        let response = await User.findOne({ _id: {$in: req.params.userId} }).select(["-pass"]);
+        let response = await User.findOne({ _id: { $in: req.params.userId } }).select(["-pass"]);
         return res.status(200).json({ 'status': 200, data: response });
     }
     catch (error) {
@@ -410,14 +445,14 @@ backend.put('/miles', getAuth, async (req, res) => {
         }
         else {
             let response = await User.findOneAndUpdate({ _id: req.body.userId },
-                { $inc: { 'monthlyMiles': req.body.miles, 'totalMiles': req.body.miles, 'dailyMiles': req.body.miles } },
+                { $inc: { 'monthlyMiles': Math.round(req.body.miles), 'totalMiles': Math.round(req.body.miles), 'dailyMiles': Math.round(req.body.miles) } },
                 {
                     new: true
                 });
 
             await Mile.create({
                 userId: req.body.userId,
-                miles: req.body.miles
+                miles: Math.round(req.body.miles)
             })
             return res.status(200).json({ 'status': 200, 'message': "The miles have been added." })
         }
@@ -507,11 +542,14 @@ backend.put('/championSignature', getAuth, async (req, res) => {
 backend.put("/changePassword", getAuth, async (req, res) => {
     const oldPasswordCorrect = async (userId, oldPassword) => {
         let user = await User.findOne({
-            _id: userId,
-            pass: oldPassword
+            _id: userId
         });
-        if (user !== null) return true;
-        else return false;
+        if (user !== null) {
+            return Bcrypt.compareSync(user.pass, oldPassword);
+        }
+        else { 
+            return false 
+        };
     }
 
     const isValidPassword = async (email) => {
@@ -538,7 +576,7 @@ backend.put("/changePassword", getAuth, async (req, res) => {
             let response = await User.findOneAndUpdate({
                 _id: req.body.userId
             }, {
-                pass: req.body.newPassword
+                pass: Bcrypt.hashSync(req.body.newPassword)
             });
             return res.status(200).json({ "status": 200, "message": "Password updated successfully." })
         }
@@ -673,7 +711,7 @@ backend.put('/like', getAuth, async (req, res) => {
         let currentUser = await User.findOne({
             "_id": req.body.userId
         });
-        if(currentUser.whoILiked.includes(req.body.likedUserId)) {
+        if (currentUser.whoILiked.includes(req.body.likedUserId)) {
             return res.status(400).json({ 'status': 400, 'message': "Don't like the same person twice!" })
         }
         else {
@@ -683,11 +721,11 @@ backend.put('/like', getAuth, async (req, res) => {
                     new: true
                 });
 
-                await User.findOneAndUpdate({ _id: req.body.likedUserId },
-                    { $push: { whoLikedMe: req.body.userId } },
-                    {
-                        new: true
-                    });
+            await User.findOneAndUpdate({ _id: req.body.likedUserId },
+                { $push: { whoLikedMe: req.body.userId } },
+                {
+                    new: true
+                });
         }
 
         return res.status(200).json({ 'status': 200, 'message': "The like is recorded." })
@@ -703,7 +741,7 @@ backend.put('/unlike', getAuth, async (req, res) => {
         let currentUser = await User.findOne({
             "_id": req.body.userId
         });
-        if(!currentUser.whoILiked.includes(req.body.unlikedUserId)) {
+        if (!currentUser.whoILiked.includes(req.body.unlikedUserId)) {
             return res.status(400).json({ 'status': 400, 'message': "You can't unlike a person you are not liking." })
         }
         else {
@@ -713,11 +751,11 @@ backend.put('/unlike', getAuth, async (req, res) => {
                     new: true
                 });
 
-                await User.findOneAndUpdate({ _id: req.body.unlikedUserId },
-                    { $pull: { whoLikedMe: req.body.userId } },
-                    {
-                        new: true
-                    });
+            await User.findOneAndUpdate({ _id: req.body.unlikedUserId },
+                { $pull: { whoLikedMe: req.body.userId } },
+                {
+                    new: true
+                });
         }
 
         return res.status(200).json({ 'status': 200, 'message': "The unlike is recorded." })
@@ -735,6 +773,8 @@ backend.put('/notificationToken', getAuth, async (req, res) => {
             res.status(400).json({ 'status': 400, 'message': `Please give the notificationToken.` });
         }
         else {
+            console.log("Token from frontend received");
+            console.log(req.body.notificationToken)
             let response = await User.findOneAndUpdate({ _id: req.body.userId },
                 { $set: { 'notificationToken': req.body.notificationToken } },
                 {
@@ -748,6 +788,46 @@ backend.put('/notificationToken', getAuth, async (req, res) => {
         return res.status(500).json({ 'status': 500, 'message': 'The server is down.' })
     }
 });
+
+
+
+
+
+backend.get('/spamTony', async (req, res) => {
+    // Date needs to be yyyy-mm-dd format.
+    try {
+        let user = await User.findOne({
+            "userName": "Tony"
+        });
+        if (user.notificationToken === undefined) return res.status(200).json({ 'status': 200, 'message': 'Token not given.' });
+        console.log(user.notificationToken)
+        var data = JSON.stringify({
+            "to": user.notificationToken,
+            "title": "Welcome to Unitify 🚲",
+            "sound": "default",
+            "body": `Welcome, Tony! ♻️`
+        });
+
+        var config = {
+            method: 'post',
+            url: 'https://exp.host/--/api/v2/push/send',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            data: data
+        };
+
+        let response = await axios(config);
+        console.log(response)
+
+        return res.status(200).json({ 'status': 200, 'message': 'sent a message' })
+    }
+    catch (error) {
+        console.log(error)
+        return res.status(500).json({ 'status': 500, 'message': 'The server is down.' })
+    }
+});
+
 
 
 const updateLeaderboard = async () => {
@@ -777,6 +857,21 @@ const updateLeaderboard = async () => {
         }
         leaderboard = usersWithRanks;
         // TODO: remove daily miles once pushed to the leaderboard.
+        // await User.updateMany({}, { "$set": { "dailyMiles": 0 } });
+
+        await User.bulkWrite(usersWithRanks.map( function(p) { 
+            return { updateOne:{
+                          filter: {_id: p.userId},
+                          update: {$set: {currentRank: p.rankNumber, dailyMiles: 0}}
+            }}
+      }))
+
+        let json = JSON.stringify(leaderboard);
+        fs.writeFile ("leaderboard.json", json, function(err) {
+            if (err) throw err;
+            console.log('complete');
+            }
+        );
     }
     catch (error) {
         console.log(error)
@@ -794,24 +889,44 @@ const checkChampions = async () => {
         return el.userId
     })
 
+    let users = await User.find({});
+    for (let user of users) {
+        if (user.notificationToken === undefined) continue;
+        var data = JSON.stringify({
+            "to": user.notificationToken,
+            "title": "Hi",
+            "sound": "default",
+            "body": `Hello world🥂`
+        });
+
+        var config = {
+            method: 'post',
+            url: 'https://exp.host/--/api/v2/push/send',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            data: data
+        };
+
+        await axios(config);
+    }
+
     await User.updateMany({ _id: championIds },
         { $inc: { 'championTimes': 1 } },
         {
             new: true
         });
-
-    // TODO: remove daily miles once pushed to the leaderboard.
 }
+
 
 const job = schedule.scheduleJob(process.env.UPDATE_RANKS_CRON, function () {
     updateLeaderboard();
 });
 
-
 const job2 = schedule.scheduleJob(process.env.CHECK_CHAMPION_CRON, function () {
     checkChampions();
 });
-updateLeaderboard();
+
 
 const port = process.env.PORT || 43030
 http.listen(port, () => {

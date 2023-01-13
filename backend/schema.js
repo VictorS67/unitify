@@ -13,7 +13,8 @@ const userSchema = new mongoose.Schema(
     {
         userName: {
             type: String,
-            equired: true
+            required: true, 
+            unique: true
         },
         email: {
             type: String,
@@ -26,19 +27,54 @@ const userSchema = new mongoose.Schema(
         avatarImage: {
             // dont know
         },
-        // championSig:{
-        //     type:String,
-        //     required: true
-        // },
-        // backgroundImage:{
-        //     //type unknown
-        //     required:false
-        // },
-        // fontSize:{
-        //     type:Number,
-        //     required:false
-        // },
-        //Palette etcs unkown
+        dailyMiles: {
+            type: Number, 
+            default: 0
+        },
+        monthlyMiles: {
+            type: Number,
+            default: 0
+        },
+        totalMiles: {
+            type: Number,
+            default: 0
+        }, 
+        likeNumber: {
+            type: Number,
+            default: 0
+        }, 
+        currentRank: {
+            type: Number, 
+            default: 0
+        },
+        championSignature:{
+            type:String,
+            default: ""
+        }, 
+        championTimes: {
+            type: Number, 
+            default: 0
+        }, 
+        visitedTimes: {
+            type: Number, 
+            default: 0
+        }, 
+        whoLikedMe: {
+            type: [String], 
+            default: []
+        }, 
+        whoILiked: {
+            type: [String], 
+            default: []
+        }, 
+        notificationToken: {
+            type: String
+        }
+    }, 
+    {
+        timestamps: {
+            createdAt: 'created_at'
+        }
     }
 )
 
@@ -53,11 +89,7 @@ const rankSchema = new mongoose.Schema(
             type: Number,
             required: true
         },
-        likeNUmber: {
-            type: Number,
-            required: true
-        },
-        timeStamp: {
+        updatedAt: {
             type: Date,
             required: true
         }
@@ -74,10 +106,12 @@ const mileSchema = new mongoose.Schema(
         miles: {
             type: Number,
             required: true
-        },
-        timeStamp: {
-            type: Date,
-            required: true
+        }
+    },
+    {
+        timestamps: {
+            createdAt: 'created_at',
+            updatedAt: 'updatedAt'
         }
     }
 )
@@ -166,5 +200,9 @@ const locationSchema = new mongoose.Schema({
 
 module.exports = {
     userSchema: userSchema,
-    locationSchema: locationSchema
+    locationSchema: locationSchema,
+    rankSchema: rankSchema,
+    mileSchema: mileSchema,
+    transportationSchema: transportationSchema,
+    questionnaireSchema: questionnaireSchema
 }
