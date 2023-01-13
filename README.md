@@ -1,4 +1,3 @@
-
 <!-- Banner Image -->
 
 <p align="center">
@@ -32,9 +31,9 @@
 </p>
   
 ---
-- [Project Layout](#-project-layout)
-- [Software Builds](#-software-builds)
-- [The Team](#-the-team)
+- [Project Layout](#project-layout)
+- [Software Builds](#software-builds)
+- [The Team](#the-team)
 - [License](#license)
 
 In response to the pandemic, Covid-19 caused a huge spike in bicycle sales. Because of increased concern about public transit and a need for physical activity, an increasing number of people are opting for one of the most basic modes of transportation, resulting in a so-called "bike boom.” Along with the increase in cycling came a huge drop in greenhouse gas emissions, which plunged to 4.6 percent in 2020. However, when the Covid-19 limitations were lifted and people returned to in-person school and work, bike use has declined, leading in an increase in automobile usage. What was thought to be a permanent decrease in emissions was nothing a blip, with global greenhouse gas emissions rising above pre-pandemic levels in 2021 and onwards. Zero emission vehicles are expensive and not accessible for everyone. Thus, it is necessary to generate a solution to which everybody in the world could contribute.
@@ -100,6 +99,52 @@ Unitify is an App run on Android and IOS. We hope it could encourage people use 
 
 ### backend
 
+1. Set up environment.
+
+   - Ubuntu 20.04
+   - MongoDB 5.0.9
+   - Nginx 1.18.0
+   - Redis 5.0.7
+
+2. Installation instructions.
+
+   1. Clone the repo.
+      `git clone https://github.com/VictorS67/unitify.git`
+
+   2. Switch to the backend branch (for the latest version of backend, or you can get the stable version in the main branch).
+      `git checkout backend`
+
+   3. Install all the necsessary node libraries and dependencies.
+      `npm install`
+
+   4. Now, you need to set up the necessary environments: Run this code first to copy from the .env template:
+      `cp .env-sample .env`
+
+      ```
+      MONGODB_URI=YOUR_MONGODB_CONNECTION_STRING
+      SIGNATURE_CHAR_LIMIT=THE_CHAMPION_SIGNATURE_LENGTH_LIMIT
+      CHECK_CHAMPION_CRON=CRON_FREQUENCY_OF_CHECKING_CHAMPION
+      UPDATE_RANKS_CRON=CRON_FREQUENCY_OF_UPDATING_LEARERBOARDT
+      PORT=PORT_THE_BACKEND_IS_RUNNING
+      ```
+
+3. Run the backend server.
+
+   - Now, after the above steps, you can run the backend:
+     `node unitify-server.js`
+
+   - And you can verify by running:
+     `localhost:PORT/hello-world`
+
+   - You should be able to see the following output in your browser:
+     `Congratulations, the Unitify backend is now running.`
+
+4. Production Builds.
+
+   - If you want to run the app in the backend (production), you can run the following command, but make sure that you have PM2 installed in your ubuntu machine (you can use this tutorial: https://www.digitalocean.com/community/tutorials/how-to-use-pm2-to-setup-a-node-js-production-environment-on-an-ubuntu-vps):
+
+   - `pm2 start unitify-server.js`
+
 ## The Team
 
 Here are our team members!
@@ -113,4 +158,3 @@ Here are our team members!
 
 The Unitify source code is made available under the [MIT license](LICENSE). Some of the dependencies are licensed differently, please check them on [Expo](https://github.com/expo/expo), [react-native-maps](https://github.com/react-native-maps/react-native-maps), [
 react-native-google-places-autocomplete](https://github.com/FaridSafi/react-native-google-places-autocomplete), [react-native-paper](https://callstack.github.io/react-native-paper/), [react-navigation](https://reactnavigation.org/).
-
