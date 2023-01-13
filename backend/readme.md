@@ -11,7 +11,7 @@
 Clone the repo.
 `git clone https://github.com/VictorS67/unitify.git`
 
-Switch to the backend branch.
+Switch to the backend branch (for the latest version of backend, or you can get the stable version in the main branch).
 `git checkout backend`
 
 Install all the necsessary node libraries and dependencies.
