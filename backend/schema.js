@@ -70,6 +70,11 @@ const userSchema = new mongoose.Schema(
         notificationToken: {
             type: String
         }
+    }, 
+    {
+        timestamps: {
+            createdAt: 'created_at'
+        }
     }
 )
 
